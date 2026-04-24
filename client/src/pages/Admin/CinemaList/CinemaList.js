@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getCinemas } from '../../../store/actions';
 import { withStyles } from '@material-ui/core';
-import { CircularProgress, Grid } from '@material-ui/core';
+import { CircularProgress, Grid, Typography } from '@material-ui/core';
 import { AddCinema, CinemaToolbar } from './components';
 import { ResponsiveDialog } from '../../../components';
 import styles from './styles';
@@ -16,13 +16,15 @@ class CinemaList extends Component {
     this.state = {
       editCinema: null,
       openEditDialog: false,
-      search: ''
+      search: '',
+      loading: true
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { cinemas, getCinemas } = this.props;
-    if (!cinemas.length) getCinemas();
+    if (!cinemas.length) await getCinemas();
+    this.setState({ loading: false });
   }
 
   openEditDialog = cinema => {
@@ -39,7 +41,7 @@ class CinemaList extends Component {
 
   render() {
     const { classes, cinemas } = this.props;
-    const { editCinema, search } = this.state;
+    const { editCinema, search, loading } = this.state;
     const filteredCinemas = match(search, cinemas, 'name');
     return (
       <div className={classes.root}>
@@ -48,8 +50,12 @@ class CinemaList extends Component {
           onChangeSearch={e => this.setState({ search: e.target.value })}
         />
         <div className={classes.content}>
-          {filteredCinemas.length === 0 ? (
+          {loading ? (
             <CircularProgress />
+          ) : filteredCinemas.length === 0 ? (
+            <Typography variant="body1">
+              No cinemas found.
+            </Typography>
           ) : (
             <Grid container spacing={3}>
               {filteredCinemas.map(cinema => (

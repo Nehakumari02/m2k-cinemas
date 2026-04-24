@@ -14,7 +14,8 @@ export default theme => ({
     right: 0,
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
-    width: '100%'
+    width: '100%',
+    pointerEvents: 'none'
   },
   infoSection: {
     position: 'relative',
@@ -88,7 +89,7 @@ export default theme => ({
       transitionDelay: '0.15s'
     }
   },
-  movieActions: { position: 'absolute', bottom: 0, right: 0 },
+  movieActions: { position: 'absolute', bottom: 0, right: 0, zIndex: 3 },
   button: {
     width: 200,
     height: 70,

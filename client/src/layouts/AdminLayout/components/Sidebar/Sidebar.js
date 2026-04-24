@@ -129,7 +129,7 @@ class Sidebar extends Component {
           <ListItem
             className={classes.listItem}
             component="a"
-            href="http://georgesimos.com"
+            href=""
             target="_blank">
             <ListItemIcon className={classes.listItemIcon}>
               <InfoIcon />

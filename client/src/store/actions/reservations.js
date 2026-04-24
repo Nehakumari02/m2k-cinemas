@@ -4,6 +4,10 @@ import { setAlert } from './alert';
 export const getReservations = () => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      dispatch(setAlert('Please login again to view reservations', 'error', 5000));
+      return { status: 'error', data: [] };
+    }
     const url = '/reservations';
     const response = await fetch(url, {
       method: 'GET',
@@ -11,12 +15,24 @@ export const getReservations = () => async dispatch => {
         Authorization: `Bearer ${token}`
       }
     });
-    const reservations = await response.json();
-    if (response.ok) {
-      dispatch({ type: GET_RESERVATIONS, payload: reservations });
+    const responseText = await response.text();
+    let responseData = [];
+    try {
+      responseData = responseText ? JSON.parse(responseText) : [];
+    } catch (e) {
+      responseData = [];
     }
+    if (response.ok) {
+      dispatch({ type: GET_RESERVATIONS, payload: responseData });
+      return { status: 'success', data: responseData };
+    }
+    const message =
+      (responseData && responseData.error) || 'Unable to load reservations';
+    dispatch(setAlert(message, 'error', 5000));
+    return { status: 'error', data: [] };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+    return { status: 'error', data: [] };
   }
 };
 
@@ -54,8 +70,15 @@ export const addReservation = reservation => async dispatch => {
       },
       body: JSON.stringify(reservation)
     });
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      responseData = {};
+    }
     if (response.ok) {
-      const { reservation, QRCode } = await response.json();
+      const { reservation, QRCode } = responseData;
       dispatch(setAlert('Reservation Created', 'success', 5000));
       return {
         status: 'success',
@@ -63,6 +86,17 @@ export const addReservation = reservation => async dispatch => {
         data: { reservation, QRCode }
       };
     }
+    dispatch(
+      setAlert(
+        responseData.error || 'Reservation could not be created, please try again.',
+        'error',
+        5000
+      )
+    );
+    return {
+      status: 'error',
+      message: responseData.error || 'Reservation could not be created'
+    };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return {

@@ -13,6 +13,38 @@ router.post('/reservations', auth.simple, async (req, res) => {
   const QRCode = await generateQR(`https://elcinema.herokuapp.com/#/checkin/${reservation._id}`);
 
   try {
+    const reservationDate = new Date(reservation.date);
+    const startOfDay = new Date(reservationDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(reservationDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existingReservations = await Reservation.find({
+      cinemaId: reservation.cinemaId,
+      startAt: reservation.startAt,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    const existingSeats = new Set(
+      existingReservations
+        .map((item) => item.seats || [])
+        .reduce((acc, seats) => acc.concat(seats), [])
+        .map(([row, seat]) => `${row}-${seat}`)
+    );
+
+    const requestedSeats = (reservation.seats || []).map(
+      ([row, seat]) => `${row}-${seat}`
+    );
+    const conflictedSeats = requestedSeats.filter((seatKey) =>
+      existingSeats.has(seatKey)
+    );
+
+    if (conflictedSeats.length) {
+      return res.status(409).send({
+        error: 'One or more selected seats are already booked. Please refresh and choose different seats.',
+      });
+    }
+
     await reservation.save();
     res.status(201).send({ reservation, QRCode });
   } catch (e) {

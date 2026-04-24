@@ -29,6 +29,14 @@ function MovieBanner(props) {
   const { movie, fullDescription } = props;
   const classes = useStyles(props);
   if (!movie) return null;
+  const imageUrl = (() => {
+    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
+    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
+      return movie.image;
+    }
+    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
+  })();
+  const encodedImageUrl = encodeURI(imageUrl);
 
   return (
     <div className={classes.movieHero}>
@@ -83,19 +91,19 @@ function MovieBanner(props) {
       <div
         className={classes.blurBackground}
         style={{
-          backgroundImage: `url(${movie.image})`
+          backgroundImage: `url("${encodedImageUrl}")`
         }}
       />
       <div className={classes.movieActions}>
         {fullDescription ? (
-          <Link to={`booking/${movie._id}`} style={{ textDecoration: 'none' }}>
+          <Link to={`/movie/booking/${movie._id}`} style={{ textDecoration: 'none' }}>
             <Button variant="contained" className={classes.button}>
               Buy Tickets
               <ArrowRightAlt className={classes.buttonIcon} />
             </Button>
           </Link>
         ) : (
-          <Link to={`movie/${movie._id}`} style={{ textDecoration: 'none' }}>
+          <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
             <Button className={classnames(classes.button, classes.learnMore)}>
               Learn More
               <ArrowRightAlt className={classes.buttonIcon} />

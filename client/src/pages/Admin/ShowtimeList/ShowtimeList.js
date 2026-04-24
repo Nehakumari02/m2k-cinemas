@@ -6,6 +6,8 @@ import styles from './styles';
 import { AddShowtime, ShowtimesToolbar, ShowtimesTable } from './components';
 import {
   getShowtimes,
+  getMovies,
+  getCinemas,
   toggleDialog,
   selectShowtime,
   selectAllShowtimes,
@@ -20,8 +22,17 @@ class ShowtimeList extends Component {
   };
 
   componentDidMount() {
-    const { showtimes, getShowtimes } = this.props;
+    const {
+      showtimes,
+      movies,
+      cinemas,
+      getShowtimes,
+      getMovies,
+      getCinemas
+    } = this.props;
     if (!showtimes.length) getShowtimes();
+    if (!movies.length) getMovies();
+    if (!cinemas.length) getCinemas();
   }
 
   handleDeleteShowtime = () => {
@@ -75,14 +86,18 @@ class ShowtimeList extends Component {
   }
 }
 
-const mapStateToProps = ({ showtimeState }) => ({
+const mapStateToProps = ({ showtimeState, movieState, cinemaState }) => ({
   openDialog: showtimeState.openDialog,
   showtimes: showtimeState.showtimes,
-  selectedShowtimes: showtimeState.selectedShowtimes
+  selectedShowtimes: showtimeState.selectedShowtimes,
+  movies: movieState.movies,
+  cinemas: cinemaState.cinemas
 });
 
 const mapDispatchToProps = {
   getShowtimes,
+  getMovies,
+  getCinemas,
   toggleDialog,
   selectShowtime,
   selectAllShowtimes,

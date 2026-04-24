@@ -97,11 +97,29 @@ userSchema.methods.generateAuthToken = async function() {
   return token;
 };
 
-userSchema.statics.findByCredentials = async (username, password) => {
-  const user = await User.findOne({ username });
+userSchema.statics.findByCredentials = async (identifier, password) => {
+  const normalizedIdentifier = String(identifier || '')
+    .trim()
+    .toLowerCase();
+  const user = await User.findOne({
+    $or: [{ username: normalizedIdentifier }, { email: normalizedIdentifier }],
+  });
   if (!user) throw new Error('Unable to login');
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  let isMatch = false;
+  const providedPassword = String(password || '');
+
+  // Support legacy users whose password might be stored as plain text.
+  // On successful login, migrate immediately to a secure hash.
+  if (typeof user.password === 'string' && user.password.startsWith('$2')) {
+    isMatch = await bcrypt.compare(providedPassword, user.password);
+  } else {
+    isMatch = providedPassword === String(user.password || '');
+    if (isMatch) {
+      user.password = await bcrypt.hash(providedPassword, 8);
+      await user.save();
+    }
+  }
   if (!isMatch) throw new Error('Unable to login');
 
   return user;

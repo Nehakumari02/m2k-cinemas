@@ -94,8 +94,9 @@ class AddShowtime extends Component {
   };
 
   render() {
-    const { nowShowing, cinemas, classes, className } = this.props;
+    const { nowShowing, movies, cinemas, classes, className } = this.props;
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
+    const movieOptions = nowShowing.length ? nowShowing : movies;
 
     const rootClassName = classNames(classes.root, className);
     const title = this.props.selectedShowtime
@@ -150,7 +151,7 @@ class AddShowtime extends Component {
               onChange={event =>
                 this.handleFieldChange('movieId', event.target.value)
               }>
-              {nowShowing.map(movie => (
+              {movieOptions.map(movie => (
                 <MenuItem key={movie._id} value={movie._id}>
                   {movie.title}
                 </MenuItem>

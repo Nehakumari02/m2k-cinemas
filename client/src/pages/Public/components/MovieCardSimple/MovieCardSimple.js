@@ -27,14 +27,22 @@ const useStyles = makeStyles(theme => ({
 const MovieCardSimple = props => {
   const classes = useStyles();
   const { movie } = props;
+  const imageUrl = (() => {
+    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
+    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
+      return movie.image;
+    }
+    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
+  })();
+  const encodedImageUrl = encodeURI(imageUrl);
 
   return (
-    <Link to={`movie/${movie._id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
       <Card className={classes.card}>
         <CardActionArea>
           <CardMedia
             className={classes.media}
-            image={movie.image}
+            image={encodedImageUrl}
             title={movie.title}
           />
           <CardContent>

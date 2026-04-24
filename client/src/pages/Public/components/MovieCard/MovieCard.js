@@ -7,14 +7,22 @@ import { Link } from 'react-router-dom';
 
 const MovieCard = props => {
   const { classes, movie } = props;
+  const imageUrl = (() => {
+    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
+    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
+      return movie.image;
+    }
+    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
+  })();
+  const encodedImageUrl = encodeURI(imageUrl);
 
   return (
-    <Link to={`movie/${movie._id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
       <div className={classes.card}>
         <header
           className={classes.header}
           style={{
-            backgroundImage: `url(${movie.image})`
+            backgroundImage: `url("${encodedImageUrl}")`
           }}>
           <Typography className={classes.h4} variant="h4" color="inherit">
             {movie.genre}

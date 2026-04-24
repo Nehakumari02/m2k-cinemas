@@ -9,14 +9,14 @@ import ReservationsCalendar from './components/ReservationsCalendar/Reservations
 import { match } from '../../../utils';
 
 class ReservationList extends Component {
-  state = { mode: 'list', search: '' };
+  state = { mode: 'list', search: '', loading: true };
 
   static propTypes = {
     className: PropTypes.string,
     classes: PropTypes.object.isRequired
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const {
       reservations,
       movies,
@@ -26,9 +26,10 @@ class ReservationList extends Component {
       getCinemas
     } = this.props;
 
-    if (!reservations.length) getReservations();
-    if (!movies.length) getMovies();
-    if (!cinemas.length) getCinemas();
+    if (!reservations.length) await getReservations();
+    if (!movies.length) await getMovies();
+    if (!cinemas.length) await getCinemas();
+    this.setState({ loading: false });
   }
 
   onChangeMode = () =>
@@ -37,7 +38,7 @@ class ReservationList extends Component {
   onChangeSearch = e => this.setState({ search: e.target.value });
 
   render() {
-    const { mode, search } = this.state;
+    const { mode, search, loading } = this.state;
     const { classes, reservations, movies, cinemas } = this.props;
 
     const filteredReservations = match(search, reservations, 'phone');
@@ -52,10 +53,12 @@ class ReservationList extends Component {
           onChangeMode={this.onChangeMode}
         />
         <div className={classes.content}>
-          {!filteredReservations.length ? (
+          {loading ? (
             <div className={classes.progressWrapper}>
               <CircularProgress />
             </div>
+          ) : !filteredReservations.length ? (
+            <div>No reservations found.</div>
           ) : mode === 'list' ? (
             <ReservationsTable
               reservations={filteredReservations}

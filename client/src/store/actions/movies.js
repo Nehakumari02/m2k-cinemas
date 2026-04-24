@@ -3,14 +3,24 @@ import { setAlert } from './alert';
 
 export const uploadMovieImage = (id, image) => async dispatch => {
   try {
+    const token = localStorage.getItem('jwtToken');
     const data = new FormData();
     data.append('file', image);
     const url = '/movies/photo/' + id;
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: data
     });
-    const responseData = await response.json();
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      responseData = {};
+    }
     if (response.ok) {
       dispatch(setAlert('Image Uploaded', 'success', 5000));
     }

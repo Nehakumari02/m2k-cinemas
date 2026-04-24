@@ -29,12 +29,22 @@ export const getCinemas = () => async dispatch => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
-    const cinemas = await response.json();
+    const responseText = await response.text();
+    let cinemas = [];
+    try {
+      cinemas = responseText ? JSON.parse(responseText) : [];
+    } catch (e) {
+      cinemas = [];
+    }
     if (response.ok) {
       dispatch({ type: GET_CINEMAS, payload: cinemas });
+      return { status: 'success', data: cinemas };
     }
+    dispatch(setAlert('Unable to load cinemas', 'error', 5000));
+    return { status: 'error', data: [] };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+    return { status: 'error', data: [] };
   }
 };
 

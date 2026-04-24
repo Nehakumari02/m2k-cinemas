@@ -130,7 +130,7 @@ function LoginForm(props) {
       <div className={classes.fields}>
         <TextField
           className={classes.textField}
-          label="username"
+          label="Username or Email"
           name="username"
           onChange={event => handleFieldChange(event)}
           type="text"

@@ -54,6 +54,14 @@ export default function MovieInfo(props) {
   const { movie } = props;
 
   if (!movie) return <h1>Movie Loading...</h1>;
+  const imageUrl = (() => {
+    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
+    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
+      return movie.image;
+    }
+    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
+  })();
+  const encodedImageUrl = encodeURI(imageUrl);
 
   return (
     <Grid item xs={12} md={12} lg={3}>
@@ -61,7 +69,7 @@ export default function MovieInfo(props) {
         <div
           className={classes.background}
           style={{
-            backgroundImage: `url(${movie.image})`
+            backgroundImage: `url("${encodedImageUrl}")`
           }}
         />
         <Typography className={classes.title}>{movie.title}</Typography>

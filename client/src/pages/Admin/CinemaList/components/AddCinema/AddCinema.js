@@ -22,8 +22,24 @@ class AddCinema extends Component {
     ticketPrice: '',
     city: '',
     seatsAvailable: '',
+    seatsPerRow: 10,
     seats: [],
     notification: {}
+  };
+
+  buildSeatLayout = (totalSeats, seatsPerRow) => {
+    const total = Number(totalSeats) || 0;
+    const perRow = Number(seatsPerRow) || 10;
+    if (!total || !perRow) return [];
+
+    const rows = [];
+    let remaining = total;
+    while (remaining > 0) {
+      const currentRowSeats = Math.min(perRow, remaining);
+      rows.push(Array.from({ length: currentRowSeats }, () => 0));
+      remaining -= currentRowSeats;
+    }
+    return rows;
   };
 
   componentDidMount() {
@@ -53,8 +69,9 @@ class AddCinema extends Component {
       ticketPrice,
       city,
       seatsAvailable,
-      seats
+      seatsPerRow
     } = this.state;
+    const seats = this.buildSeatLayout(seatsAvailable, seatsPerRow);
     const cinema = { name, ticketPrice, city, seatsAvailable, seats };
     let notification = {};
     type === 'create'
@@ -127,6 +144,7 @@ class AddCinema extends Component {
       image,
       ticketPrice,
       city,
+      seatsPerRow,
       seatsAvailable,
       notification
     } = this.state;
@@ -207,8 +225,22 @@ class AddCinema extends Component {
                 this.handleFieldChange('seatsAvailable', event.target.value)
               }
             />
+            <TextField
+              className={classes.textField}
+              label="Seats Per Row"
+              margin="dense"
+              type="number"
+              value={seatsPerRow}
+              variant="outlined"
+              inputProps={{
+                min: 1,
+                max: 20
+              }}
+              onChange={event =>
+                this.handleFieldChange('seatsPerRow', event.target.value)
+              }
+            />
           </div>
-          {this.renderSeatFields()}
         </form>
 
         <Button

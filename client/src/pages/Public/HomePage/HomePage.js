@@ -39,6 +39,7 @@ class HomePage extends Component {
   render() {
     const {
       classes,
+      movies,
       randomMovie,
       comingSoon,
       nowShowing,
@@ -48,6 +49,11 @@ class HomePage extends Component {
       <Fragment>
         <MovieBanner movie={randomMovie} height="85vh" />
         <Box height={60} />
+        <MovieCarousel
+          carouselClass={classes.carousel}
+          title="All Movies"
+          movies={movies}
+        />
         <MovieCarousel
           carouselClass={classes.carousel}
           title="Suggested for you"

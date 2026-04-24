@@ -43,7 +43,9 @@ router.post('/users/photo/:id', upload('users').single('file'), async (req, res,
 // Login User
 router.post('/users/login', async (req, res) => {
   try {
-    const user = await User.findByCredentials(req.body.username, req.body.password);
+    const { username, email, id, identifier, password } = req.body;
+    const loginIdentifier = identifier || id || username || email;
+    const user = await User.findByCredentials(loginIdentifier, password);
     const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (e) {
