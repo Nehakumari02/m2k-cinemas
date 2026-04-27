@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 import { Paper } from '../../../../components';
 import { EventSeat, AttachMoney } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,14 +59,14 @@ const useStyles = makeStyles(theme => ({
 
 function CinemaCard(props) {
   const classes = useStyles(props);
-  const { className, cinema } = props;
+  const { className, cinema, linkToDetails = false } = props;
   const cinemaImage =
     cinema && cinema.image
       ? cinema.image
       : 'https://source.unsplash.com/featured/?cinema';
 
   const rootClassName = classNames(classes.root, className);
-  return (
+  const content = (
     <Paper className={rootClassName}>
       <div className={classes.imageWrapper}>
         <img alt="cinema" className={classes.image} src={cinemaImage} />
@@ -92,6 +93,16 @@ function CinemaCard(props) {
       </div>
     </Paper>
   );
+
+  if (linkToDetails) {
+    return (
+      <Link to={`/cinemas/${cinema._id}`} style={{ textDecoration: 'none' }}>
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }
 
 export default CinemaCard;

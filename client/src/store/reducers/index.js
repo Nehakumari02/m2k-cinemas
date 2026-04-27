@@ -7,6 +7,8 @@ import cinemas from './cinemas';
 import reservations from './reservations';
 import showtimes from './showtimes';
 import checkout from './checkout';
+import offers from './offers';
+import experiences from './experiences';
 
 export default combineReducers({
   alertState: alert,
@@ -16,5 +18,7 @@ export default combineReducers({
   cinemaState: cinemas,
   reservationState: reservations,
   showtimeState: showtimes,
-  checkoutState: checkout
+  checkoutState: checkout,
+  offerState: offers,
+  experienceState: experiences
 });

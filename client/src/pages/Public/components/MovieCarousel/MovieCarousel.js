@@ -34,10 +34,10 @@ function PrevArrow(props) {
 function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
   const classes = useStyles();
   const settings = {
-    centerMode: true,
-    infinite: true,
+    centerMode: false,
+    infinite: movies.length > 5,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: Math.min(5, movies.length),
     swipeToSlide: true,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -45,19 +45,22 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
       {
         breakpoint: 1600,
         settings: {
-          slidesToShow: 3
+          slidesToShow: Math.min(5, movies.length),
+          infinite: movies.length > 5
         }
       },
       {
         breakpoint: 1250,
         settings: {
-          slidesToShow: 2
+          slidesToShow: Math.min(3, movies.length),
+          infinite: movies.length > 3
         }
       },
       {
         breakpoint: 750,
         settings: {
-          slidesToShow: 1
+          slidesToShow: 1,
+          infinite: movies.length > 1
         }
       }
     ]
@@ -66,17 +69,19 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
   return (
     <div className={carouselClass}>
       <div className={classes.container}>
-        <Typography className={classes.h2} variant="h2" color="inherit">
-          {title}
-        </Typography>
-        {to==null? null
-           :
+        <div className={classes.titleBlock}>
+          <Typography className={classes.h2} variant="h2" color="inherit">
+            {title}
+          </Typography>
+          <div className={classes.titleAccent} />
+        </div>
+        {to == null ? null : (
           <Link to={to} style={{ textDecoration: 'none' }}>
-          <Button className={classes.button} color="primary">
-            Explore All
-          </Button>
-        </Link>
-      }
+            <Button className={classes.button} variant="outlined">
+              Explore All
+            </Button>
+          </Link>
+        )}
       </div>
       <Slider {...settings} className={classes.slider}>
         {movies.map(movie => (
@@ -87,3 +92,4 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
   );
 }
 export default MovieCarousel;
+

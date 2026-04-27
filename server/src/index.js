@@ -14,6 +14,9 @@ const cinemaRouter = require('./routes/cinema');
 const showtimeRouter = require('./routes/showtime');
 const reservationRouter = require('./routes/reservation');
 const invitationsRouter = require('./routes/invitations');
+const paymentsRouter = require('./routes/payments');
+const offersRouter = require('./routes/offers');
+const experiencesRouter = require('./routes/experiences');
 
 const app = express();
 app.disable('x-powered-by');
@@ -48,12 +51,15 @@ app.use(cinemaRouter);
 app.use(showtimeRouter);
 app.use(reservationRouter);
 app.use(invitationsRouter);
+app.use(paymentsRouter);
+app.use(offersRouter);
+app.use(experiencesRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/build/index.html'));
+  res.sendFile(path.join(__dirname, '../../client/build/index.html'));
 });
 app.listen(port, () => console.log(`app is running in PORT: ${port}`));

@@ -1,8 +1,9 @@
 export default theme => ({
   movieCard: {
     position: 'relative',
-    height: 350,
-    width: 800,
+    minHeight: 340,
+    width: '100%',
+    maxWidth: 920,
     color: theme.palette.common.white,
     backgroundColor: theme.palette.background.dark,
     borderRadius: 10,
@@ -51,8 +52,7 @@ export default theme => ({
   },
   description: {
     padding: theme.spacing(3),
-    height: '50%',
-    width: '50%'
+    width: '55%'
   },
   descriptionText: {
     color: '#cfd6e1'
@@ -88,9 +88,8 @@ export default theme => ({
   },
 
   [theme.breakpoints.down('sm')]: {
-    fullWidth: { width: '100%' },
     movieCard: {
-      width: '90%',
+      width: '100%',
       margin: '0 auto',
       height: 'auto'
     },
@@ -103,7 +102,8 @@ export default theme => ({
       marginTop: theme.spacing(3)
     },
     description: {
-      width: '100%'
+      width: '100%',
+      paddingTop: theme.spacing(1)
     },
     infoSection: {
       background:

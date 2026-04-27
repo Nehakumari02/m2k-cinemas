@@ -36,6 +36,18 @@ import jsPDF from 'jspdf';
 
 class BookingPage extends Component {
   didSetSuggestion = false;
+  state = {
+    paymentMethod: '',
+    paymentDetails: {
+      cardNumber: '',
+      nameOnCard: '',
+      expiry: '',
+      cvv: '',
+      upiId: '',
+      bankName: '',
+      accountHolder: ''
+    }
+  };
 
   componentDidMount() {
     const {
@@ -64,6 +76,109 @@ class BookingPage extends Component {
       getCinema(selectedCinema);
     }
   }
+
+  loadRazorpayScript = () =>
+    new Promise(resolve => {
+      if (window.Razorpay) return resolve(true);
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  launchPayment = async amount => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      this.props.setAlert('Please login again to continue payment', 'error', 5000);
+      return false;
+    }
+
+    const sdkLoaded = await this.loadRazorpayScript();
+    if (!sdkLoaded) {
+      this.props.setAlert('Unable to load payment SDK', 'error', 5000);
+      return false;
+    }
+
+    const configResponse = await fetch('/payments/config', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const configData = await configResponse.json();
+    if (!configResponse.ok || !configData.keyId) {
+      this.props.setAlert(
+        configData.error || 'Payment gateway is not configured',
+        'error',
+        5000
+      );
+      return false;
+    }
+
+    const orderResponse = await fetch('/payments/create-order', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount })
+    });
+    const orderData = await orderResponse.json();
+    if (!orderResponse.ok || !orderData.order) {
+      this.props.setAlert(
+        orderData.error || 'Unable to create payment order',
+        'error',
+        5000
+      );
+      return false;
+    }
+
+    return new Promise(resolve => {
+      const options = {
+        key: configData.keyId,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'Cinema Plus',
+        description: 'Movie ticket payment',
+        order_id: orderData.order.id,
+        handler: async response => {
+          const verifyResponse = await fetch('/payments/verify', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(response)
+          });
+          const verifyData = await verifyResponse.json();
+          if (!verifyResponse.ok || !verifyData.verified) {
+            this.props.setAlert(
+              verifyData.error || 'Payment verification failed',
+              'error',
+              5000
+            );
+            return resolve(false);
+          }
+          this.props.setAlert('Payment successful', 'success', 3000);
+          return resolve(true);
+        },
+        prefill: {
+          name: this.props.user && this.props.user.name ? this.props.user.name : '',
+          contact: this.props.user && this.props.user.phone ? this.props.user.phone : ''
+        },
+        theme: {
+          color: '#3f51b5'
+        },
+        modal: {
+          ondismiss: () => resolve(false)
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    });
+  };
 
   // JSpdf Generator For generating the PDF
   jsPdfGenerator = () => {
@@ -117,9 +232,57 @@ class BookingPage extends Component {
       showInvitationForm,
       setQRCode
     } = this.props;
+    const { paymentMethod, paymentDetails } = this.state;
 
     if (selectedSeats.length === 0) return;
     if (!isAuth) return toggleLoginPopup();
+    if (!paymentMethod)
+      return this.props.setAlert('Please select a payment method', 'error', 5000);
+
+    if (paymentMethod === 'card') {
+      const cleanCardNumber = paymentDetails.cardNumber.replace(/\s+/g, '');
+      const isValidCardNumber = /^\d{16}$/.test(cleanCardNumber);
+      const isValidName = paymentDetails.nameOnCard.trim().length >= 3;
+      const isValidExpiry = /^(0[1-9]|1[0-2])\/\d{2}$/.test(
+        paymentDetails.expiry.trim()
+      );
+      const isValidCvv = /^\d{3,4}$/.test(paymentDetails.cvv.trim());
+      if (
+        !isValidCardNumber ||
+        !isValidName ||
+        !isValidExpiry ||
+        !isValidCvv
+      ) {
+        return this.props.setAlert(
+          'Invalid card details. Enter valid card number, name, expiry (MM/YY), and CVV.',
+          'error',
+          5000
+        );
+      }
+    }
+    if (paymentMethod === 'upi') {
+      const isValidUpi = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/.test(
+        paymentDetails.upiId.trim()
+      );
+      if (!isValidUpi) {
+        return this.props.setAlert('Invalid UPI ID format', 'error', 5000);
+      }
+    }
+    if (paymentMethod === 'netbanking') {
+      const isValidBankName = paymentDetails.bankName.trim().length >= 2;
+      const isValidAccountHolder = paymentDetails.accountHolder.trim().length >= 3;
+      if (!isValidBankName || !isValidAccountHolder) {
+        return this.props.setAlert(
+          'Invalid net banking details. Check bank and account holder name.',
+          'error',
+          5000
+        );
+      }
+    }
+
+    const totalAmount = selectedSeats.length * cinema.ticketPrice;
+    const paymentSuccess = await this.launchPayment(totalAmount);
+    if (!paymentSuccess) return;
 
     const response = await addReservation({
       date: selectedDate,
@@ -139,6 +302,19 @@ class BookingPage extends Component {
       showInvitationForm();
     }
   }
+
+  onChangePaymentMethod = event =>
+    this.setState({ paymentMethod: event.target.value });
+
+  onPaymentFieldChange = event => {
+    const { name, value } = event.target;
+    this.setState(prevState => ({
+      paymentDetails: {
+        ...prevState.paymentDetails,
+        [name]: value
+      }
+    }));
+  };
 
   bookSeats() {
     const { cinema, selectedSeats } = this.props;
@@ -363,6 +539,7 @@ class BookingPage extends Component {
       suggestedSeats,
       suggestedSeat
     } = this.props;
+    const { paymentMethod, paymentDetails } = this.state;
     const { uniqueCinemas, uniqueTimes } = this.onFilterCinema();
     let seats = this.onGetReservedSeats();
     if (suggestedSeats && selectedTime && !suggestedSeat.length) {
@@ -413,6 +590,10 @@ class BookingPage extends Component {
                   ticketPrice={cinema.ticketPrice}
                   seatsAvailable={cinema.seatsAvailable}
                   selectedSeats={selectedSeats.length}
+                  paymentMethod={paymentMethod}
+                  paymentDetails={paymentDetails}
+                  onChangePaymentMethod={this.onChangePaymentMethod}
+                  onPaymentFieldChange={this.onPaymentFieldChange}
                   onBookSeats={() => this.checkout()}
                 />
               </>

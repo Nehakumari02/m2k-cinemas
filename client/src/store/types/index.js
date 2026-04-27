@@ -6,3 +6,5 @@ export * from './cinemas';
 export * from './reservations';
 export * from './showtimes';
 export * from './checkout';
+export * from './offers';
+export * from './experiences';

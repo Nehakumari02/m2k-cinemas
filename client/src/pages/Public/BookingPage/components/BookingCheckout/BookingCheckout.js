@@ -1,23 +1,102 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Box, Grid, Typography, Button } from '@material-ui/core';
+import { Box, Grid, Typography, Button, TextField, MenuItem } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
+  checkoutBar: {
+    marginTop: theme.spacing(3),
+    background: 'linear-gradient(135deg, rgb(18,18,26) 0%, rgb(28,28,38) 100%)',
+    borderRadius: '14px',
+    border: '1px solid rgba(183,36,41,0.12)',
+    overflow: 'hidden',
+  },
+  infoRow: {
+    padding: '20px 24px',
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '24px',
+  },
+  infoBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
   bannerTitle: {
-    fontSize: theme.spacing(1.4),
+    fontSize: '0.65rem',
     textTransform: 'uppercase',
-    color: 'rgb(93, 93, 97)',
-    marginBottom: theme.spacing(1)
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: '0.1em',
+    fontWeight: 700,
   },
   bannerContent: {
-    fontSize: theme.spacing(2),
+    fontSize: '1rem',
+    fontWeight: 700,
+    color: '#fff',
     textTransform: 'capitalize',
-    color: theme.palette.common.white
+  },
+  priceHighlight: {
+    color: '#b72429',
+    fontWeight: 800,
+    fontSize: '1.1rem',
+  },
+  paymentSection: {
+    padding: '16px 24px',
+    borderTop: '1px solid rgba(255,255,255,0.06)',
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '12px',
+  },
+  selectField: {
+    minWidth: 170,
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      color: '#fff',
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
+      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+    },
+    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
+    '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.5)' },
+  },
+  textField: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      color: '#fff',
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
+      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+    },
+    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
+  },
+  bookButton: {
+    marginLeft: 'auto',
+    background: 'linear-gradient(90deg, #b72429, #8b1c20)',
+    color: '#14141c',
+    fontWeight: 800,
+    fontSize: '0.9rem',
+    letterSpacing: '0.06em',
+    padding: '12px 36px',
+    borderRadius: '8px',
+    textTransform: 'uppercase',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      background: 'linear-gradient(90deg, #8b1c20, #6d1518)',
+      boxShadow: '0 6px 24px rgba(183,36,41,0.35)',
+      transform: 'translateY(-1px)',
+    },
+    '&:disabled': {
+      background: 'rgba(255,255,255,0.08)',
+      color: 'rgba(255,255,255,0.25)',
+    }
   },
   [theme.breakpoints.down('sm')]: {
-    hideOnSmall: {
-      display: 'none'
-    }
+    infoRow: { gap: '12px', padding: '14px 16px' },
+    paymentSection: { padding: '12px 16px' },
+    bookButton: { width: '100%', marginLeft: 0, marginTop: theme.spacing(1) },
   }
 }));
 
@@ -28,58 +107,145 @@ export default function BookingCheckout(props) {
     ticketPrice,
     selectedSeats,
     seatsAvailable,
+    paymentMethod,
+    paymentDetails,
+    onChangePaymentMethod,
+    onPaymentFieldChange,
     onBookSeats
   } = props;
 
+  const totalPrice = ticketPrice * selectedSeats;
+
   return (
-    <Box marginTop={2} bgcolor="rgb(18, 20, 24)">
-      <Grid container>
-        <Grid item xs={8} md={10}>
-          <Grid container spacing={3} style={{ padding: 20 }}>
-            {user && user.name && (
-              <Grid item className={classes.hideOnSmall}>
-                <Typography className={classes.bannerTitle}>Name</Typography>
-                <Typography className={classes.bannerContent}>
-                  {user.name}
-                </Typography>
-              </Grid>
-            )}
-            <Grid item>
-              <Typography className={classes.bannerTitle}>Tickets</Typography>
-              {selectedSeats > 0 ? (
-                <Typography className={classes.bannerContent}>
-                  {selectedSeats} tickets
-                </Typography>
-              ) : (
-                <Typography className={classes.bannerContent}>0</Typography>
-              )}
-            </Grid>
-            <Grid item>
-              <Typography className={classes.bannerTitle}>Price</Typography>
-              <Typography className={classes.bannerContent}>
-                {ticketPrice * selectedSeats} &euro;
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid
-          item
-          xs={4}
-          md={2}
-          style={{
-            color: 'rgb(120, 205, 4)',
-            background: 'black',
-            display: 'flex'
-          }}>
-          <Button
-            color="inherit"
-            fullWidth
-            disabled={seatsAvailable <= 0}
-            onClick={() => onBookSeats()}>
-            Checkout
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
+    <div className={classes.checkoutBar}>
+      {/* ── Info Row ── */}
+      <div className={classes.infoRow}>
+        {user && user.name && (
+          <div className={classes.infoBlock}>
+            <Typography className={classes.bannerTitle}>Name</Typography>
+            <Typography className={classes.bannerContent}>{user.name}</Typography>
+          </div>
+        )}
+        <div className={classes.infoBlock}>
+          <Typography className={classes.bannerTitle}>Tickets</Typography>
+          <Typography className={classes.bannerContent}>
+            {selectedSeats > 0 ? `${selectedSeats} ticket${selectedSeats > 1 ? 's' : ''}` : '0'}
+          </Typography>
+        </div>
+        <div className={classes.infoBlock}>
+          <Typography className={classes.bannerTitle}>Total</Typography>
+          <Typography className={classes.priceHighlight}>
+            ₹{totalPrice}
+          </Typography>
+        </div>
+      </div>
+
+      {/* ── Payment Fields ── */}
+      <div className={classes.paymentSection}>
+        <TextField
+          select
+          value={paymentMethod}
+          label="Payment Method"
+          variant="outlined"
+          size="small"
+          onChange={onChangePaymentMethod}
+          className={classes.selectField}
+          style={{ minWidth: 180 }}
+        >
+          <MenuItem value="card">Card</MenuItem>
+          <MenuItem value="upi">UPI</MenuItem>
+          <MenuItem value="netbanking">Net Banking</MenuItem>
+        </TextField>
+
+        {paymentMethod === 'card' && (
+          <>
+            <TextField
+              label="Card Number"
+              name="cardNumber"
+              value={paymentDetails.cardNumber}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 200 }}
+            />
+            <TextField
+              label="Name on Card"
+              name="nameOnCard"
+              value={paymentDetails.nameOnCard}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 180 }}
+            />
+            <TextField
+              label="Expiry (MM/YY)"
+              name="expiry"
+              value={paymentDetails.expiry}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 130 }}
+            />
+            <TextField
+              label="CVV"
+              name="cvv"
+              value={paymentDetails.cvv}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 90 }}
+            />
+          </>
+        )}
+        {paymentMethod === 'upi' && (
+          <TextField
+            label="UPI ID"
+            name="upiId"
+            value={paymentDetails.upiId}
+            variant="outlined"
+            size="small"
+            onChange={onPaymentFieldChange}
+            className={classes.textField}
+            style={{ minWidth: 240 }}
+          />
+        )}
+        {paymentMethod === 'netbanking' && (
+          <>
+            <TextField
+              label="Bank Name"
+              name="bankName"
+              value={paymentDetails.bankName}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 200 }}
+            />
+            <TextField
+              label="Account Holder"
+              name="accountHolder"
+              value={paymentDetails.accountHolder}
+              variant="outlined"
+              size="small"
+              onChange={onPaymentFieldChange}
+              className={classes.textField}
+              style={{ minWidth: 200 }}
+            />
+          </>
+        )}
+
+        <Button
+          className={classes.bookButton}
+          disabled={seatsAvailable <= 0}
+          onClick={() => onBookSeats()}
+        >
+          Pay & Book
+        </Button>
+      </div>
+    </div>
   );
 }

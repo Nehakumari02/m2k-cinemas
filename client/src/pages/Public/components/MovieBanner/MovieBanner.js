@@ -18,10 +18,10 @@ const useStyles = makeStyles(styles);
 
 const StyledRating = withStyles({
   iconFilled: {
-    color: '#fff'
+    color: '#b72429'
   },
   iconEmpty: {
-    color: '#fff'
+    color: 'rgba(255,255,255,0.2)'
   }
 })(Rating);
 
@@ -40,20 +40,40 @@ function MovieBanner(props) {
 
   return (
     <div className={classes.movieHero}>
+      <div
+        className={classes.heroBackdrop}
+        style={{
+          backgroundImage: `url("${encodedImageUrl}")`
+        }}
+      />
       <div className={classes.infoSection}>
         <header className={classes.movieHeader}>
-          {fullDescription && (
-            <Box mb={3} display="flex" alignItems="center" flexWrap="wrap">
+          {/* Genre Tags */}
+          {movie.genre && (
+            <Box mb={1.5} display="flex" alignItems="center" flexWrap="wrap">
               {movie.genre.split(',').map((genre, index) => (
                 <Typography
                   key={`${genre}-${index}`}
                   className={classes.tag}
                   variant="body1"
                   color="inherit">
-                  {genre}
+                  {genre.trim()}
                 </Typography>
               ))}
+            </Box>
+          )}
 
+          {/* Title */}
+          <Typography
+            className={classes.movieTitle}
+            variant="h1"
+            color="inherit">
+            {movie.title}
+          </Typography>
+
+          {/* Rating */}
+          {fullDescription && (
+            <Box display="flex" alignItems="center" mb={0.5}>
               <StyledRating
                 value={4}
                 readOnly
@@ -62,53 +82,61 @@ function MovieBanner(props) {
               />
             </Box>
           )}
-          <Typography
-            className={classes.movieTitle}
-            variant="h1"
-            color="inherit">
-            {movie.title}
-          </Typography>
+
+          {/* Description */}
           <Typography
             className={classes.descriptionText}
             variant="body1"
             color="inherit">
-            {textTruncate(movie.description, 450)}
+            {textTruncate(movie.description, 250)}
           </Typography>
+
+          {/* Director */}
           <Typography className={classes.director} variant="h4" color="inherit">
-            By: {movie.director}
+            Directed by <span>{movie.director}</span>
           </Typography>
-          <Typography
-            className={classes.duration}
-            variant="body1"
-            color="inherit">
-            {movie.duration} min
-          </Typography>
-          <Typography className={classes.genre} variant="body1" color="inherit">
-            {movie.genre}
-          </Typography>
+
+          {/* Duration & Genre pills */}
+          <Box display="flex" alignItems="center" mt={1}>
+            <Typography className={classes.duration} variant="body1" color="inherit">
+              🕐 {movie.duration} min
+            </Typography>
+            <Typography className={classes.genre} variant="body1" color="inherit">
+              {movie.genre}
+            </Typography>
+          </Box>
         </header>
       </div>
-      <div
-        className={classes.blurBackground}
-        style={{
-          backgroundImage: `url("${encodedImageUrl}")`
-        }}
-      />
+
+      {/* Poster */}
+      <div className={classes.posterWrapper}>
+        <img className={classes.posterImage} src={encodedImageUrl} alt={movie.title} />
+      </div>
+
+      {/* Actions */}
       <div className={classes.movieActions}>
         {fullDescription ? (
           <Link to={`/movie/booking/${movie._id}`} style={{ textDecoration: 'none' }}>
             <Button variant="contained" className={classes.button}>
-              Buy Tickets
+              Book Now
               <ArrowRightAlt className={classes.buttonIcon} />
             </Button>
           </Link>
         ) : (
-          <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
-            <Button className={classnames(classes.button, classes.learnMore)}>
-              Learn More
-              <ArrowRightAlt className={classes.buttonIcon} />
-            </Button>
-          </Link>
+          <>
+            <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
+              <Button className={classnames(classes.button, classes.learnMore)}>
+                View Details
+                <ArrowRightAlt className={classes.buttonIcon} />
+              </Button>
+            </Link>
+            <Link to={`/movie/booking/${movie._id}`} style={{ textDecoration: 'none' }}>
+              <Button variant="contained" className={classes.button}>
+                Book Now
+                <ArrowRightAlt className={classes.buttonIcon} />
+              </Button>
+            </Link>
+          </>
         )}
       </div>
     </div>

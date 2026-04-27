@@ -1,29 +1,30 @@
-import { red, blue, lightBlue, yellow, green } from '@material-ui/core/colors';
+import { red, blue, green } from '@material-ui/core/colors';
 const white = '#FFF';
 const black = '#000';
+const brandRed = '#b72429';
 
 export default {
   type: 'dark',
   common: {
     black,
     white,
-    commonBackground: 'rgb(45, 45, 45)',
+    commonBackground: 'rgb(20, 20, 28)',
     contrastText: white,
     neutral: '#E4E7EB',
     muted: '#9EA0A4'
   },
   default: {
-    light: 'rgba(41, 150, 243, .1)',
-    main: 'rgba(0, 40, 73, .9)',
-    dark: 'rgb(0, 40, 73)',
-    logoBg: 'rgb(51, 51, 51)',
-    border: 'rgba(0, 40, 73, .1)',
+    light: 'rgba(183, 36, 41, .15)',
+    main: 'rgba(20, 20, 28, .95)',
+    dark: 'rgb(14, 14, 20)',
+    logoBg: 'rgb(20, 20, 28)',
+    border: 'rgba(183, 36, 41, .2)',
     contrastText: white
   },
   primary: {
-    light: lightBlue[300],
-    main: lightBlue[500],
-    dark: lightBlue[700],
+    light: '#d94449',
+    main: brandRed,
+    dark: '#8b1c20',
     contrastText: white
   },
   success: {
@@ -39,9 +40,9 @@ export default {
     contrastText: white
   },
   warning: {
-    light: yellow[300],
-    main: yellow[500],
-    dark: yellow[700],
+    light: '#d94449',
+    main: brandRed,
+    dark: '#8b1c20',
     contrastText: white
   },
   danger: {
@@ -51,12 +52,13 @@ export default {
     contrastText: white
   },
   background: {
-    paper: 'rgb(45, 45, 45)',
-    default: 'rgb(26, 26, 26)',
-    dark: 'rgb(26, 26, 26)'
+    paper: 'rgb(22, 22, 30)',
+    default: 'rgb(14, 14, 20)',
+    dark: 'rgb(14, 14, 20)'
   },
-  border: '#DFE3E8',
-  divider: '#DFE3E8',
+  border: '#2a2a38',
+  divider: '#2a2a38',
+  gold: brandRed,
   oxfordBlue: 'rgba(5, 41, 73, 1)',
   prussianBlue: 'rgba(19, 49, 92, 1)',
   darkCerulean: 'rgba(19, 64, 116, 1)',

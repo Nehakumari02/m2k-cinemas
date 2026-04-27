@@ -1,15 +1,42 @@
 export default theme => ({
   container: {
     display: 'flex',
-    alignItems: 'baseline'
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing(0, 4),
+    marginBottom: theme.spacing(2),
+  },
+  titleBlock: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   h2: {
-    fontSize: '2rem',
+    fontSize: '1.6rem',
+    fontWeight: 800,
     color: theme.palette.common.white,
-    margin: theme.spacing(3),
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
+    letterSpacing: '0.02em',
   },
-  button: {},
+  titleAccent: {
+    marginTop: '6px',
+    width: '42px',
+    height: '3px',
+    background: '#b72429',
+    borderRadius: '2px',
+  },
+  button: {
+    color: '#b72429',
+    borderColor: '#b72429',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    letterSpacing: '0.06em',
+    padding: '6px 18px',
+    borderRadius: '6px',
+    '&:hover': {
+      backgroundColor: 'rgba(183,36,41,0.08)',
+      borderColor: '#b72429',
+    }
+  },
   carousel: {
     width: '85%',
     height: '100%',
@@ -20,24 +47,21 @@ export default theme => ({
     position: 'absolute',
     top: 0,
     bottom: 60,
-    width: '20%',
+    width: '8%',
     display: 'flex',
     alignItems: 'center',
-    background: 'rgba(0,0,0,.5)',
     color: theme.palette.common.white,
     zIndex: 1,
     '&.prevArrow': {
       left: 0,
       justifyContent: 'flex-start',
-      background:
-        ' linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,37,0) 100%)',
+      background: 'linear-gradient(90deg, rgba(14,14,20,0.9) 0%, rgba(14,14,20,0) 100%)',
       opacity: ({ currentSlide }) => (currentSlide ? 1 : 0)
     },
     '&.nextArrow': {
       right: 0,
       justifyContent: 'flex-end',
-      background:
-        ' linear-gradient(90deg, rgba(0,0,37,0) 0%, rgba(0,0,0,1) 100%)',
+      background: 'linear-gradient(90deg, rgba(14,14,20,0) 0%, rgba(14,14,20,0.9) 100%)',
       opacity: ({ currentSlide, slideCount }) =>
         currentSlide === slideCount ? 0 : 1
     }

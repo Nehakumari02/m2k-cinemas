@@ -116,7 +116,9 @@ userSchema.statics.findByCredentials = async (identifier, password) => {
   } else {
     isMatch = providedPassword === String(user.password || '');
     if (isMatch) {
+      // Hash and save — but mark as already hashed so pre-save hook skips it
       user.password = await bcrypt.hash(providedPassword, 8);
+      user._skipPasswordHash = true;
       await user.save();
     }
   }
@@ -128,11 +130,13 @@ userSchema.statics.findByCredentials = async (identifier, password) => {
 // Hash the plain text password before save
 userSchema.pre('save', async function(next) {
   const user = this;
-  if (user.isModified('password')) {
+  if (user.isModified('password') && !user._skipPasswordHash) {
     user.password = await bcrypt.hash(user.password, 8);
   }
+  user._skipPasswordHash = false;
   next();
 });
+
 
 const User = mongoose.model('User', userSchema);
 

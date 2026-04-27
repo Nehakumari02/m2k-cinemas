@@ -14,6 +14,8 @@ const ShowtimeList = lazy(() => import('./pages/Admin/ShowtimeList'));
 const ReservationList = lazy(() => import('./pages/Admin/ReservationList'));
 const User = lazy(() => import('./pages/Admin/User'));
 const Account = lazy(() => import('./pages/Admin/Account'));
+const OfferList = lazy(() => import('./pages/Admin/OfferList'));
+const ExperienceList = lazy(() => import('./pages/Admin/ExperienceList'));
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -27,7 +29,11 @@ const MovieCategoryPage = lazy(() =>
   import('./pages/Public/MovieCategoryPage')
 );
 const CinemasPage = lazy(() => import('./pages/Public/CinemasPage'));
+const CinemaDetailPage = lazy(() => import('./pages/Public/CinemaDetailPage'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
+const OffersPage = lazy(() => import('./pages/Public/OffersPage'));
+const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
+const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
 
@@ -63,6 +69,30 @@ const Routes = () => {
             path="/cinemas"
             layout={PublicLayout}
             component={CinemasPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/cinemas/:id"
+            layout={PublicLayout}
+            component={CinemaDetailPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/offers"
+            layout={PublicLayout}
+            component={OffersPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/showtimings"
+            layout={PublicLayout}
+            component={ShowtimingsPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/experience/:id"
+            layout={PublicLayout}
+            component={ExperiencePage}
           />
           <WithLayoutRoute
             exact
@@ -125,6 +155,18 @@ const Routes = () => {
             path="/admin/account"
             layout={AdminLayout}
             component={Account}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/offers"
+            layout={AdminLayout}
+            component={OfferList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/experiences"
+            layout={AdminLayout}
+            component={ExperienceList}
           />
           <Route path="*" component={() => '404 NOT FOUND'} />
         </Switch>

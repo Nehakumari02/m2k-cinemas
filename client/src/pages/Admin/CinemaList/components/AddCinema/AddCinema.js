@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core';
-import { Button, TextField, Typography } from '@material-ui/core';
+import { Button, TextField, Typography, IconButton } from '@material-ui/core';
+import { Add, Delete, EventSeat } from '@material-ui/icons';
 import styles from './styles';
-import { Add } from '@material-ui/icons';
 import {
   getCinemas,
   createCinemas,
@@ -14,6 +14,21 @@ import {
 } from '../../../../../store/actions';
 import { FileUpload } from '../../../../../components';
 
+const ROW_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+const CATEGORIES = [
+  { key: 'gold', label: 'GOLD', color: '#b72429', bg: 'rgba(183,36,41,0.12)' },
+  { key: 'premium', label: 'PREMIUM', color: '#e040fb', bg: 'rgba(224,64,251,0.12)' },
+  { key: 'classic', label: 'CLASSIC', color: '#42a5f5', bg: 'rgba(66,165,245,0.12)' },
+];
+
+function getCategory(rowIndex, totalRows) {
+  const third = Math.ceil(totalRows / 3);
+  if (rowIndex < third) return CATEGORIES[0];
+  if (rowIndex < third * 2) return CATEGORIES[1];
+  return CATEGORIES[2];
+}
+
 class AddCinema extends Component {
   state = {
     _id: '',
@@ -21,139 +36,168 @@ class AddCinema extends Component {
     image: null,
     ticketPrice: '',
     city: '',
-    seatsAvailable: '',
-    seatsPerRow: 10,
-    seats: [],
+    rowConfigs: [{ seats: 10 }],
     notification: {}
-  };
-
-  buildSeatLayout = (totalSeats, seatsPerRow) => {
-    const total = Number(totalSeats) || 0;
-    const perRow = Number(seatsPerRow) || 10;
-    if (!total || !perRow) return [];
-
-    const rows = [];
-    let remaining = total;
-    while (remaining > 0) {
-      const currentRowSeats = Math.min(perRow, remaining);
-      rows.push(Array.from({ length: currentRowSeats }, () => 0));
-      remaining -= currentRowSeats;
-    }
-    return rows;
   };
 
   componentDidMount() {
     if (this.props.editCinema) {
-      const { image, ...rest } = this.props.editCinema;
-      this.setState({ ...rest });
+      const { image, seats, seatsAvailable, ...rest } = this.props.editCinema;
+      // Parse existing seats 2D array back into row configs
+      const rowConfigs =
+        seats && seats.length > 0
+          ? seats.map(row => ({ seats: Array.isArray(row) ? row.length : 0 }))
+          : [{ seats: 10 }];
+      this.setState({ ...rest, rowConfigs });
     }
   }
 
   handleFieldChange = (field, value) => {
-    const newState = { ...this.state };
-    newState[field] = value;
-    this.setState(newState);
+    this.setState({ [field]: value });
   };
 
+  // ── Row Config Handlers ──
+  handleAddRow = () => {
+    if (this.state.rowConfigs.length >= 26) return;
+    this.setState(prev => ({
+      rowConfigs: [...prev.rowConfigs, { seats: 10 }]
+    }));
+  };
+
+  handleRemoveRow = index => {
+    this.setState(prev => ({
+      rowConfigs: prev.rowConfigs.filter((_, i) => i !== index)
+    }));
+  };
+
+  handleRowSeatsChange = (index, value) => {
+    const numVal = Math.max(0, Math.min(20, Number(value) || 0));
+    this.setState(prev => {
+      const rowConfigs = [...prev.rowConfigs];
+      rowConfigs[index] = { ...rowConfigs[index], seats: numVal };
+      return { rowConfigs };
+    });
+  };
+
+  // ── Build seats 2D array from rowConfigs ──
+  buildSeatsFromConfigs = () => {
+    return this.state.rowConfigs.map(row =>
+      Array.from({ length: row.seats }, () => 0)
+    );
+  };
+
+  getTotalSeats = () => {
+    return this.state.rowConfigs.reduce((sum, row) => sum + row.seats, 0);
+  };
+
+  // ── Submit ──
   onSubmitAction = async type => {
-    const {
-      getCinemas,
-      createCinemas,
-      updateCinemas,
-      removeCinemas
-    } = this.props;
-    const {
-      _id,
-      name,
-      image,
-      ticketPrice,
-      city,
-      seatsAvailable,
-      seatsPerRow
-    } = this.state;
-    const seats = this.buildSeatLayout(seatsAvailable, seatsPerRow);
+    const { getCinemas, createCinemas, updateCinemas, removeCinemas } = this.props;
+    const { _id, name, image, ticketPrice, city } = this.state;
+    const seats = this.buildSeatsFromConfigs();
+    const seatsAvailable = this.getTotalSeats();
     const cinema = { name, ticketPrice, city, seatsAvailable, seats };
+
     let notification = {};
-    type === 'create'
-      ? (notification = await createCinemas(image, cinema))
-      : type === 'update'
-      ? (notification = await updateCinemas(image, cinema, _id))
-      : (notification = await removeCinemas(_id));
+    if (type === 'create') {
+      notification = await createCinemas(image, cinema);
+    } else if (type === 'update') {
+      notification = await updateCinemas(image, cinema, _id);
+    } else {
+      notification = await removeCinemas(_id);
+    }
     this.setState({ notification });
     if (notification && notification.status === 'success') getCinemas();
   };
 
-  handleSeatsChange = (index, value) => {
-    if (value > 10) return;
-    const { seats } = this.state;
-    seats[index] = Array.from({ length: value }, () => 0);
-    this.setState({
-      seats
-    });
-  };
-
-  onAddSeatRow = () => {
-    this.setState(prevState => ({
-      seats: [...prevState.seats, []]
-    }));
-  };
-
-  renderSeatFields = () => {
-    const { seats } = this.state;
+  // ── Render Live Preview ──
+  renderPreview = () => {
     const { classes } = this.props;
+    const { rowConfigs } = this.state;
+    const totalRows = rowConfigs.length;
+
+    if (totalRows === 0 || this.getTotalSeats() === 0) {
+      return (
+        <div className={classes.previewEmpty}>
+          Add rows above to see the seat layout preview
+        </div>
+      );
+    }
+
+    const third = Math.ceil(totalRows / 3);
+    const categoryBreaks = [0, third, third * 2];
+
     return (
       <>
-        <div className={classes.field}>
-          <Button onClick={() => this.onAddSeatRow()}>
-            <Add /> add Seats
-          </Button>
+        {/* Screen */}
+        <div className={classes.previewScreen}>
+          <div className={classes.previewScreenCurve} />
+          <span className={classes.previewScreenLabel}>Screen</span>
         </div>
-        {seats.length > 0 &&
-          seats.map((seat, index) => (
-            <div key={`seat-${index}-${seat.length}`} className={classes.field}>
-              <TextField
-                key={`new-seat-${index}`}
-                className={classes.textField}
-                label={
-                  'Add number of seats for row : ' +
-                  (index + 10).toString(36).toUpperCase()
-                }
-                margin="dense"
-                required
-                value={seat.length}
-                variant="outlined"
-                type="number"
-                inputProps={{
-                  min: 0,
-                  max: 10
-                }}
-                onChange={event =>
-                  this.handleSeatsChange(index, event.target.value)
-                }
-              />
-            </div>
-          ))}
+
+        {/* Rows */}
+        {rowConfigs.map((row, rowIndex) => {
+          const cat = getCategory(rowIndex, totalRows);
+          const showBand = categoryBreaks.includes(rowIndex);
+          const letter = ROW_LETTERS[rowIndex] || String(rowIndex + 1);
+          const aisleAt = Math.floor(row.seats / 2);
+
+          return (
+            <Fragment key={rowIndex}>
+              {showBand && (
+                <div className={classes.previewCategoryBand}>
+                  <div
+                    className={classes.previewCategoryLine}
+                    style={{ background: cat.color }}
+                  />
+                  <span
+                    className={classes.previewCategoryLabel}
+                    style={{
+                      color: cat.color,
+                      background: cat.bg,
+                      border: `1px solid ${cat.color}`
+                    }}>
+                    {cat.label}
+                  </span>
+                  <div
+                    className={classes.previewCategoryLine}
+                    style={{ background: cat.color }}
+                  />
+                </div>
+              )}
+              <div className={classes.previewRow}>
+                <span className={classes.previewRowLabel}>{letter}</span>
+                <div className={classes.previewSeatsGroup}>
+                  {Array.from({ length: row.seats }).map((_, si) => (
+                    <Fragment key={si}>
+                      {si === aisleAt && (
+                        <div className={classes.previewAisle} />
+                      )}
+                      <div
+                        className={classes.previewSeat}
+                        style={{ backgroundColor: cat.color + '33' }}
+                      />
+                    </Fragment>
+                  ))}
+                </div>
+                <span className={classes.previewRowLabel}>{letter}</span>
+              </div>
+            </Fragment>
+          );
+        })}
       </>
     );
   };
 
   render() {
     const { classes, className } = this.props;
-    const {
-      name,
-      image,
-      ticketPrice,
-      city,
-      seatsPerRow,
-      seatsAvailable,
-      notification
-    } = this.state;
+    const { name, image, ticketPrice, city, rowConfigs, notification } = this.state;
+    const totalSeats = this.getTotalSeats();
+    const totalRows = rowConfigs.length;
 
     const rootClassName = classNames(classes.root, className);
     const mainTitle = this.props.editCinema ? 'Edit Cinema' : 'Add Cinema';
-    const submitButton = this.props.editCinema
-      ? 'Update Cinema'
-      : 'Save Details';
+    const submitButton = this.props.editCinema ? 'Update Cinema' : 'Save Details';
     const submitAction = this.props.editCinema
       ? () => this.onSubmitAction('update')
       : () => this.onSubmitAction('create');
@@ -163,7 +207,9 @@ class AddCinema extends Component {
         <Typography variant="h4" className={classes.title}>
           {mainTitle}
         </Typography>
+
         <form autoComplete="off" noValidate>
+          {/* ── Basic Fields ── */}
           <div className={classes.field}>
             <TextField
               className={classes.textField}
@@ -173,11 +219,8 @@ class AddCinema extends Component {
               required
               value={name}
               variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('name', event.target.value)
-              }
+              onChange={e => this.handleFieldChange('name', e.target.value)}
             />
-
             <TextField
               fullWidth
               className={classes.textField}
@@ -186,11 +229,10 @@ class AddCinema extends Component {
               required
               variant="outlined"
               value={city}
-              onChange={event =>
-                this.handleFieldChange('city', event.target.value)
-              }
+              onChange={e => this.handleFieldChange('city', e.target.value)}
             />
           </div>
+
           <div className={classes.field}>
             <FileUpload
               className={classes.textField}
@@ -210,39 +252,107 @@ class AddCinema extends Component {
               type="number"
               value={ticketPrice}
               variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('ticketPrice', event.target.value)
-              }
-            />
-            <TextField
-              className={classes.textField}
-              label="Seats Available"
-              margin="dense"
-              required
-              value={seatsAvailable}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('seatsAvailable', event.target.value)
-              }
-            />
-            <TextField
-              className={classes.textField}
-              label="Seats Per Row"
-              margin="dense"
-              type="number"
-              value={seatsPerRow}
-              variant="outlined"
-              inputProps={{
-                min: 1,
-                max: 20
-              }}
-              onChange={event =>
-                this.handleFieldChange('seatsPerRow', event.target.value)
-              }
+              onChange={e => this.handleFieldChange('ticketPrice', e.target.value)}
             />
           </div>
         </form>
 
+        {/* ── Seat Layout Builder ── */}
+        <div className={classes.seatBuilderSection}>
+          <div className={classes.seatBuilderTitle}>
+            <EventSeat style={{ fontSize: '1.2rem' }} />
+            Seat Layout Builder
+          </div>
+
+          {/* Stats */}
+          <div className={classes.seatBuilderStats}>
+            <span className={classes.statChip}>
+              {totalRows} Row{totalRows !== 1 ? 's' : ''}
+            </span>
+            <span className={classes.statChip}>
+              {totalSeats} Total Seat{totalSeats !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {/* Row Configs */}
+          <div className={classes.rowConfigList}>
+            {rowConfigs.map((row, index) => {
+              const cat = getCategory(index, totalRows);
+              const letter = ROW_LETTERS[index] || String(index + 1);
+
+              return (
+                <div key={index} className={classes.rowConfigItem}>
+                  {/* Row Letter */}
+                  <div
+                    className={classes.rowLabel}
+                    style={{
+                      background: cat.bg,
+                      color: cat.color,
+                      border: `1px solid ${cat.color}`
+                    }}>
+                    {letter}
+                  </div>
+
+                  {/* Category Badge */}
+                  <span
+                    className={classes.rowCategoryName}
+                    style={{
+                      color: cat.color,
+                      background: cat.bg,
+                      border: `1px solid ${cat.color}`
+                    }}>
+                    {cat.label}
+                  </span>
+
+                  {/* Seats Input */}
+                  <TextField
+                    className={classes.rowSeatsInput}
+                    label="Seats"
+                    size="small"
+                    type="number"
+                    variant="outlined"
+                    value={row.seats}
+                    inputProps={{ min: 1, max: 20 }}
+                    onChange={e =>
+                      this.handleRowSeatsChange(index, e.target.value)
+                    }
+                  />
+
+                  {/* Info */}
+                  <span className={classes.rowSeatsLabel}>
+                    {row.seats} seat{row.seats !== 1 ? 's' : ''} in row {letter}
+                  </span>
+
+                  {/* Delete */}
+                  <IconButton
+                    className={classes.deleteRowBtn}
+                    onClick={() => this.handleRemoveRow(index)}
+                    disabled={rowConfigs.length <= 1}>
+                    <Delete style={{ fontSize: '1rem' }} />
+                  </IconButton>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Add Row Button */}
+          <Button
+            className={classes.addRowBtn}
+            variant="outlined"
+            onClick={this.handleAddRow}
+            disabled={rowConfigs.length >= 26}>
+            <Add style={{ marginRight: 4 }} />
+            Add Row {ROW_LETTERS[rowConfigs.length] || ''}
+          </Button>
+
+          {/* ── Live Preview ── */}
+          <div className={classes.previewSection}>
+            <div className={classes.previewTitle}>Live Seat Map Preview</div>
+            {this.renderPreview()}
+          </div>
+        </div>
+
+        {/* ── Action Buttons ── */}
         <Button
           className={classes.buttonFooter}
           color="primary"

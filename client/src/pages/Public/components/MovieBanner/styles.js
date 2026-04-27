@@ -4,77 +4,172 @@ export default theme => ({
     height: props => (props.height ? props.height : '100%'),
     width: '100%',
     color: theme.palette.common.white,
-    backgroundColor: theme.palette.background.dark
+    backgroundColor: 'rgb(14,14,20)',
+    overflow: 'hidden',
   },
-  blurBackground: {
+  heroBackdrop: {
     position: 'absolute',
     top: 0,
-    zIndex: 1,
+    left: 0,
+    zIndex: 0,
     height: '100%',
-    right: 0,
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center',
     width: '100%',
-    pointerEvents: 'none'
+    pointerEvents: 'none',
+    filter: 'brightness(0.35) saturate(1.2)',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '40%',
+      background: 'linear-gradient(transparent, rgb(14,14,20))',
+    },
   },
   infoSection: {
     position: 'relative',
     padding: theme.spacing(3),
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     width: '100%',
     height: '100%',
-    backgroundBlendMode: 'multiply',
-    background:
-      'linear-gradient(to right, rgba(0,0,0,.9) 25%, transparent 100%)',
-    zIndex: 2
+    zIndex: 2,
+    background: 'linear-gradient(to right, rgba(14,14,20,0.95) 0%, rgba(14,14,20,0.6) 50%, transparent 100%)',
+  },
+  posterWrapper: {
+    position: 'absolute',
+    right: '8%',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    zIndex: 2,
+    width: 280,
+    height: 400,
+    borderRadius: '16px',
+    overflow: 'hidden',
+    boxShadow: '0 25px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)',
+    border: '2px solid rgba(255,255,255,0.06)',
+    transition: 'transform 0.4s ease, box-shadow 0.4s ease',
+    '&:hover': {
+      transform: 'translateY(-50%) scale(1.03)',
+      boxShadow: '0 30px 70px rgba(0,0,0,0.8), 0 0 30px rgba(183,36,41,0.15)',
+    },
+  },
+  posterImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
   },
   movieHeader: {
     position: 'relative',
-    padding: theme.spacing(3),
-    maxWidth: '60%'
+    padding: theme.spacing(0, 4, 10, 6),
+    maxWidth: '55%',
   },
   tag: {
-    padding: theme.spacing(0.3, 3),
+    padding: '4px 16px',
     marginRight: theme.spacing(1),
-    border: '1px solid rgba(255,255,255,0.9)',
-    borderRadius: 25
+    marginBottom: theme.spacing(0.5),
+    border: '1px solid rgba(183,36,41,0.6)',
+    borderRadius: 25,
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: '#e8a0a3',
+    letterSpacing: '0.03em',
+    background: 'rgba(183,36,41,0.12)',
   },
   movieTitle: {
-    maxWidth: '60%',
-    fontSize: '32px',
-    lineHeight: 1.2,
-    fontWeight: 400,
-    textTransform: 'capitalize'
+    fontSize: '3rem',
+    lineHeight: 1.15,
+    fontWeight: 800,
+    textTransform: 'capitalize',
+    letterSpacing: '-0.01em',
+    marginBottom: theme.spacing(1),
+    textShadow: '0 4px 30px rgba(0,0,0,0.5)',
   },
   director: {
-    color: '#9ac7fa',
-    fontWeight: '500',
-    fontSize: '16px',
-    marginTop: theme.spacing(1)
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: 500,
+    fontSize: '0.9rem',
+    marginTop: theme.spacing(0.5),
+    '& span': {
+      color: '#fff',
+      fontWeight: 600,
+    },
   },
-
   duration: {
-    display: 'inline-block',
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(1),
-    border: '1px solid rgba(255,255,255,0.13)'
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginTop: theme.spacing(1.5),
+    padding: '6px 16px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'rgba(255,255,255,0.05)',
+    fontSize: '0.82rem',
+    fontWeight: 600,
+    color: 'rgba(255,255,255,0.7)',
   },
   genre: {
-    display: 'inline-block',
-    color: '#cee4fd',
-    marginLeft: theme.spacing(2)
+    display: 'inline-flex',
+    color: 'rgba(255,255,255,0.5)',
+    marginLeft: theme.spacing(1.5),
+    fontSize: '0.82rem',
+    fontWeight: 500,
   },
   descriptionText: {
-    color: '#cfd6e1',
-    padding: theme.spacing(2, 0),
-    maxWidth: '60%'
+    color: 'rgba(255,255,255,0.6)',
+    padding: theme.spacing(1.5, 0),
+    fontSize: '0.92rem',
+    lineHeight: 1.7,
+    maxWidth: '90%',
   },
+  movieActions: {
+    position: 'absolute',
+    bottom: theme.spacing(6),
+    left: theme.spacing(9),
+    zIndex: 3,
+    display: 'flex',
+    gap: theme.spacing(2),
+  },
+  button: {
+    padding: '14px 36px',
+    borderRadius: '10px',
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    background: '#b72429',
+    color: '#fff',
+    boxShadow: '0 4px 20px rgba(183,36,41,0.4)',
+    transition: 'all 0.25s ease',
+    '&:hover': {
+      background: '#8b1c20',
+      boxShadow: '0 6px 28px rgba(183,36,41,0.5)',
+      transform: 'translateY(-2px)',
+    },
+  },
+  learnMore: {
+    background: 'rgba(255,255,255,0.08)',
+    color: '#fff',
+    border: '1px solid rgba(255,255,255,0.15)',
+    boxShadow: 'none',
+    '&:hover': {
+      background: 'rgba(255,255,255,0.12)',
+      border: '1px solid rgba(255,255,255,0.25)',
+      boxShadow: 'none',
+      transform: 'translateY(-2px)',
+    },
+  },
+  buttonIcon: { marginLeft: theme.spacing(1), fontSize: '1.2rem' },
+
   footer: {
     position: 'absolute',
     left: theme.spacing(4),
     bottom: theme.spacing(2),
-    zIndex: 2
+    zIndex: 2,
   },
   icons: {
     display: 'inline-block',
@@ -85,44 +180,47 @@ export default theme => ({
     '&:hover': {
       color: 'rgba(255, 255, 255, 0.8)',
       transform: 'scale(1.25)',
-      transition: 'all 0.3s',
-      transitionDelay: '0.15s'
-    }
+    },
   },
-  movieActions: { position: 'absolute', bottom: 0, right: 0, zIndex: 3 },
-  button: {
-    width: 200,
-    height: 70,
-    borderRadius: 0,
-    zIndex: 2
-  },
-  learnMore: { color: theme.palette.common.white },
-  buttonIcon: { marginLeft: theme.spacing(2) },
+
   [theme.breakpoints.down('sm')]: {
     infoSection: {
-      background:
-        'linear-gradient(to right, rgba(0,0,0,.9) 70%, transparent 100%)'
+      background: 'linear-gradient(to top, rgba(14,14,20,1) 30%, rgba(14,14,20,0.5) 100%)',
+      width: '100%',
+      alignItems: 'flex-end',
     },
-    movieHeader: { maxWidth: '90%' },
-    movieTitle: {
+    movieHeader: {
       maxWidth: '100%',
-      fontSize: '16px'
+      padding: theme.spacing(0, 2, 8, 2),
+    },
+    movieTitle: {
+      fontSize: '1.8rem',
     },
     descriptionText: {
       maxWidth: '100%',
-      fontSize: '12px'
+      fontSize: '0.8rem',
     },
-    tag: { padding: theme.spacing(0.3, 1), margin: theme.spacing(1, 1, 1, 0) },
-    movieActions: { display: 'flex', width: '100%' },
+    tag: { padding: '3px 10px', margin: theme.spacing(0.5, 0.5, 0.5, 0) },
+    movieActions: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      gap: 0,
+    },
+    posterWrapper: {
+      display: 'none',
+    },
     button: {
       flex: 1,
-      fontSize: 13,
-      height: 'auto',
-      padding: theme.spacing(2)
+      fontSize: '0.8rem',
+      borderRadius: 0,
+      padding: theme.spacing(2),
     },
     footer: {
       left: theme.spacing(1),
-      bottom: theme.spacing(12)
-    }
-  }
+      bottom: theme.spacing(12),
+    },
+  },
 });

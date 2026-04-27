@@ -1,24 +1,255 @@
 export default theme => ({
   root: {},
-  title: { marginLeft: theme.spacing(3) },
+  title: {
+    marginLeft: theme.spacing(3),
+    color: '#fff',
+    fontWeight: 700,
+  },
   field: {
     margin: theme.spacing(3),
-    display: 'flex'
+    display: 'flex',
+    gap: theme.spacing(2),
   },
   textField: {
     width: '100%',
-    marginRight: theme.spacing(3)
+    marginRight: theme.spacing(3),
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.15)' },
+      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
+      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+    },
   },
   portletFooter: {
     paddingLeft: theme.spacing(3),
     paddingRight: theme.spacing(3),
     paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2)
+    paddingBottom: theme.spacing(2),
   },
   buttonFooter: {
-    margin: theme.spacing(3)
+    margin: theme.spacing(3),
   },
   infoMessage: {
-    marginLeft: theme.spacing(3)
-  }
+    marginLeft: theme.spacing(3),
+  },
+
+  /* ── Seat Layout Builder ── */
+  seatBuilderSection: {
+    margin: theme.spacing(3),
+    padding: theme.spacing(3),
+    background: 'rgba(255,255,255,0.03)',
+    borderRadius: '14px',
+    border: '1px solid rgba(255,255,255,0.08)',
+  },
+  seatBuilderTitle: {
+    fontSize: '1rem',
+    fontWeight: 700,
+    color: '#b72429',
+    marginBottom: theme.spacing(2),
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+  },
+  seatBuilderStats: {
+    display: 'flex',
+    gap: theme.spacing(3),
+    marginBottom: theme.spacing(2),
+    flexWrap: 'wrap',
+  },
+  statChip: {
+    padding: '6px 16px',
+    borderRadius: '20px',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    background: 'rgba(183,36,41,0.1)',
+    color: '#b72429',
+    border: '1px solid rgba(183,36,41,0.2)',
+  },
+
+  /* ── Row Config ── */
+  rowConfigList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginBottom: theme.spacing(3),
+  },
+  rowConfigItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '10px 16px',
+    background: 'rgba(255,255,255,0.04)',
+    borderRadius: '10px',
+    border: '1px solid rgba(255,255,255,0.06)',
+    transition: 'border-color 0.2s ease',
+    '&:hover': {
+      borderColor: 'rgba(183,36,41,0.25)',
+    },
+  },
+  rowLabel: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 800,
+    fontSize: '0.85rem',
+    flexShrink: 0,
+  },
+  rowSeatsInput: {
+    width: '100px',
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
+      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+    },
+    '& .MuiInputLabel-root': { fontSize: '0.8rem' },
+  },
+  rowCategoryName: {
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    letterSpacing: '0.1em',
+    padding: '3px 10px',
+    borderRadius: '10px',
+    flexShrink: 0,
+  },
+  rowSeatsLabel: {
+    fontSize: '0.75rem',
+    color: 'rgba(255,255,255,0.4)',
+    flex: 1,
+    textAlign: 'right',
+  },
+  deleteRowBtn: {
+    minWidth: '32px',
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    padding: 0,
+    color: 'rgba(255,255,255,0.3)',
+    '&:hover': {
+      color: '#ff5252',
+      background: 'rgba(255,82,82,0.1)',
+    },
+  },
+  addRowBtn: {
+    margin: '0 auto',
+    display: 'flex',
+    color: '#b72429',
+    borderColor: 'rgba(183,36,41,0.3)',
+    borderRadius: '10px',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    padding: '8px 24px',
+    '&:hover': {
+      borderColor: '#b72429',
+      background: 'rgba(183,36,41,0.08)',
+    },
+  },
+
+  /* ── Live Preview ── */
+  previewSection: {
+    marginTop: theme.spacing(3),
+    padding: theme.spacing(3),
+    background: 'rgb(14,14,20)',
+    borderRadius: '14px',
+    border: '1px solid rgba(255,255,255,0.06)',
+  },
+  previewTitle: {
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: theme.spacing(2),
+  },
+  previewScreen: {
+    width: '80%',
+    margin: '0 auto 20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  previewScreenCurve: {
+    width: '100%',
+    height: '8px',
+    background: 'linear-gradient(90deg, transparent, #b72429 20%, #b72429 80%, transparent)',
+    borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+    boxShadow: '0 -3px 20px rgba(183,36,41,0.35)',
+    marginBottom: '3px',
+  },
+  previewScreenLabel: {
+    fontSize: '0.55rem',
+    color: 'rgba(183,36,41,0.5)',
+    letterSpacing: '0.3em',
+    textTransform: 'uppercase',
+    fontWeight: 700,
+  },
+  previewCategoryBand: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '80%',
+    margin: '8px auto 2px',
+    gap: '6px',
+  },
+  previewCategoryLine: {
+    flex: 1,
+    height: '1px',
+    opacity: 0.3,
+  },
+  previewCategoryLabel: {
+    fontSize: '0.5rem',
+    fontWeight: 800,
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase',
+    padding: '1px 8px',
+    borderRadius: '8px',
+  },
+  previewRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '2px',
+  },
+  previewRowLabel: {
+    width: '18px',
+    textAlign: 'center',
+    fontSize: '0.5rem',
+    fontWeight: 700,
+    color: 'rgba(255,255,255,0.25)',
+    flexShrink: 0,
+  },
+  previewSeatsGroup: {
+    display: 'flex',
+    gap: '3px',
+    justifyContent: 'center',
+  },
+  previewSeat: {
+    width: '16px',
+    height: '14px',
+    borderRadius: '4px 4px 1px 1px',
+    position: 'relative',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      bottom: '-2px',
+      left: '1px',
+      right: '1px',
+      height: '2px',
+      borderRadius: '0 0 2px 2px',
+      backgroundColor: 'inherit',
+      filter: 'brightness(0.6)',
+    },
+  },
+  previewAisle: {
+    width: '12px',
+    flexShrink: 0,
+  },
+  previewEmpty: {
+    textAlign: 'center',
+    color: 'rgba(255,255,255,0.2)',
+    fontSize: '0.85rem',
+    padding: theme.spacing(4),
+  },
 });

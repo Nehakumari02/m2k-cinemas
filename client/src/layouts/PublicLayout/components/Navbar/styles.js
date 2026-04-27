@@ -4,7 +4,8 @@ export default theme => ({
     top: 0,
     left: 0,
     width: '100%',
-    padding: '1.25rem 20px',
+    padding: '0 32px',
+    height: '64px',
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -12,14 +13,19 @@ export default theme => ({
     transform: 'translate3d(0,0,0)',
     backfaceVisibility: 'hidden',
     zIndex: 999,
-    transition: 'all 300ms ease-in'
+    transition: 'background 300ms ease-in',
+    background: 'rgba(14,14,20,0.72)',
+    backdropFilter: 'blur(12px)',
+    borderBottom: '1px solid rgba(183,36,41,0.10)'
   },
   navbarColor: {
-    background: theme.palette.background.dark,
+    background: 'rgb(14,14,20)',
+    borderBottom: '1px solid rgba(183,36,41,0.18)',
     transition: 'all 200ms ease-out'
   },
   logoLink: {
-    display: 'inline-block',
+    display: 'inline-flex',
+    alignItems: 'center',
     paddingTop: '.15rem',
     paddingBottom: '.15rem',
     marginRight: '20px',
@@ -31,9 +37,11 @@ export default theme => ({
   logo: {
     maxHeight: '2.4rem',
     width: 'auto',
-    fontSize: '2rem',
-    letterSpacing: '1px',
-    color: theme.palette.common.white
+    fontSize: '1.8rem',
+    fontWeight: 800,
+    letterSpacing: '2px',
+    color: '#b72429',
+    textTransform: 'uppercase'
   },
   navLinks: {
     marginLeft: 'auto',
@@ -41,29 +49,32 @@ export default theme => ({
   },
   navLink: {
     position: 'relative',
-    color: theme.palette.common.white,
+    color: 'rgba(255,255,255,0.88)',
     padding: '0 .5rem',
     margin: '0 1rem',
-    fontSize: '1.1rem',
+    fontSize: '0.95rem',
     fontWeight: '600',
+    letterSpacing: '0.04em',
     cursor: 'pointer',
     textDecoration: 'none',
+    textTransform: 'uppercase',
     zIndex: 2,
+    transition: 'color 200ms ease',
     '&:after': {
       content: '""',
       position: 'absolute',
-      bottom: 0,
+      bottom: '-4px',
       left: 0,
       width: '100%',
       opacity: 0,
-      height: 0,
-      backgroundColor: 'rgba(255,255,255,0.5)',
+      height: '2px',
+      backgroundColor: '#b72429',
       transition: 'all 200ms linear',
       zIndex: 1
     },
+    '&:hover': { color: '#b72429' },
     '&:hover:after': {
-      opacity: 1,
-      height: '9px'
+      opacity: 1
     }
   },
   navAccount: { marginLeft: 'auto', marginRight: theme.spacing(3) },

@@ -38,7 +38,7 @@ function CinemasPage(props) {
           spacing={2}>
           {cinemas.map(cinema => (
             <Grid key={cinema._id} item xs={12} md={4} lg={3}>
-              <CinemaCard cinema={cinema} />
+              <CinemaCard cinema={cinema} linkToDetails />
             </Grid>
           ))}
         </Grid>

@@ -14,6 +14,8 @@ import DashboardIcon from '@material-ui/icons/DashboardOutlined';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import AccountBoxIcon from '@material-ui/icons/AccountBoxOutlined';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 // Component styles
 import styles from './styles';
 
@@ -86,6 +88,32 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Reservations"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/offers">
+            <ListItemIcon className={classes.listItemIcon}>
+              <LocalOfferIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Offers"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/experiences">
+            <ListItemIcon className={classes.listItemIcon}>
+              <MovieFilterIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Experiences"
             />
           </ListItem>
           {user && user.role === 'superadmin' && (
