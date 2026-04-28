@@ -80,7 +80,7 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
     fontSize: '0.65rem',
     fontWeight: 700,
-    color: 'rgba(255,255,255,0.35)',
+    color: '#64748b',
     flexShrink: 0,
     userSelect: 'none'
   },
@@ -105,7 +105,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     fontSize: '0.55rem',
     fontWeight: 700,
-    color: 'rgba(255,255,255,0.6)',
+    color: '#0f172a',
     outline: 'none',
     '&::before': {
       content: '""',
@@ -130,7 +130,7 @@ const useStyles = makeStyles(theme => ({
   },
   seatSelected: {
     boxShadow: '0 0 10px rgba(183,36,41,0.6)',
-    color: '#14141c'
+    color: '#fff'
   },
 
   /* ── Aisle Gap ── */
@@ -148,16 +148,16 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     justifyContent: 'center',
     padding: '12px 24px',
-    background: 'rgba(255,255,255,0.04)',
+    background: '#ffffff',
     borderRadius: '12px',
-    border: '1px solid rgba(255,255,255,0.07)'
+    border: '1px solid rgba(15,23,42,0.1)'
   },
   legendItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '7px',
     fontSize: '0.78rem',
-    color: 'rgba(255,255,255,0.7)',
+    color: '#334155',
     fontWeight: 500
   },
   legendSeat: {

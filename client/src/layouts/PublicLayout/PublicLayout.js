@@ -4,8 +4,8 @@ import { Navbar, Footer } from './components';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.dark,
-    color: theme.palette.common.white,
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
     height: '100%'
   }
 }));

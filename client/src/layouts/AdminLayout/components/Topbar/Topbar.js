@@ -43,7 +43,7 @@ class Topbar extends Component {
       <div className={`${classes.root} , ${ToolbarClasses}`}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.brandWrapper}>
-            <div className={classes.logo}>Cinema +</div>
+            <div className={classes.logo}>M2K Cinemas</div>
             <IconButton
               className={classes.menuButton}
               aria-label="Menu"
@@ -53,7 +53,7 @@ class Topbar extends Component {
           </div>
 
           <NavLink className={classes.title} to="/">
-            Cinema App
+            M2K Cinemas
           </NavLink>
 
           <IconButton

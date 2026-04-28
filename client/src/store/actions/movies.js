@@ -32,6 +32,82 @@ export const uploadMovieImage = (id, image) => async dispatch => {
   }
 };
 
+export const uploadMovieBackdrops = (id, files) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const data = new FormData();
+    (files || []).forEach(file => data.append('files', file));
+    const url = '/movies/backdrops/' + id;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: data
+    });
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      responseData = {};
+    }
+    if (response.ok) {
+      dispatch(setAlert('Backdrop images uploaded', 'success', 5000));
+    } else {
+      dispatch(
+        setAlert(
+          (responseData && responseData.error && responseData.error.message) ||
+            responseData.error ||
+            'Backdrop upload failed',
+          'error',
+          5000
+        )
+      );
+    }
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+  }
+};
+
+export const uploadMovieCastCrewImages = (id, files) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const data = new FormData();
+    (files || []).forEach(file => data.append('files', file));
+    const url = '/movies/cast-crew-images/' + id;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: data
+    });
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      responseData = {};
+    }
+    if (response.ok) {
+      dispatch(setAlert('Cast & crew images uploaded', 'success', 5000));
+    } else {
+      dispatch(
+        setAlert(
+          (responseData && responseData.error && responseData.error.message) ||
+            responseData.error ||
+            'Cast/Crew image upload failed',
+          'error',
+          5000
+        )
+      );
+    }
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+  }
+};
+
 export const getMovies = () => async dispatch => {
   try {
     const url = '/movies';
@@ -85,7 +161,7 @@ export const getMovieSuggestion = id => async dispatch => {
   }
 };
 
-export const addMovie = (image, newMovie) => async dispatch => {
+export const addMovie = (image, newMovie, backdropFiles = [], castCrewFiles = []) => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
     const url = '/movies';
@@ -100,7 +176,11 @@ export const addMovie = (image, newMovie) => async dispatch => {
     const movie = await response.json();
     if (response.ok) {
       dispatch(setAlert('Movie have been saved!', 'success', 5000));
-      if (image) dispatch(uploadMovieImage(movie._id, image));
+      if (image) await dispatch(uploadMovieImage(movie._id, image));
+      if (backdropFiles.length)
+        await dispatch(uploadMovieBackdrops(movie._id, backdropFiles));
+      if (castCrewFiles.length)
+        await dispatch(uploadMovieCastCrewImages(movie._id, castCrewFiles));
       dispatch(getMovies());
     }
   } catch (error) {
@@ -108,7 +188,13 @@ export const addMovie = (image, newMovie) => async dispatch => {
   }
 };
 
-export const updateMovie = (movieId, movie, image) => async dispatch => {
+export const updateMovie = (
+  movieId,
+  movie,
+  image,
+  backdropFiles = [],
+  castCrewFiles = []
+) => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
     const url = '/movies/' + movieId;
@@ -123,7 +209,11 @@ export const updateMovie = (movieId, movie, image) => async dispatch => {
     if (response.ok) {
       dispatch(onSelectMovie(null));
       dispatch(setAlert('Movie have been saved!', 'success', 5000));
-      if (image) dispatch(uploadMovieImage(movieId, image));
+      if (image) await dispatch(uploadMovieImage(movieId, image));
+      if (backdropFiles.length)
+        await dispatch(uploadMovieBackdrops(movieId, backdropFiles));
+      if (castCrewFiles.length)
+        await dispatch(uploadMovieCastCrewImages(movieId, castCrewFiles));
       dispatch(getMovies());
     }
   } catch (error) {

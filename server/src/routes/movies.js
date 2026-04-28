@@ -43,6 +43,66 @@ router.post(
   }
 );
 
+router.post(
+  '/movies/backdrops/:id',
+  auth.enhance,
+  upload('movies').array('files'),
+  async (req, res, next) => {
+    const url = `${req.protocol}://${req.get('host')}`;
+    const { files = [] } = req;
+    const movieId = req.params.id;
+    try {
+      if (!files.length) {
+        const error = new Error('Please upload at least one file');
+        error.httpStatusCode = 400;
+        return next(error);
+      }
+      const movie = await Movie.findById(movieId);
+      if (!movie) return res.sendStatus(404);
+      const uploaded = files.map(file => `${url}/${file.path}`);
+      movie.backdropImages = [...(movie.backdropImages || []), ...uploaded];
+      movie.markModified('backdropImages');
+      await movie.save();
+      return res.send({ movie, files });
+    } catch (e) {
+      return res.status(400).send(e);
+    }
+  }
+);
+
+router.post(
+  '/movies/cast-crew-images/:id',
+  auth.enhance,
+  upload('movies').array('files'),
+  async (req, res, next) => {
+    const url = `${req.protocol}://${req.get('host')}`;
+    const { files = [] } = req;
+    const movieId = req.params.id;
+    try {
+      if (!files.length) {
+        const error = new Error('Please upload at least one file');
+        error.httpStatusCode = 400;
+        return next(error);
+      }
+      const movie = await Movie.findById(movieId);
+      if (!movie) return res.sendStatus(404);
+
+      const castCrew = Array.isArray(movie.castCrew) ? movie.castCrew : [];
+      files.forEach((file, index) => {
+        if (castCrew[index]) {
+          castCrew[index].image = `${url}/${file.path}`;
+        }
+      });
+      movie.castCrew = castCrew;
+      movie.markModified('castCrew');
+      await movie.save();
+      return res.send({ movie, files });
+    } catch (e) {
+      return res.status(400).send(e);
+    }
+  }
+);
+
 // Get all movies
 router.get('/movies', async (req, res) => {
   try {
@@ -73,6 +133,8 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
   const allowedUpdates = [
     'title',
     'image',
+    'backdropImages',
+    'castCrew',
     'language',
     'genre',
     'director',

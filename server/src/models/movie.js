@@ -11,6 +11,28 @@ const movieSchema = new Schema({
   image: {
     type: String,
   },
+  backdropImages: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
+  castCrew: [
+    {
+      name: {
+        type: String,
+        trim: true,
+      },
+      role: {
+        type: String,
+        trim: true,
+      },
+      image: {
+        type: String,
+        trim: true,
+      },
+    },
+  ],
   language: {
     type: String,
     required: true,

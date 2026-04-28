@@ -13,7 +13,7 @@ export default theme => ({
   h2: {
     fontSize: '1.6rem',
     fontWeight: 800,
-    color: theme.palette.common.white,
+    color: '#0f172a',
     textTransform: 'capitalize',
     letterSpacing: '0.02em',
   },
@@ -50,22 +50,22 @@ export default theme => ({
     width: '8%',
     display: 'flex',
     alignItems: 'center',
-    color: theme.palette.common.white,
+    color: '#334155',
     zIndex: 1,
     '&.prevArrow': {
       left: 0,
       justifyContent: 'flex-start',
-      background: 'linear-gradient(90deg, rgba(14,14,20,0.9) 0%, rgba(14,14,20,0) 100%)',
+      background: 'linear-gradient(90deg, rgba(248,250,252,0.98) 0%, rgba(248,250,252,0) 100%)',
       opacity: ({ currentSlide }) => (currentSlide ? 1 : 0)
     },
     '&.nextArrow': {
       right: 0,
       justifyContent: 'flex-end',
-      background: 'linear-gradient(90deg, rgba(14,14,20,0) 0%, rgba(14,14,20,0.9) 100%)',
+      background: 'linear-gradient(90deg, rgba(248,250,252,0) 0%, rgba(248,250,252,0.98) 100%)',
       opacity: ({ currentSlide, slideCount }) =>
         currentSlide === slideCount ? 0 : 1
     }
   },
 
-  slider: { '& .slick-slide': { padding: theme.spacing(1) } }
+  slider: { '& .slick-slide': { padding: theme.spacing(0.5) } }
 });

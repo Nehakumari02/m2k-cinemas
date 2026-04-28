@@ -1,10 +1,10 @@
 export default theme => ({
   container: {
-    backgroundColor: theme.palette.background.dark,
+    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
     paddingTop: theme.spacing(12),
     paddingBottom: theme.spacing(8),
-    color: theme.palette.common.white,
+    color: theme.palette.text.primary,
   },
   header: {
     textAlign: 'center',
@@ -13,11 +13,11 @@ export default theme => ({
   title: {
     fontSize: '2.5rem',
     fontWeight: 800,
-    color: '#fff',
+    color: '#0f172a',
     letterSpacing: '-0.02em',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.6)',
+    color: '#64748b',
     marginTop: theme.spacing(1),
     fontSize: '1.1rem',
   },
@@ -39,8 +39,8 @@ export default theme => ({
   card: {
     borderRadius: '14px',
     overflow: 'hidden',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: '#ffffff',
+    border: '1px solid rgba(15,23,42,0.08)',
     transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
     cursor: 'pointer',
     display: 'flex',
@@ -49,7 +49,7 @@ export default theme => ({
     '&:hover': {
       transform: 'translateY(-4px)',
       borderColor: 'rgba(183,36,41,0.25)',
-      boxShadow: '0 12px 30px rgba(0,0,0,0.4)',
+      boxShadow: '0 12px 30px rgba(15,23,42,0.12)',
     },
   },
   cardImage: {
@@ -57,7 +57,7 @@ export default theme => ({
     height: '180px',
     objectFit: 'cover',
     display: 'block',
-    borderBottom: '1px solid rgba(255,255,255,0.05)',
+    borderBottom: '1px solid rgba(15,23,42,0.08)',
   },
   cardBody: {
     padding: theme.spacing(3),
@@ -81,13 +81,13 @@ export default theme => ({
   cardTitle: {
     fontSize: '1.1rem',
     fontWeight: 700,
-    color: '#fff',
+    color: '#0f172a',
     marginBottom: theme.spacing(1),
     lineHeight: 1.4,
   },
   cardDesc: {
     fontSize: '0.85rem',
-    color: 'rgba(255,255,255,0.5)',
+    color: '#64748b',
     lineHeight: 1.6,
     marginBottom: theme.spacing(3),
     flexGrow: 1,
@@ -96,14 +96,14 @@ export default theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid rgba(15,23,42,0.08)',
     paddingTop: theme.spacing(2),
   },
   validTill: {
     fontSize: '0.8rem',
-    color: 'rgba(255,255,255,0.4)',
+    color: '#64748b',
     '& span': {
-      color: 'rgba(255,255,255,0.7)',
+      color: '#334155',
       fontWeight: 600,
     },
   },
@@ -121,8 +121,8 @@ export default theme => ({
     },
   },
   dialogPaper: {
-    backgroundColor: '#1a1a24',
-    color: '#fff',
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
     borderRadius: '16px',
     overflow: 'hidden',
     maxWidth: '500px',
@@ -141,22 +141,22 @@ export default theme => ({
     position: 'absolute',
     top: theme.spacing(2),
     right: theme.spacing(2),
-    color: 'rgba(255,255,255,0.6)',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    color: '#64748b',
+    backgroundColor: 'rgba(15,23,42,0.08)',
     '&:hover': {
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      color: '#fff',
+      backgroundColor: 'rgba(15,23,42,0.16)',
+      color: '#0f172a',
     },
   },
   dialogTitle: {
     fontSize: '1.4rem',
     fontWeight: 800,
     marginBottom: theme.spacing(2),
-    color: '#fff',
+    color: '#0f172a',
   },
   dialogDesc: {
     fontSize: '0.95rem',
-    color: 'rgba(255,255,255,0.7)',
+    color: '#334155',
     lineHeight: 1.6,
     marginBottom: theme.spacing(3),
   },
@@ -174,7 +174,7 @@ export default theme => ({
     fontSize: '0.75rem',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
-    color: 'rgba(255,255,255,0.5)',
+    color: '#64748b',
     marginBottom: theme.spacing(1),
   },
   dialogCodeValue: {
@@ -196,7 +196,7 @@ export default theme => ({
   },
   termsText: {
     fontSize: '0.7rem',
-    color: 'rgba(255,255,255,0.4)',
+    color: '#64748b',
     textAlign: 'center',
     marginTop: theme.spacing(3),
   }

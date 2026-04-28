@@ -37,10 +37,10 @@ export default theme => ({
     textTransform: 'uppercase',
     textDecoration: 'none',
     fontSize: '14px',
-    color: theme.palette.common.white
+    color: theme.palette.text.primary
   },
   menuButton: {
-    color: theme.palette.common.white,
+    color: theme.palette.text.primary,
     marginLeft: '-4px'
   },
   notificationsButton: {

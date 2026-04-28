@@ -1,14 +1,14 @@
 export default theme => ({
   container: {
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.background.dark
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.background.default
   },
   fullHeight: {
     height: '100vh'
   },
   title: {
     width: '50%',
-    color: theme.palette.common.white
+    color: theme.palette.text.primary
   },
   h2: {
     fontSize: '3rem',

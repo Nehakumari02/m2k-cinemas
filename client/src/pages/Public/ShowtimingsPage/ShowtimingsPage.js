@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
   page: {
     paddingTop: theme.spacing(12),
     paddingBottom: theme.spacing(6),
-    color: '#fff',
+    color: '#0f172a',
   },
   header: {
     marginBottom: theme.spacing(2),
@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(0.5),
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.72)',
+    color: '#64748b',
   },
   filterRow: {
     marginTop: theme.spacing(2.5),
@@ -32,14 +32,14 @@ const useStyles = makeStyles(theme => ({
     minWidth: 220,
     '& .MuiOutlinedInput-root': {
       borderRadius: 10,
-      color: '#fff',
-      backgroundColor: 'rgba(255,255,255,0.04)',
-      '& fieldset': { borderColor: 'rgba(255,255,255,0.16)' },
+      color: '#0f172a',
+      backgroundColor: '#ffffff',
+      '& fieldset': { borderColor: 'rgba(15,23,42,0.15)' },
       '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.5)' },
       '&.Mui-focused fieldset': { borderColor: '#b72429' },
     },
-    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.58)' },
-    '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.58)' },
+    '& .MuiInputLabel-root': { color: '#64748b' },
+    '& .MuiSelect-icon': { color: '#64748b' },
   },
   chipsRow: {
     display: 'flex',
@@ -48,8 +48,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(3),
   },
   dateChip: {
-    borderColor: 'rgba(255,255,255,0.28)',
-    color: '#fff',
+    borderColor: 'rgba(15,23,42,0.2)',
+    color: '#334155',
   },
   activeDateChip: {
     backgroundColor: '#b72429',
@@ -58,16 +58,16 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     display: 'flex',
-    background: '#171b22',
+    background: '#ffffff',
     borderRadius: 14,
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: '1px solid rgba(15,23,42,0.1)',
     overflow: 'hidden',
     height: '100%',
   },
   poster: {
     width: 120,
     minWidth: 120,
-    backgroundColor: '#101319',
+    backgroundColor: '#f1f5f9',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   },
@@ -80,12 +80,12 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(0.4),
   },
   meta: {
-    color: 'rgba(255,255,255,0.62)',
+    color: '#64748b',
     marginBottom: theme.spacing(1),
   },
   cinemaName: {
     fontWeight: 600,
-    color: '#f3f6fb',
+    color: '#1e293b',
     marginBottom: theme.spacing(1),
   },
   timingsRow: {
@@ -95,12 +95,20 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1.3),
   },
   timeChip: {
-    borderColor: 'rgba(255,255,255,0.28)',
-    color: '#fff',
+    borderColor: 'rgba(15,23,42,0.2)',
+    color: '#334155',
     fontWeight: 600,
   },
   empty: {
-    color: 'rgba(255,255,255,0.65)',
+    color: '#64748b',
+  },
+  bookButton: {
+    backgroundColor: '#b72429',
+    color: '#fff',
+    fontWeight: 700,
+    '&:hover': {
+      backgroundColor: '#8b1c20',
+    },
   },
   [theme.breakpoints.down('sm')]: {
     field: { minWidth: '100%' },
@@ -313,8 +321,8 @@ function ShowtimingsPage({
                   </div>
                   <Button
                     size="small"
-                    color="secondary"
                     variant="contained"
+                    className={classes.bookButton}
                     component={Link}
                     to={`/movie/booking/${item.movie._id}`}
                   >

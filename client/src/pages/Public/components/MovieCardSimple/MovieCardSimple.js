@@ -13,18 +13,18 @@ const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   card: {
-    width: 200,
+    width: 230,
     margin: '0 auto',
-    backgroundColor: '#16161e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
-    color: theme.palette.common.white,
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+    color: '#0f172a',
+    boxShadow: '0 8px 24px rgba(15,23,42,0.14)',
     overflow: 'hidden',
     transition: 'transform .25s ease, box-shadow .25s ease',
     position: 'relative',
     '&:hover': {
       transform: 'translateY(-6px)',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.55)',
+      boxShadow: '0 20px 40px rgba(15,23,42,0.2)',
     },
     '&:hover $bookOverlay': {
       opacity: 1,
@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     top: '10px',
     left: '10px',
     background: 'rgba(183,36,41,0.92)',
-    color: '#14141c',
+    color: '#fff',
     fontSize: '0.65rem',
     fontWeight: 800,
     padding: '2px 8px',
@@ -79,7 +79,7 @@ const useStyles = makeStyles(theme => ({
   },
   bookBtn: {
     background: 'linear-gradient(90deg, #b72429, #8b1c20)',
-    color: '#14141c',
+    color: '#fff',
     border: 'none',
     borderRadius: '6px',
     padding: '9px 0',
@@ -92,7 +92,7 @@ const useStyles = makeStyles(theme => ({
   },
   h5: {
     textTransform: 'capitalize',
-    fontSize: '0.95rem',
+    fontSize: '1rem',
     fontWeight: 700,
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
@@ -100,7 +100,7 @@ const useStyles = makeStyles(theme => ({
     textOverflow: 'ellipsis',
   },
   meta: {
-    color: 'rgba(255,255,255,0.5)',
+    color: '#64748b',
     fontSize: '0.75rem',
     textTransform: 'uppercase',
     letterSpacing: '.06em',
@@ -108,7 +108,7 @@ const useStyles = makeStyles(theme => ({
   },
   cardContent: {
     padding: '10px 12px 12px',
-    backgroundColor: '#16161e',
+    backgroundColor: '#ffffff',
   }
 }));
 

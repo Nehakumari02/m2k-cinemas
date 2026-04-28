@@ -4,12 +4,12 @@ import { Grid, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   movieInfos: {
-    background: 'linear-gradient(180deg, rgb(18,18,26) 0%, rgb(10,10,16) 100%)',
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
     position: 'relative',
     height: '100%',
     borderRadius: '14px',
     overflow: 'hidden',
-    border: '1px solid rgba(183,36,41,0.08)',
+    border: '1px solid rgba(15,23,42,0.08)',
   },
   background: {
     position: 'absolute',
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
       left: 0,
       right: 0,
       height: '60%',
-      background: 'linear-gradient(transparent, rgb(18,18,26))',
+      background: 'linear-gradient(transparent, #ffffff)',
     }
   },
   title: {
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   infoBox: {
-    color: theme.palette.common.white,
+    color: '#0f172a',
     marginBottom: theme.spacing(1.5),
   },
   infoLabel: {
@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
   },
   infoValue: {
     fontSize: '0.82rem',
-    color: 'rgba(255,255,255,0.75)',
+    color: '#334155',
   },
   [theme.breakpoints.down('md')]: {
     movieInfos: { minHeight: '30vh', borderRadius: '10px' },
@@ -83,7 +83,7 @@ export default function MovieInfo(props) {
     return (
       <Grid item xs={12} md={12} lg={3}>
         <div className={classes.movieInfos} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-          <Typography style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
+          <Typography style={{ color: '#64748b', fontWeight: 600 }}>
             Loading Movie...
           </Typography>
         </div>

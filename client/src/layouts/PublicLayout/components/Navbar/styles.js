@@ -14,12 +14,12 @@ export default theme => ({
     backfaceVisibility: 'hidden',
     zIndex: 999,
     transition: 'background 300ms ease-in',
-    background: 'rgba(14,14,20,0.72)',
+    background: 'rgba(255,255,255,0.9)',
     backdropFilter: 'blur(12px)',
-    borderBottom: '1px solid rgba(183,36,41,0.10)'
+    borderBottom: '1px solid rgba(183,36,41,0.15)'
   },
   navbarColor: {
-    background: 'rgb(14,14,20)',
+    background: '#ffffff',
     borderBottom: '1px solid rgba(183,36,41,0.18)',
     transition: 'all 200ms ease-out'
   },
@@ -49,7 +49,7 @@ export default theme => ({
   },
   navLink: {
     position: 'relative',
-    color: 'rgba(255,255,255,0.88)',
+    color: '#1f2937',
     padding: '0 .5rem',
     margin: '0 1rem',
     fontSize: '0.95rem',
@@ -94,7 +94,7 @@ export default theme => ({
     height: '2px',
     width: '30px',
     display: 'block',
-    backgroundColor: theme.palette.common.white,
+    backgroundColor: '#1f2937',
     marginBottom: '7px',
     transition: ' transform .2s ease, background-color .5s ease'
   },
@@ -128,7 +128,7 @@ export default theme => ({
       transform: 'translateX(0%) translateY(-100%)'
     },
     '&:before': {
-      background: theme.palette.common.black,
+      background: '#ffffff',
       transitionDelay: '0s'
     },
     '&:after': {
@@ -177,7 +177,7 @@ export default theme => ({
     fontSize: '10rem',
     fontWeight: 800,
     marginTop: '25px',
-    color: '#fff',
+    color: '#111827',
     opacity: 0,
     transition: 'all 300ms linear'
   },
@@ -200,7 +200,7 @@ export default theme => ({
   },
   innerNavLink: {
     position: 'relative',
-    color: theme.palette.common.white,
+    color: '#111827',
     padding: '0 .5rem',
     margin: '0 1rem',
     fontSize: '2rem',

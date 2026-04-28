@@ -9,7 +9,7 @@ import { getOffers } from '../../../../store/actions';
 const useStyles = makeStyles(theme => ({
   section: {
     padding: theme.spacing(6, 0, 8),
-    background: 'rgb(14,14,20)',
+    background: '#f8fafc',
     overflow: 'hidden',
   },
   headerRow: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   sectionTitle: {
     fontSize: '1.6rem',
     fontWeight: 800,
-    color: '#fff',
+    color: '#0f172a',
     letterSpacing: '-0.01em',
   },
   titleAccent: {
@@ -44,8 +44,8 @@ const useStyles = makeStyles(theme => ({
     width: '40px',
     height: '40px',
     borderRadius: '10px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    color: 'rgba(255,255,255,0.5)',
+    border: '1px solid rgba(15,23,42,0.12)',
+    color: '#64748b',
     transition: 'all 0.2s ease',
     '&:hover': {
       borderColor: '#b72429',
@@ -53,8 +53,8 @@ const useStyles = makeStyles(theme => ({
       background: 'rgba(183,36,41,0.08)',
     },
     '&.Mui-disabled': {
-      color: 'rgba(255,255,255,0.15)',
-      borderColor: 'rgba(255,255,255,0.05)',
+      color: 'rgba(100,116,139,0.35)',
+      borderColor: 'rgba(15,23,42,0.06)',
     },
   },
   seeAllBtn: {
@@ -83,15 +83,15 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '320px',
     borderRadius: '14px',
     overflow: 'hidden',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: '#ffffff',
+    border: '1px solid rgba(15,23,42,0.08)',
     flexShrink: 0,
     transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
     cursor: 'pointer',
     '&:hover': {
       transform: 'translateY(-4px)',
       borderColor: 'rgba(183,36,41,0.25)',
-      boxShadow: '0 12px 30px rgba(0,0,0,0.4)',
+      boxShadow: '0 12px 30px rgba(15,23,42,0.12)',
     },
   },
   cardImage: {
@@ -99,7 +99,7 @@ const useStyles = makeStyles(theme => ({
     height: '180px',
     objectFit: 'cover',
     display: 'block',
-    borderBottom: '1px solid rgba(255,255,255,0.05)',
+    borderBottom: '1px solid rgba(15,23,42,0.08)',
   },
   cardBody: {
     padding: theme.spacing(2, 2.5),
@@ -107,7 +107,7 @@ const useStyles = makeStyles(theme => ({
   cardTitle: {
     fontSize: '0.92rem',
     fontWeight: 700,
-    color: '#fff',
+    color: '#0f172a',
     marginBottom: theme.spacing(0.5),
     lineHeight: 1.4,
     display: '-webkit-box',
@@ -117,7 +117,7 @@ const useStyles = makeStyles(theme => ({
   },
   cardDesc: {
     fontSize: '0.78rem',
-    color: 'rgba(255,255,255,0.45)',
+    color: '#64748b',
     lineHeight: 1.6,
     marginBottom: theme.spacing(1.5),
     display: '-webkit-box',
@@ -129,14 +129,14 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid rgba(15,23,42,0.08)',
     paddingTop: theme.spacing(1.5),
   },
   validTill: {
     fontSize: '0.7rem',
-    color: 'rgba(255,255,255,0.35)',
+    color: '#64748b',
     '& span': {
-      color: 'rgba(255,255,255,0.6)',
+      color: '#334155',
       fontWeight: 600,
     },
   },
@@ -167,8 +167,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1.5),
   },
   dialogPaper: {
-    backgroundColor: '#1a1a24',
-    color: '#fff',
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
     borderRadius: '16px',
     overflow: 'hidden',
     maxWidth: '500px',
@@ -187,22 +187,22 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: theme.spacing(2),
     right: theme.spacing(2),
-    color: 'rgba(255,255,255,0.6)',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    color: '#64748b',
+    backgroundColor: 'rgba(15,23,42,0.08)',
     '&:hover': {
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      color: '#fff',
+      backgroundColor: 'rgba(15,23,42,0.16)',
+      color: '#0f172a',
     },
   },
   dialogTitle: {
     fontSize: '1.4rem',
     fontWeight: 800,
     marginBottom: theme.spacing(2),
-    color: '#fff',
+    color: '#0f172a',
   },
   dialogDesc: {
     fontSize: '0.95rem',
-    color: 'rgba(255,255,255,0.7)',
+    color: '#334155',
     lineHeight: 1.6,
     marginBottom: theme.spacing(3),
   },
@@ -220,7 +220,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: '0.75rem',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
-    color: 'rgba(255,255,255,0.5)',
+    color: '#64748b',
     marginBottom: theme.spacing(1),
   },
   dialogCodeValue: {
@@ -231,7 +231,7 @@ const useStyles = makeStyles(theme => ({
   },
   dialogAction: {
     backgroundColor: '#b72429',
-    color: '#fff',
+    color: '#ffffff',
     padding: theme.spacing(1.5),
     fontWeight: 700,
     fontSize: '1rem',
@@ -242,7 +242,7 @@ const useStyles = makeStyles(theme => ({
   },
   termsText: {
     fontSize: '0.7rem',
-    color: 'rgba(255,255,255,0.4)',
+    color: '#64748b',
     textAlign: 'center',
     marginTop: theme.spacing(3),
   }
@@ -317,7 +317,7 @@ function OffersSection({ offers: storeOffers, getOffers }) {
       </div>
 
       {!offers.length ? (
-        <div style={{ padding: '0 32px', color: 'rgba(255,255,255,0.5)' }}>
+        <div style={{ padding: '0 32px', color: '#64748b' }}>
           <Typography variant="body2">No active offers available right now.</Typography>
         </div>
       ) : (

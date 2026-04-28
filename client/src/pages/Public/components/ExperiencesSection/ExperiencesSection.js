@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
   section: {
     width: '100%',
     padding: '60px 5%',
-    backgroundColor: 'rgb(14,14,20)',
+    backgroundColor: '#f8fafc',
   },
   header: {
     display: 'flex',
@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
   sectionTitle: {
     fontSize: '1.8rem',
     fontWeight: 800,
-    color: '#fff',
+    color: '#0f172a',
     position: 'relative',
     '&::after': {
       content: '""',
@@ -89,7 +89,7 @@ const useStyles = makeStyles(theme => ({
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     '&:hover': {
       transform: 'translateY(-6px)',
-      boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+      boxShadow: '0 20px 50px rgba(15,23,42,0.2)',
     },
     '&:hover $cardOverlay': {
       opacity: 1,

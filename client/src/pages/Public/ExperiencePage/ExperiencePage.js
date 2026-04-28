@@ -43,14 +43,14 @@ const EXPERIENCES = {
 const useStyles = makeStyles(theme => ({
   hero: {
     minHeight: '75vh',
-    color: '#fff',
+    color: '#0f172a',
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(10, 0, 8),
   },
   card: {
-    background: 'rgba(0,0,0,0.35)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'rgba(255,255,255,0.88)',
+    border: '1px solid rgba(15,23,42,0.1)',
     borderRadius: 16,
     padding: theme.spacing(5),
     backdropFilter: 'blur(2px)',
@@ -62,16 +62,16 @@ const useStyles = makeStyles(theme => ({
   },
   subtitle: {
     fontWeight: 600,
-    color: 'rgba(255,255,255,0.85)',
+    color: '#334155',
     marginBottom: theme.spacing(2),
   },
   description: {
-    color: 'rgba(255,255,255,0.88)',
+    color: '#334155',
     lineHeight: 1.7,
     marginBottom: theme.spacing(3),
   },
   feature: {
-    color: 'rgba(255,255,255,0.9)',
+    color: '#334155',
     marginBottom: theme.spacing(1),
   },
   actions: {
@@ -94,7 +94,7 @@ function ExperiencePage({ match, experiences, getExperiences }) {
 
   if (!exp) {
     return (
-      <Container style={{ paddingTop: 120, color: '#fff' }}>
+      <Container style={{ paddingTop: 120, color: '#0f172a' }}>
         <Typography variant="h3">Experience not found</Typography>
       </Container>
     );
@@ -132,7 +132,7 @@ function ExperiencePage({ match, experiences, getExperiences }) {
                 >
                   Explore Cinemas
                 </Button>
-                <Button component={Link} to="/" variant="outlined" style={{ color: '#fff', borderColor: '#fff' }}>
+                <Button component={Link} to="/" variant="outlined" style={{ color: '#0f172a', borderColor: 'rgba(15,23,42,0.25)' }}>
                   Back Home
                 </Button>
               </div>

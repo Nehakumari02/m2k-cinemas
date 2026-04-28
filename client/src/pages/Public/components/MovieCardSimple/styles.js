@@ -5,7 +5,7 @@ export default theme => ({
     flexDirection: 'column',
     width: 400,
     height: 400,
-    boxShadow: `10px 5px 40px 20px ${theme.palette.background.dark}`,
+    boxShadow: '0 10px 30px rgba(15,23,42,0.12)',
     margin: '60px 30px'
   },
   header: {
@@ -19,7 +19,7 @@ export default theme => ({
   },
   body: {
     height: '20%',
-    color: theme.palette.common.white,
+    color: theme.palette.text.primary,
     padding: '15px',
     whiteSpace: 'normal'
   }

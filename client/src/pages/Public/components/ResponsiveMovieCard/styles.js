@@ -4,8 +4,8 @@ export default theme => ({
     minHeight: 340,
     width: '100%',
     maxWidth: 920,
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.background.dark,
+    color: '#0f172a',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     transition: 'all 0.4s',
     '&:hover': {
@@ -18,7 +18,7 @@ export default theme => ({
     width: '100%',
     height: '100%',
     backgroundBlendMode: 'multiply',
-    background: 'linear-gradient(to right, #0d0d0c 50%, transparent 100%)',
+    background: 'linear-gradient(to right, rgba(255,255,255,0.96) 55%, rgba(255,255,255,0.55) 100%)',
     zIndex: 2,
     borderRadius: 10
   },
@@ -34,7 +34,7 @@ export default theme => ({
     textTransform: 'capitalize'
   },
   director: {
-    color: '#9ac7fa',
+    color: '#475569',
     fontWeight: '500',
     fontSize: '16px',
     marginTop: theme.spacing(1)
@@ -43,11 +43,11 @@ export default theme => ({
     display: 'inline-block',
     marginTop: theme.spacing(2),
     padding: theme.spacing(1),
-    border: '1px solid rgba(255,255,255,0.13)'
+    border: '1px solid rgba(15,23,42,0.15)'
   },
   genre: {
     display: 'inline-block',
-    color: '#cee4fd',
+    color: '#64748b',
     marginLeft: theme.spacing(2)
   },
   description: {
@@ -55,7 +55,7 @@ export default theme => ({
     width: '55%'
   },
   descriptionText: {
-    color: '#cfd6e1'
+    color: '#334155'
   },
   footer: {
     height: '10%',
@@ -65,11 +65,11 @@ export default theme => ({
   icons: {
     display: 'inline-block',
     cursor: 'pointer',
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: '#64748b',
     margin: theme.spacing(0, 1),
     transition: 'all 0.3s',
     '&:hover': {
-      color: 'rgba(255, 255, 255, 0.8)',
+      color: '#0f172a',
       transform: 'scale(1.25)',
       transition: 'all 0.3s',
       transitionDelay: '0.15s'
@@ -107,7 +107,7 @@ export default theme => ({
     },
     infoSection: {
       background:
-        'linear-gradient(to top, rgb(20, 20, 19) 50%, transparent 100%)',
+        'linear-gradient(to top, rgba(255,255,255,0.95) 55%, transparent 100%)',
       zIndex: 2,
       borderRadius: 10
     }

@@ -186,7 +186,7 @@ class HomePage extends Component {
         <footer className={classes.footer}>
           <div className={classes.footerTop}>
             <div className={classes.footerBrand}>
-              <Typography className={classes.footerLogo}>CINEMA +</Typography>
+              <Typography className={classes.footerLogo}>M2K CINEMAS</Typography>
               <Typography className={classes.footerTagline}>
                 India's Finest Cinematic Experience
               </Typography>
@@ -217,7 +217,7 @@ class HomePage extends Component {
           </div>
           <div className={classes.footerBottom}>
             <Typography className={classes.footerCopy}>
-              © {new Date().getFullYear()} Cinema+. All rights reserved.
+              © {new Date().getFullYear()} M2K Cinemas. All rights reserved.
             </Typography>
             <div className={classes.footerSocials}>
               {['📘', '🐦', '📸', '▶️'].map((icon, i) => (

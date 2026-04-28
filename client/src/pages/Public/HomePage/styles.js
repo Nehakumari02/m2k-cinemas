@@ -22,8 +22,8 @@ export default theme => ({
     justifyContent: 'center',
     gap: '8px',
     padding: '16px 5%',
-    backgroundColor: 'rgb(18,18,26)',
-    borderBottom: '1px solid rgba(183,36,41,0.10)',
+    backgroundColor: '#ffffff',
+    borderBottom: '1px solid rgba(15,23,42,0.08)',
     flexWrap: 'wrap',
     position: 'sticky',
     top: '64px',
@@ -32,8 +32,8 @@ export default theme => ({
   },
   tab: {
     background: 'transparent',
-    border: '1px solid rgba(255,255,255,0.12)',
-    color: 'rgba(255,255,255,0.65)',
+    border: '1px solid rgba(15,23,42,0.15)',
+    color: '#475569',
     borderRadius: '24px',
     padding: '8px 20px',
     fontSize: '0.82rem',
@@ -49,16 +49,16 @@ export default theme => ({
   tabActive: {
     background: '#b72429',
     borderColor: '#b72429',
-    color: '#14141c',
+    color: '#ffffff',
     '&:hover': {
       background: '#8b1c20',
-      color: '#14141c',
+      color: '#ffffff',
     }
   },
 
   /* ── Carousel Sections ────────────────────── */
   sectionWrapper: {
-    backgroundColor: 'rgb(14,14,20)',
+    backgroundColor: '#f8fafc',
     paddingTop: theme.spacing(5),
     paddingBottom: theme.spacing(2),
     scrollMarginTop: '130px',
@@ -82,7 +82,7 @@ export default theme => ({
   sectionTitle: {
     fontSize: '1.6rem',
     fontWeight: 800,
-    color: theme.palette.common.white,
+    color: '#0f172a',
     letterSpacing: '0.02em',
   },
   titleAccent: {
@@ -95,9 +95,9 @@ export default theme => ({
 
   /* ── Footer ───────────────────────────────── */
   footer: {
-    backgroundColor: 'rgb(10,10,16)',
-    borderTop: '1px solid rgba(183,36,41,0.15)',
-    color: '#fff',
+    backgroundColor: '#ffffff',
+    borderTop: '1px solid rgba(15,23,42,0.08)',
+    color: '#0f172a',
     marginTop: theme.spacing(2),
   },
   footerTop: {
@@ -122,7 +122,7 @@ export default theme => ({
   },
   footerTagline: {
     fontSize: '0.82rem',
-    color: 'rgba(255,255,255,0.45)',
+    color: '#64748b',
     letterSpacing: '0.04em',
     lineHeight: 1.6,
   },
@@ -147,7 +147,7 @@ export default theme => ({
   },
   footerLink: {
     fontSize: '0.88rem',
-    color: 'rgba(255,255,255,0.55)',
+    color: '#475569',
     textDecoration: 'none',
     cursor: 'pointer',
     transition: 'color 0.2s',
@@ -155,7 +155,7 @@ export default theme => ({
     '&:hover': { color: '#b72429' }
   },
   footerBottom: {
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid rgba(15,23,42,0.08)',
     padding: '18px 8%',
     display: 'flex',
     justifyContent: 'space-between',
@@ -165,7 +165,7 @@ export default theme => ({
   },
   footerCopy: {
     fontSize: '0.78rem',
-    color: 'rgba(255,255,255,0.3)',
+    color: '#64748b',
   },
   footerSocials: {
     display: 'flex',

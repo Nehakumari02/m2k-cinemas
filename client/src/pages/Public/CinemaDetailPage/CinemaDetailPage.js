@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
   page: {
     paddingTop: theme.spacing(10),
     paddingBottom: theme.spacing(6),
-    color: '#fff',
+    color: '#0f172a',
   },
   hero: {
     borderRadius: 16,
@@ -22,21 +22,43 @@ const useStyles = makeStyles(theme => ({
     backgroundPosition: 'center',
     marginBottom: theme.spacing(4),
     position: 'relative',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: '1px solid rgba(15,23,42,0.08)',
+  },
+  heroImage: {
+    position: 'absolute',
+    inset: 0,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat',
+    transform: 'scale(1.01)',
   },
   heroBackdrop: {
     position: 'absolute',
     inset: 0,
-    background: 'linear-gradient(90deg, rgba(0,0,0,.88) 20%, rgba(0,0,0,.45) 70%, rgba(0,0,0,.2) 100%)',
+    background: 'linear-gradient(90deg, rgba(2,6,23,.85) 18%, rgba(2,6,23,.52) 60%, rgba(2,6,23,.3) 100%)',
   },
   heroOverlay: {
     position: 'relative',
     zIndex: 2,
     width: '62%',
   },
-  title: { fontWeight: 800, marginBottom: theme.spacing(1) },
-  subtitle: { color: 'rgba(255,255,255,0.8)' },
-  chip: { marginRight: theme.spacing(1), marginTop: theme.spacing(1) },
+  title: {
+    fontWeight: 800,
+    marginBottom: theme.spacing(1),
+    color: '#ffffff',
+    textShadow: '0 8px 26px rgba(0,0,0,0.45)',
+  },
+  subtitle: {
+    color: '#e2e8f0',
+    textShadow: '0 6px 18px rgba(0,0,0,0.35)',
+  },
+  chip: {
+    marginRight: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    color: '#fff',
+    backgroundColor: 'rgba(15,23,42,0.58)',
+    border: '1px solid rgba(255,255,255,0.2)',
+  },
   ctaRow: {
     marginTop: theme.spacing(2.5),
     display: 'flex',
@@ -44,14 +66,14 @@ const useStyles = makeStyles(theme => ({
   },
   sectionTitle: { marginTop: theme.spacing(3), marginBottom: theme.spacing(2), fontWeight: 700 },
   movieCard: {
-    background: '#171b22',
+    background: '#ffffff',
     borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: '1px solid rgba(15,23,42,0.1)',
     padding: theme.spacing(2.2),
     height: '100%',
   },
   movieTitle: { fontWeight: 700, marginBottom: theme.spacing(0.7) },
-  meta: { color: 'rgba(255,255,255,0.65)', marginBottom: theme.spacing(1.2) },
+  meta: { color: '#64748b', marginBottom: theme.spacing(1.2) },
   showtimeRow: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -59,8 +81,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1.5),
   },
   timeChip: {
-    borderColor: 'rgba(255,255,255,0.3)',
-    color: '#fff',
+    borderColor: 'rgba(15,23,42,0.2)',
+    color: '#334155',
   },
   dateRow: {
     display: 'flex',
@@ -69,13 +91,21 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   dateChip: {
-    borderColor: 'rgba(255,255,255,0.3)',
-    color: '#fff',
+    borderColor: 'rgba(15,23,42,0.2)',
+    color: '#334155',
   },
   dateChipActive: {
     backgroundColor: '#b72429',
     color: '#fff',
     borderColor: '#b72429',
+  },
+  bookButton: {
+    backgroundColor: '#b72429',
+    color: '#fff',
+    fontWeight: 700,
+    '&:hover': {
+      backgroundColor: '#8b1c20',
+    },
   },
   [theme.breakpoints.down('sm')]: {
     hero: { minHeight: 300, padding: theme.spacing(2.5) },
@@ -155,7 +185,8 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
 
   return (
     <Container className={classes.page} maxWidth="lg">
-      <div className={classes.hero} style={{ backgroundImage: `url("${encodeURI(image)}")` }}>
+      <div className={classes.hero}>
+        <div className={classes.heroImage} style={{ backgroundImage: `url("${encodeURI(image)}")` }} />
         <div className={classes.heroBackdrop} />
         <div className={classes.heroOverlay}>
           <Typography variant="h3" className={classes.title}>{cinema.name}</Typography>
@@ -170,7 +201,7 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
               to="/cinemas"
               variant="outlined"
               size="small"
-              style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.55)' }}
+              style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.5)', backgroundColor: 'rgba(15,23,42,0.24)' }}
             >
               All Cinemas
             </Button>
@@ -225,7 +256,7 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
                   to={`/movie/booking/${movie._id}`}
                   variant="contained"
                   size="small"
-                  color="secondary"
+                  className={classes.bookButton}
                 >
                   Book Tickets
                 </Button>

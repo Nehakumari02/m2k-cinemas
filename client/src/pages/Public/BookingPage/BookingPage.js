@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Grid, Container } from '@material-ui/core';
+import { withStyles, Grid, Container, Typography } from '@material-ui/core';
 import {
   getMovie,
   getCinemasUserModeling,
@@ -458,6 +458,13 @@ class BookingPage extends Component {
   onChangeCinema = event => this.props.setSelectedCinema(event.target.value);
   onChangeDate = date => this.props.setSelectedDate(date);
   onChangeTime = event => this.props.setSelectedTime(event.target.value);
+  onProceedToSeats = (cinemaId, time) => {
+    const { match, history, selectedDate, setSelectedCinema, setSelectedTime } = this.props;
+    if (cinemaId) setSelectedCinema(cinemaId);
+    if (time) setSelectedTime(time);
+    if (!selectedDate) return;
+    history.push(`/movie/booking/${match.params.id}/seats`);
+  };
 
   sendInvitations = async () => {
     const invitations = this.createInvitations();
@@ -537,9 +544,28 @@ class BookingPage extends Component {
       setInvitation,
       resetCheckout,
       suggestedSeats,
-      suggestedSeat
+      suggestedSeat,
+      match
     } = this.props;
+    const isSeatsStep = match.params.step === 'seats';
     const { paymentMethod, paymentDetails } = this.state;
+    const normalizeImage = value => {
+      if (!value) return '';
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        return encodeURI(value);
+      }
+      return encodeURI(value.startsWith('/') ? value : `/${value}`);
+    };
+    const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
+    const castMembers = castCrew.filter(
+      member => String(member.role || '').toLowerCase() === 'cast'
+    );
+    const crewMembers = castCrew.filter(
+      member => String(member.role || '').toLowerCase() !== 'cast'
+    );
+    const backdropImages = Array.isArray(movie && movie.backdropImages)
+      ? movie.backdropImages
+      : [];
     const { uniqueCinemas, uniqueTimes } = this.onFilterCinema();
     let seats = this.onGetReservedSeats();
     if (suggestedSeats && selectedTime && !suggestedSeat.length) {
@@ -555,17 +581,111 @@ class BookingPage extends Component {
         <Grid container spacing={2} style={{ height: '100%' }}>
           <MovieInfo movie={movie} />
           <Grid item lg={9} xs={12} md={12}>
-            <BookingForm
-              cinemas={uniqueCinemas}
-              times={uniqueTimes}
-              showtimes={showtimes}
-              selectedCinema={selectedCinema}
-              selectedDate={selectedDate}
-              selectedTime={selectedTime}
-              onChangeCinema={this.onChangeCinema}
-              onChangeDate={this.onChangeDate}
-              onChangeTime={this.onChangeTime}
-            />
+            {!isSeatsStep && (
+              <BookingForm
+                cinemas={uniqueCinemas}
+                times={uniqueTimes}
+                showtimes={showtimes}
+                selectedCinema={selectedCinema}
+                selectedDate={selectedDate}
+                selectedTime={selectedTime}
+                onChangeCinema={this.onChangeCinema}
+                onChangeDate={this.onChangeDate}
+                onChangeTime={this.onChangeTime}
+                onProceedToSeats={this.onProceedToSeats}
+              />
+            )}
+
+            {!isSeatsStep &&
+              (selectedCinema || selectedDate || selectedTime) &&
+              (castMembers.length || crewMembers.length || backdropImages.length) && (
+              <div className={classes.mediaSection}>
+                {!!castMembers.length && (
+                  <div className={classes.peopleBlock}>
+                    <Typography variant="h5" className={classes.sectionTitle}>
+                      Cast
+                    </Typography>
+                    <div className={classes.peopleScroller}>
+                      {castMembers.map((member, index) => {
+                        const memberImage = member.image
+                          ? normalizeImage(member.image)
+                          : 'https://source.unsplash.com/featured/?portrait';
+                        return (
+                          <div
+                            key={`${member.name || 'cast'}-${index}`}
+                            className={classes.personCard}>
+                            <img
+                              src={memberImage}
+                              alt={member.name || 'Cast'}
+                              className={classes.personImage}
+                            />
+                            <Typography variant="body2" className={classes.personName}>
+                              {member.name || 'Unknown'}
+                            </Typography>
+                            <Typography variant="caption" className={classes.personRole}>
+                              Cast
+                            </Typography>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {!!crewMembers.length && (
+                  <div className={classes.peopleBlock}>
+                    <Typography variant="h5" className={classes.sectionTitle}>
+                      Crew
+                    </Typography>
+                    <div className={classes.peopleScroller}>
+                      {crewMembers.map((member, index) => {
+                        const memberImage = member.image
+                          ? normalizeImage(member.image)
+                          : 'https://source.unsplash.com/featured/?portrait';
+                        return (
+                          <div
+                            key={`${member.role || 'crew'}-${member.name || 'crew'}-${index}`}
+                            className={classes.personCard}>
+                            <img
+                              src={memberImage}
+                              alt={member.name || 'Crew'}
+                              className={classes.personImage}
+                            />
+                            <Typography variant="body2" className={classes.personName}>
+                              {member.name || 'Unknown'}
+                            </Typography>
+                            <Typography variant="caption" className={classes.personRole}>
+                              {member.role || 'Crew'}
+                            </Typography>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {!!backdropImages.length && (
+                  <div className={classes.backdropBlock}>
+                    <Typography variant="h5" className={classes.sectionTitle}>
+                      Movie Stills
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {backdropImages.map((image, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={`${image}-${index}`}>
+                          <div className={classes.backdropCard}>
+                            <img
+                              src={normalizeImage(image)}
+                              alt={`Backdrop ${index + 1}`}
+                              className={classes.backdropImage}
+                            />
+                          </div>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </div>
+                )}
+              </div>
+            )}
             {showInvitation && !!selectedSeats.length && (
               <BookingInvitation
                 selectedSeats={selectedSeats}
@@ -577,7 +697,7 @@ class BookingPage extends Component {
               />
             )}
 
-            {cinema && selectedCinema && selectedTime && !showInvitation && (
+            {isSeatsStep && cinema && selectedCinema && selectedTime && !showInvitation && (
               <>
                 <BookingSeats
                   seats={seats}

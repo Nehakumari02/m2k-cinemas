@@ -5,9 +5,9 @@ import { Box, Grid, Typography, Button, TextField, MenuItem } from '@material-ui
 const useStyles = makeStyles(theme => ({
   checkoutBar: {
     marginTop: theme.spacing(3),
-    background: 'linear-gradient(135deg, rgb(18,18,26) 0%, rgb(28,28,38) 100%)',
+    background: '#ffffff',
     borderRadius: '14px',
-    border: '1px solid rgba(183,36,41,0.12)',
+    border: '1px solid rgba(15,23,42,0.1)',
     overflow: 'hidden',
   },
   infoRow: {
@@ -25,14 +25,14 @@ const useStyles = makeStyles(theme => ({
   bannerTitle: {
     fontSize: '0.65rem',
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.4)',
+    color: '#64748b',
     letterSpacing: '0.1em',
     fontWeight: 700,
   },
   bannerContent: {
     fontSize: '1rem',
     fontWeight: 700,
-    color: '#fff',
+    color: '#0f172a',
     textTransform: 'capitalize',
   },
   priceHighlight: {
@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
   },
   paymentSection: {
     padding: '16px 24px',
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid rgba(15,23,42,0.08)',
     display: 'flex',
     alignItems: 'center',
     flexWrap: 'wrap',
@@ -52,30 +52,30 @@ const useStyles = makeStyles(theme => ({
     minWidth: 170,
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
-      backgroundColor: 'rgba(255,255,255,0.06)',
-      color: '#fff',
-      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+      backgroundColor: '#fff',
+      color: '#0f172a',
+      '& fieldset': { borderColor: 'rgba(15,23,42,0.15)' },
       '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
       '&.Mui-focused fieldset': { borderColor: '#b72429' },
     },
-    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
-    '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.5)' },
+    '& .MuiInputLabel-root': { color: '#64748b' },
+    '& .MuiSelect-icon': { color: '#64748b' },
   },
   textField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
-      backgroundColor: 'rgba(255,255,255,0.06)',
-      color: '#fff',
-      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+      backgroundColor: '#fff',
+      color: '#0f172a',
+      '& fieldset': { borderColor: 'rgba(15,23,42,0.15)' },
       '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
       '&.Mui-focused fieldset': { borderColor: '#b72429' },
     },
-    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
+    '& .MuiInputLabel-root': { color: '#64748b' },
   },
   bookButton: {
     marginLeft: 'auto',
     background: 'linear-gradient(90deg, #b72429, #8b1c20)',
-    color: '#14141c',
+    color: '#fff',
     fontWeight: 800,
     fontSize: '0.9rem',
     letterSpacing: '0.06em',
@@ -89,8 +89,8 @@ const useStyles = makeStyles(theme => ({
       transform: 'translateY(-1px)',
     },
     '&:disabled': {
-      background: 'rgba(255,255,255,0.08)',
-      color: 'rgba(255,255,255,0.25)',
+      background: 'rgba(15,23,42,0.08)',
+      color: '#94a3b8',
     }
   },
   [theme.breakpoints.down('sm')]: {

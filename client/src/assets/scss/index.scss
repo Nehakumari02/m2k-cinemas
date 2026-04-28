@@ -11,7 +11,8 @@ html {
 }
 
 body {
-  background: rgb(26, 26, 26);
+  background: #f8fafc;
+  color: #1f2937;
   font-family: 'Montserrat', sans-serif;
   height: 100%;
 }
@@ -40,7 +41,7 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   border: 1px solid;
-  -webkit-text-fill-color: #fff;
-  -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;
+  -webkit-text-fill-color: #111827;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
   transition: background-color 5000s ease-in-out 0s;
 }
