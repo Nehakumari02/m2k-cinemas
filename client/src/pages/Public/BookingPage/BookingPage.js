@@ -36,6 +36,7 @@ import jsPDF from 'jspdf';
 
 class BookingPage extends Component {
   didSetSuggestion = false;
+  isValidObjectId = value => /^[a-f\d]{24}$/i.test(String(value || ''));
   state = {
     paymentMethod: '',
     paymentDetails: {
@@ -68,10 +69,30 @@ class BookingPage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { selectedCinema, selectedDate, getCinema } = this.props;
+    const {
+      selectedCinema,
+      selectedDate,
+      getCinema,
+      location,
+      setSelectedCinema,
+      setSelectedTime
+    } = this.props;
+    const hasValidCinemaId = this.isValidObjectId(selectedCinema);
+    const wasSeatsStep = prevProps.location.pathname.endsWith('/seats');
+    const isSeatsStep = location.pathname.endsWith('/seats');
+
+    // When user returns from seats to listing, clear sticky cinema/time filters
+    // so all available cinemas are visible again by default.
+    if (wasSeatsStep && !isSeatsStep) {
+      setSelectedCinema('');
+      setSelectedTime('');
+      return;
+    }
+
     if (
-      (selectedCinema && prevProps.selectedCinema !== selectedCinema) ||
-      (selectedCinema && prevProps.selectedDate !== selectedDate)
+      hasValidCinemaId &&
+      ((prevProps.selectedCinema !== selectedCinema) ||
+        (prevProps.selectedDate !== selectedDate))
     ) {
       getCinema(selectedCinema);
     }
@@ -460,9 +481,9 @@ class BookingPage extends Component {
   onChangeTime = event => this.props.setSelectedTime(event.target.value);
   onProceedToSeats = (cinemaId, time) => {
     const { match, history, selectedDate, setSelectedCinema, setSelectedTime } = this.props;
+    if (!this.isValidObjectId(cinemaId) || !time || !selectedDate) return;
     if (cinemaId) setSelectedCinema(cinemaId);
     if (time) setSelectedTime(time);
-    if (!selectedDate) return;
     history.push(`/movie/booking/${match.params.id}/seats`);
   };
 
@@ -545,9 +566,10 @@ class BookingPage extends Component {
       resetCheckout,
       suggestedSeats,
       suggestedSeat,
-      match
+      match,
+      location
     } = this.props;
-    const isSeatsStep = match.params.step === 'seats';
+    const isSeatsStep = location.pathname.endsWith('/seats');
     const { paymentMethod, paymentDetails } = this.state;
     const normalizeImage = value => {
       if (!value) return '';

@@ -114,6 +114,13 @@ const Routes = () => {
             layoutProps={{ withFooter: false }}
             component={BookingPage}
           />
+          <WithLayoutRoute
+            exact
+            path="/movie/booking/:id/seats"
+            layout={PublicLayout}
+            layoutProps={{ withFooter: false }}
+            component={BookingPage}
+          />
           <ProtectedRoute
             exact
             path="/admin/dashboard"
