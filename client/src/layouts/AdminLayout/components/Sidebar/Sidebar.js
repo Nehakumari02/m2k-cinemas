@@ -19,6 +19,8 @@ import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
 import EventIcon from '@material-ui/icons/Event';
 import RateReviewIcon from '@material-ui/icons/RateReview';
+import StoreIcon from '@material-ui/icons/StoreOutlined';
+import ShippingIcon from '@material-ui/icons/LocalShippingOutlined';
 // Component styles
 import styles from './styles';
 
@@ -143,6 +145,32 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Events"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/products">
+            <ListItemIcon className={classes.listItemIcon}>
+              <StoreIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Shop"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/orders">
+            <ListItemIcon className={classes.listItemIcon}>
+              <ShippingIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Orders"
             />
           </ListItem>
           <ListItem

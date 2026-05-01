@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Box, Grid, Typography, Button, TextField, MenuItem } from '@material-ui/core';
 
@@ -114,15 +114,57 @@ export default function BookingCheckout(props) {
     onToggleFoodStep,
     onChangePaymentMethod,
     onPaymentFieldChange,
-    onBookSeats
+    onBookSeats,
+    walletBalance = 0,
+    loyaltyPoints = 0,
+    pointsUsed = 0,
+    onChangePointsUsed,
+    appliedCoupon,
+    discountPercentage,
+    onApplyCoupon,
+    onRemoveCoupon
   } = props;
+
+  const [couponInput, setCouponInput] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput) return;
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const response = await fetch('/offers/validate', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: couponInput })
+      });
+      const data = await response.json();
+      if (response.ok && data.valid) {
+        onApplyCoupon(couponInput.toUpperCase(), data.discountPercentage);
+        setCouponInput('');
+      } else {
+        setCouponError(data.error || 'Invalid coupon code');
+      }
+    } catch (err) {
+      setCouponError('Error applying coupon');
+    }
+    setIsApplyingCoupon(false);
+  };
 
   const foodTotal = Object.values(selectedFood || {}).reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
   const ticketsTotal = ticketPrice * selectedSeats;
-  const totalPrice = ticketsTotal + foodTotal;
+  const subTotal = ticketsTotal + foodTotal;
+  const discountValue = Math.floor((subTotal * (discountPercentage || 0)) / 100);
+  const afterDiscountTotal = subTotal - discountValue;
+  const finalPrice = Math.max(0, afterDiscountTotal - (pointsUsed || 0));
 
   return (
     <div className={classes.checkoutBar}>
@@ -153,8 +195,18 @@ export default function BookingCheckout(props) {
         <div className={classes.infoBlock}>
           <Typography className={classes.bannerTitle}>Total Payable</Typography>
           <Typography className={classes.priceHighlight}>
-            ₹{totalPrice}
+            ₹{finalPrice}
           </Typography>
+          {discountValue > 0 && (
+            <Typography variant="caption" style={{ color: '#22c55e', fontWeight: 'bold' }}>
+              (-₹{discountValue} coupon)
+            </Typography>
+          )}
+          {pointsUsed > 0 && (
+            <Typography variant="caption" style={{ color: '#22c55e', fontWeight: 'bold' }}>
+              (-₹{pointsUsed} pts)
+            </Typography>
+          )}
         </div>
       </div>
 
@@ -178,6 +230,52 @@ export default function BookingCheckout(props) {
               Back to Seats
             </Button>
 
+            {!appliedCoupon ? (
+              <Box display="flex" alignItems="center" gridGap={8}>
+                <TextField
+                  label="Promo Code"
+                  variant="outlined"
+                  size="small"
+                  value={couponInput}
+                  onChange={e => setCouponInput(e.target.value)}
+                  error={!!couponError}
+                  helperText={couponError}
+                  style={{ width: 180 }}
+                />
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={handleApplyCoupon}
+                  disabled={isApplyingCoupon || !couponInput}
+                  style={{ height: 40 }}
+                >
+                  {isApplyingCoupon ? '...' : 'Apply'}
+                </Button>
+              </Box>
+            ) : (
+              <Box display="flex" alignItems="center" gridGap={8} bgcolor="#f0fdf4" p={1} borderRadius={4} border="1px solid #bbf7d0">
+                <Typography variant="body2" style={{ color: '#166534', fontWeight: 'bold' }}>
+                  {appliedCoupon} ({discountPercentage}% OFF)
+                </Typography>
+                <Button size="small" color="secondary" onClick={onRemoveCoupon}>
+                  Remove
+                </Button>
+              </Box>
+            )}
+
+            {loyaltyPoints > 0 && (
+              <TextField
+                label={`Use Points (Max: ${Math.min(loyaltyPoints, afterDiscountTotal)})`}
+                type="number"
+                variant="outlined"
+                size="small"
+                value={pointsUsed || ''}
+                onChange={onChangePointsUsed}
+                InputProps={{ inputProps: { min: 0, max: Math.min(loyaltyPoints, afterDiscountTotal) } }}
+                style={{ width: 180 }}
+              />
+            )}
+
             <TextField
               select
               value={paymentMethod}
@@ -191,7 +289,18 @@ export default function BookingCheckout(props) {
               <MenuItem value="card">Card</MenuItem>
               <MenuItem value="upi">UPI</MenuItem>
               <MenuItem value="netbanking">Net Banking</MenuItem>
+              <MenuItem value="wallet">M2K Wallet (Balance: ₹{walletBalance})</MenuItem>
             </TextField>
+
+            {paymentMethod === 'wallet' && finalPrice > 0 && (
+              <Box ml={2}>
+                <Typography variant="body2" style={{ color: walletBalance >= finalPrice ? '#22c55e' : '#ef4444', fontWeight: 700 }}>
+                  {walletBalance >= finalPrice 
+                    ? '✓ Sufficient balance' 
+                    : `✗ Insufficient balance (Short by ₹${finalPrice - walletBalance})`}
+                </Typography>
+              </Box>
+            )}
 
             {paymentMethod === 'card' && (
               <>

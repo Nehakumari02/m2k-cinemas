@@ -1,0 +1,4 @@
+export const GET_WALLET_DATA = 'GET_WALLET_DATA';
+export const WALLET_ERROR = 'WALLET_ERROR';
+export const WALLET_LOADING = 'WALLET_LOADING';
+export const ADD_WALLET_MONEY = 'ADD_WALLET_MONEY';

@@ -21,7 +21,8 @@ import {
   setAlert,
   addReservation,
   setSuggestedSeats,
-  setQRCode
+  setQRCode,
+  getWalletData
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
@@ -49,7 +50,10 @@ class BookingPage extends Component {
       upiId: '',
       bankName: '',
       accountHolder: ''
-    }
+    },
+    pointsUsed: 0,
+    appliedCoupon: null,
+    discountPercentage: 0
   };
 
   componentDidMount() {
@@ -61,13 +65,17 @@ class BookingPage extends Component {
       getCinemasUserModeling,
       getShowtimes,
       getReservations,
-      getSuggestedReservationSeats
+      getSuggestedReservationSeats,
+      getWalletData
     } = this.props;
     getMovie(match.params.id);
     user ? getCinemasUserModeling(user.username) : getCinemas();
     getShowtimes();
     getReservations();
-    if (user) getSuggestedReservationSeats(user.username);
+    if (user) {
+      getSuggestedReservationSeats(user.username);
+      getWalletData();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -276,7 +284,7 @@ class BookingPage extends Component {
       showInvitationForm,
       setQRCode
     } = this.props;
-    const { paymentMethod, paymentDetails } = this.state;
+    const { paymentMethod, paymentDetails, pointsUsed } = this.state;
 
     if (selectedSeats.length === 0) return;
     if (!isAuth) return toggleLoginPopup();
@@ -332,9 +340,49 @@ class BookingPage extends Component {
       quantity: item.quantity
     }));
     const foodAmount = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const totalAmount = ticketsAmount + foodAmount;
+    const subTotal = ticketsAmount + foodAmount;
+    
+    // Apply coupon discount
+    const discountValue = Math.floor((subTotal * this.state.discountPercentage) / 100);
+    const afterDiscountTotal = subTotal - discountValue;
+    
+    // Apply points discount
+    const finalAmount = Math.max(0, afterDiscountTotal - pointsUsed);
 
-    const paymentSuccess = await this.launchPayment(totalAmount);
+    let paymentSuccess = false;
+    if (finalAmount === 0) {
+      paymentSuccess = true;
+    } else if (paymentMethod === 'wallet') {
+      if (this.props.walletBalance < finalAmount) {
+        return this.props.setAlert('Insufficient wallet balance', 'error', 5000);
+      }
+      try {
+        const token = localStorage.getItem('jwtToken');
+        const payResponse = await fetch('/wallet/pay', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: finalAmount,
+            description: `Booking for ${movie.title} at ${cinema.name}`
+          })
+        });
+        const payData = await payResponse.json();
+        if (payResponse.ok) {
+          paymentSuccess = true;
+          this.props.getWalletData(); // Refresh balance
+        } else {
+          return this.props.setAlert(payData.error || 'Wallet payment failed', 'error', 5000);
+        }
+      } catch (e) {
+        return this.props.setAlert('Server error during wallet payment', 'error', 5000);
+      }
+    } else {
+      paymentSuccess = await this.launchPayment(finalAmount);
+    }
+
     if (!paymentSuccess) return;
 
     const response = await addReservation({
@@ -342,7 +390,8 @@ class BookingPage extends Component {
       startAt: selectedTime,
       seats: this.bookSeats(),
       ticketPrice: cinema.ticketPrice,
-      total: totalAmount,
+      total: afterDiscountTotal, // Sending the post-coupon total
+      pointsUsed: pointsUsed,
       foodItems,
       movieId: movie._id,
       cinemaId: cinema._id,
@@ -362,12 +411,27 @@ class BookingPage extends Component {
 
   onPaymentFieldChange = event => {
     const { name, value } = event.target;
-    this.setState(prevState => ({
+    this.setState({
       paymentDetails: {
-        ...prevState.paymentDetails,
+        ...this.state.paymentDetails,
         [name]: value
       }
-    }));
+    });
+  };
+
+  onChangePointsUsed = event => {
+    const val = parseInt(event.target.value, 10);
+    this.setState({ pointsUsed: isNaN(val) ? 0 : val });
+  };
+
+  onApplyCoupon = (code, percentage) => {
+    this.setState({ appliedCoupon: code, discountPercentage: percentage });
+    this.props.setAlert(`Coupon applied! You get ${percentage}% off.`, 'success', 5000);
+  };
+
+  onRemoveCoupon = () => {
+    this.setState({ appliedCoupon: null, discountPercentage: 0 });
+    this.props.setAlert('Coupon removed.', 'info', 5000);
   };
 
   bookSeats() {
@@ -600,7 +664,8 @@ class BookingPage extends Component {
       suggestedSeats,
       suggestedSeat,
       match,
-      location
+      location,
+      walletBalance
     } = this.props;
     const isSeatsStep = location.pathname.endsWith('/seats');
     const { paymentMethod, paymentDetails } = this.state;
@@ -777,6 +842,14 @@ class BookingPage extends Component {
                   onChangePaymentMethod={this.onChangePaymentMethod}
                   onPaymentFieldChange={this.onPaymentFieldChange}
                   onBookSeats={() => this.checkout()}
+                  walletBalance={this.props.walletBalance}
+                  loyaltyPoints={this.props.loyaltyPoints}
+                  pointsUsed={this.state.pointsUsed}
+                  onChangePointsUsed={this.onChangePointsUsed}
+                  appliedCoupon={this.state.appliedCoupon}
+                  discountPercentage={this.state.discountPercentage}
+                  onApplyCoupon={this.onApplyCoupon}
+                  onRemoveCoupon={this.onRemoveCoupon}
                 />
               </>
             )}
@@ -807,7 +880,8 @@ const mapStateToProps = (
     cinemaState,
     showtimeState,
     reservationState,
-    checkoutState
+    checkoutState,
+    walletState
   },
   ownProps
 ) => ({
@@ -830,7 +904,9 @@ const mapStateToProps = (
    invitations: checkoutState.invitations,
   QRCode: checkoutState.QRCode,
   selectedFood: checkoutState.selectedFood,
-  suggestedSeats: reservationState.suggestedSeats
+  suggestedSeats: reservationState.suggestedSeats,
+  walletBalance: walletState.balance,
+  loyaltyPoints: walletState.loyaltyPoints
 });
 
 const mapDispatchToProps = {
@@ -852,7 +928,8 @@ const mapDispatchToProps = {
   showInvitationForm,
   resetCheckout,
   setAlert,
-  setQRCode
+  setQRCode,
+  getWalletData
 };
 
 export default connect(

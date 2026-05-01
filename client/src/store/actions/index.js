@@ -10,3 +10,6 @@ export * from './offers';
 export * from './experiences';
 export * from './food';
 export * from './events';
+export * from './wallet';
+export * from './products';
+export * from './cart';

@@ -5,6 +5,36 @@ const Offer = require('../models/offer');
 
 const router = new express.Router();
 
+// POST validate offer code
+router.post('/offers/validate', auth.simple, async (req, res) => {
+  const { code } = req.body;
+  console.log('Validating coupon code:', code);
+  if (!code) {
+    return res.status(400).send({ error: 'Coupon code is required' });
+  }
+
+  try {
+    const offer = await Offer.findOne({ code: code.toUpperCase() });
+
+    if (!offer) {
+      return res.status(404).send({ error: 'Invalid coupon code' });
+    }
+
+    if (!offer.isActive) {
+      return res.status(400).send({ error: 'This coupon is no longer active' });
+    }
+
+    if (new Date(offer.validTill) < new Date()) {
+      return res.status(400).send({ error: 'This coupon has expired' });
+    }
+
+    res.send({ valid: true, discountPercentage: offer.discountPercentage });
+  } catch (e) {
+    res.status(500).send({ error: 'Server error validating coupon' });
+  }
+});
+
+
 // GET all offers (public)
 router.get('/offers', async (req, res) => {
   try {
@@ -78,7 +108,7 @@ router.post(
 router.put('/offers/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['title', 'description', 'code', 'validTill', 'image', 'isActive'];
+  const allowedUpdates = ['title', 'description', 'code', 'validTill', 'image', 'isActive', 'discountPercentage'];
   const isValidOperation = updates.every(u => allowedUpdates.includes(u));
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
 

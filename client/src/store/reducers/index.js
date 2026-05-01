@@ -11,6 +11,9 @@ import offers from './offers';
 import experiences from './experiences';
 import food from './food';
 import events from './events';
+import wallet from './wallet';
+import products from './products';
+import cart from './cart';
 
 export default combineReducers({
   alertState: alert,
@@ -24,5 +27,8 @@ export default combineReducers({
   offerState: offers,
   experienceState: experiences,
   foodState: food,
-  eventState: events
+  eventState: events,
+  walletState: wallet,
+  productState: products,
+  cartState: cart
 });

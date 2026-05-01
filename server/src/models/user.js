@@ -70,6 +70,14 @@ const userSchema = Schema(
         },
       },
     ],
+    walletBalance: {
+      type: Number,
+      default: 0,
+    },
+    loyaltyPoints: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

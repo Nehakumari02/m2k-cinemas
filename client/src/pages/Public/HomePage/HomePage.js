@@ -194,6 +194,14 @@ class HomePage extends Component {
               <Typography className={classes.footerTagline}>
                 India's Finest Cinematic Experience
               </Typography>
+              <div style={{ marginTop: '20px' }}>
+                <Typography variant="caption" style={{ color: '#64748b', display: 'block', lineHeight: 1.6 }}>
+                  <strong>M2K Corporate Park, Sector-51</strong><br />
+                  Gurugram, Haryana - 122003<br />
+                  Phone: +91 0124 4525000<br />
+                  Email: <a href="mailto:info@m2kcinemas.com" style={{ color: '#b72429', textDecoration: 'none' }}>info@m2kcinemas.com</a>
+                </Typography>
+              </div>
             </div>
             <div className={classes.footerLinks}>
               <div className={classes.footerCol}>
@@ -237,6 +245,10 @@ class HomePage extends Component {
           <div className={classes.footerBottom}>
             <Typography className={classes.footerCopy}>
               © {new Date().getFullYear()} M2K Cinemas. All rights reserved.
+              <span style={{ margin: '0 12px', color: '#cbd5e1' }}>|</span>
+              <Link to="/privacy-policy" style={{ color: '#64748b', textDecoration: 'none' }}>Privacy Policy</Link>
+              <span style={{ margin: '0 12px', color: '#cbd5e1' }}>|</span>
+              <Link to="/terms-conditions" style={{ color: '#64748b', textDecoration: 'none' }}>Terms & Conditions</Link>
             </Typography>
             <div className={classes.footerSocials}>
               {['📘', '🐦', '📸', '▶️'].map((icon, i) => (

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logout } from '../../../../store/actions';
 import classnames from 'classnames';
-import { withStyles, Typography, List, ListItem } from '@material-ui/core';
+import { withStyles, Typography, List, ListItem, Badge, IconButton } from '@material-ui/core';
+import { ShoppingCart as ShoppingCartIcon } from '@material-ui/icons';
 
 // Component styles
 import styles from './styles';
@@ -28,7 +29,8 @@ class Navbar extends Component {
 
   render() {
     const { showMenu, scrollPos } = this.state;
-    const { classes, isAuth, user, logout } = this.props;
+    const { classes, isAuth, user, logout, cartItems } = this.props;
+    const cartCount = (cartItems || []).reduce((acc, item) => acc + item.quantity, 0);
     return (
       <Fragment>
         <nav
@@ -44,7 +46,7 @@ class Navbar extends Component {
             />
           </Link>
           <div className={classes.navLinks}>
-            <Link className={classes.navLink} to="/">
+            <Link className={classes.navLink} to="/movies">
               Movies
             </Link>
             <Link className={classes.navLink} to="/cinemas">
@@ -68,6 +70,14 @@ class Navbar extends Component {
             <Link className={classes.navLink} to="/contact-us">
               Contact Us
             </Link>
+            <Link className={classes.navLink} to="/shop">
+              Shop
+            </Link>
+            <Link className={classes.navLink} to="/cart">
+              <Badge badgeContent={cartCount} color="secondary">
+                <ShoppingCartIcon />
+              </Badge>
+            </Link>
           </div>
 
           <div className={classes.navAccount}>
@@ -75,24 +85,38 @@ class Navbar extends Component {
               <List component="nav">
                 {user && (
                   <ListItem>
-                    <Link
-                      className={classes.navLink}
-                      to={
-                        user.role !== 'guest'
-                          ? '/admin/dashboard'
-                          : '/mydashboard'
-                      }>
-                      Dashboard
+                    {user.role !== 'guest' ? (
+                      <Link className={classes.navLink} to="/admin/dashboard">
+                        Admin Dashboard
+                      </Link>
+                    ) : (
+                      <Link className={classes.navLink} to="/mydashboard">
+                        My Bookings
+                      </Link>
+                    )}
+                  </ListItem>
+                )}
+                {user && user.role === 'guest' && (
+                  <ListItem>
+                    <Link className={classes.navLink} to="/mydashboard">
+                      My Orders
                     </Link>
                   </ListItem>
                 )}
 
                 {isAuth ? (
-                  <ListItem>
-                    <Link className={classes.navLink} onClick={logout} to="/">
-                      Logout
-                    </Link>
-                  </ListItem>
+                  <>
+                    <ListItem>
+                      <Link className={classes.navLink} to="/mywallet">
+                        My Wallet
+                      </Link>
+                    </ListItem>
+                    <ListItem>
+                      <Link className={classes.navLink} onClick={logout} to="/">
+                        Logout
+                      </Link>
+                    </ListItem>
+                  </>
                 ) : (
                   <ListItem>
                     <Link className={classes.navLink} to="/login">
@@ -137,7 +161,7 @@ class Navbar extends Component {
               className={classes.innerNav}
               onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
               <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/">
+                <Link className={classes.innerNavLink} to="/movies">
                   Movies
                 </Link>
               </li>
@@ -176,16 +200,33 @@ class Navbar extends Component {
                   Contact Us
                 </Link>
               </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/shop">
+                  Shop
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/cart">
+                  Cart ({cartCount})
+                </Link>
+              </li>
               {user && (
                 <li className={classes.innerNavListItem}>
-                  <Link
-                    className={classes.innerNavLink}
-                    to={
-                      user.role !== 'guest'
-                        ? '/admin/dashboard'
-                        : '/mydashboard'
-                    }>
-                    Dashboard
+                  {user.role !== 'guest' ? (
+                    <Link className={classes.innerNavLink} to="/admin/dashboard">
+                      Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link className={classes.innerNavLink} to="/mydashboard">
+                      My Bookings
+                    </Link>
+                  )}
+                </li>
+              )}
+              {user && (
+                <li className={classes.innerNavListItem}>
+                  <Link className={classes.innerNavLink} to="/mywallet">
+                    My Wallet
                   </Link>
                 </li>
               )}
@@ -215,7 +256,8 @@ class Navbar extends Component {
 
 const mapStateToProps = state => ({
   isAuth: state.authState.isAuthenticated,
-  user: state.authState.user
+  user: state.authState.user,
+  cartItems: state.cartState.cartItems
 });
 
 const mapDispatchToProps = {

@@ -11,7 +11,8 @@ import {
   selectAllUsers,
   toggleUserDialog,
   addUser,
-  updateUser
+  updateUser,
+  addWalletFundsAdmin
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
 
@@ -63,7 +64,8 @@ class User extends Component {
       toggleUserDialog,
       addUser,
       updateUser,
-      deleteUser
+      deleteUser,
+      addWalletFundsAdmin
     } = this.props;
 
     return (
@@ -73,6 +75,7 @@ class User extends Component {
           selectedUsers={selectedUsers}
           toggleDialog={toggleUserDialog}
           deleteUser={() => deleteUser(selectedUsers[0])}
+          addWalletFundsAdmin={addWalletFundsAdmin}
         />
         <div className={classes.content}>{this.renderUsers()}</div>
         <ResponsiveDialog
@@ -102,7 +105,8 @@ const mapDispatchToProps = {
   toggleUserDialog,
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  addWalletFundsAdmin
 };
 export default connect(
   mapStateToProps,

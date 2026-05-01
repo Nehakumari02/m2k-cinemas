@@ -19,6 +19,8 @@ const ExperienceList = lazy(() => import('./pages/Admin/ExperienceList'));
 const FoodList = lazy(() => import('./pages/Admin/FoodList/FoodList'));
 const EventList = lazy(() => import('./pages/Admin/EventList/EventList'));
 const ReviewList = lazy(() => import('./pages/Admin/ReviewList'));
+const ProductList = lazy(() => import('./pages/Admin/ProductList'));
+const OrderList = lazy(() => import('./pages/Admin/OrderList'));
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -28,6 +30,7 @@ const Login = lazy(() => import('./pages/Public/Login'));
 const HomePage = lazy(() => import('./pages/Public/HomePage'));
 const MoviePage = lazy(() => import('./pages/Public/MoviePage'));
 const MyDashboard = lazy(() => import('./pages/Public/MyDashboard'));
+const AllMoviesPage = lazy(() => import('./pages/Public/AllMoviesPage/AllMoviesPage'));
 const MovieCategoryPage = lazy(() =>
   import('./pages/Public/MovieCategoryPage')
 );
@@ -45,6 +48,12 @@ const CareersPage = lazy(() => import('./pages/Public/CareersPage'));
 const MediaPage = lazy(() => import('./pages/Public/MediaPage'));
 const GalleryPage = lazy(() => import('./pages/Public/GalleryPage'));
 const AdvertisePage = lazy(() => import('./pages/Public/AdvertisePage'));
+const WalletPage = lazy(() => import('./pages/Public/WalletPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/Public/PrivacyPolicyPage'));
+const TermsConditionsPage = lazy(() => import('./pages/Public/TermsConditionsPage'));
+const ShopPage = lazy(() => import('./pages/Public/ShopPage'));
+const CartPage = lazy(() => import('./pages/Public/CartPage'));
+const MerchCheckoutPage = lazy(() => import('./pages/Public/MerchCheckoutPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
 
@@ -74,6 +83,12 @@ const Routes = () => {
             path="/mydashboard"
             layout={PublicLayout}
             component={MyDashboard}
+          />
+          <WithLayoutRoute
+            exact
+            path="/movies"
+            layout={PublicLayout}
+            component={AllMoviesPage}
           />
           <WithLayoutRoute
             exact
@@ -149,9 +164,45 @@ const Routes = () => {
           />
           <WithLayoutRoute
             exact
+            path="/privacy-policy"
+            layout={PublicLayout}
+            component={PrivacyPolicyPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/terms-conditions"
+            layout={PublicLayout}
+            component={TermsConditionsPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/mywallet"
+            layout={PublicLayout}
+            component={WalletPage}
+          />
+          <WithLayoutRoute
+            exact
             path="/experience/:id"
             layout={PublicLayout}
             component={ExperiencePage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/shop"
+            layout={PublicLayout}
+            component={ShopPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/cart"
+            layout={PublicLayout}
+            component={CartPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/merch-checkout"
+            layout={PublicLayout}
+            component={MerchCheckoutPage}
           />
           <WithLayoutRoute
             exact
@@ -227,6 +278,18 @@ const Routes = () => {
             path="/admin/offers"
             layout={AdminLayout}
             component={OfferList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/products"
+            layout={AdminLayout}
+            component={ProductList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/orders"
+            layout={AdminLayout}
+            component={OrderList}
           />
           <ProtectedRoute
             exact

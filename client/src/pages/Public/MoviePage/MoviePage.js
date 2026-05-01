@@ -207,8 +207,26 @@ class MoviePage extends Component {
               </>
             )}
             
+            {/* Backdrops Section */}
+            {!!backdropImages.length && (
+              <Box mt={6}>
+                <Typography variant="h4" style={{ fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>
+                  Backdrops
+                </Typography>
+                <Grid container spacing={2}>
+                  {backdropImages.map((image, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={`${image}-${index}`}>
+                      <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.1)' }}>
+                        <img src={normalizeImage(image)} alt="Backdrop" style={{ width: '100%', height: 210, objectFit: 'cover' }} />
+                      </div>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+
             {/* Review Section */}
-            <Grid container spacing={4} style={{ marginTop: 40 }}>
+            <Grid container spacing={4} style={{ marginTop: 48 }}>
               <Grid item xs={12} md={7}>
                 <Typography variant="h4" style={{ fontWeight: 800, color: '#0f172a', marginBottom: 24 }}>
                   User Reviews ({reviews.length})
@@ -239,7 +257,7 @@ class MoviePage extends Component {
               </Grid>
 
               <Grid item xs={12} md={5}>
-                <Paper elevation={0} style={{ padding: '32px', borderRadius: '24px', background: '#f8fafc', position: 'sticky', top: '100px' }}>
+                <Paper elevation={0} style={{ padding: '32px', borderRadius: '24px', background: '#f8fafc' }}>
                   <Typography variant="h5" style={{ fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>
                     Write a Review
                   </Typography>
@@ -286,24 +304,6 @@ class MoviePage extends Component {
                 </Paper>
               </Grid>
             </Grid>
-
-            {/* Backdrops Section */}
-            {!!backdropImages.length && (
-              <Box mt={8}>
-                <Typography variant="h4" style={{ fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>
-                  Backdrops
-                </Typography>
-                <Grid container spacing={2}>
-                  {backdropImages.map((image, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={`${image}-${index}`}>
-                      <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.1)' }}>
-                        <img src={normalizeImage(image)} alt="Backdrop" style={{ width: '100%', height: 210, objectFit: 'cover' }} />
-                      </div>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            )}
           </Container>
         )}
       </>

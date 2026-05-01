@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middlewares/auth');
 const Reservation = require('../models/reservation');
+const User = require('../models/user');
 const userModeling = require('../utils/userModeling');
 const generateQR = require('../utils/generateQRCode');
 
@@ -45,6 +46,19 @@ router.post('/reservations', auth.simple, async (req, res) => {
       });
     }
 
+    const pointsUsed = req.body.pointsUsed || 0;
+    const user = await User.findById(req.user._id);
+
+    if (user.loyaltyPoints < pointsUsed) {
+      return res.status(400).send({ error: 'Insufficient loyalty points' });
+    }
+
+    user.loyaltyPoints -= pointsUsed;
+    const finalAmountPaid = Math.max(0, reservation.total - pointsUsed);
+    const pointsEarned = Math.floor(finalAmountPaid * 0.1);
+    user.loyaltyPoints += pointsEarned;
+    
+    await user.save();
     await reservation.save();
     res.status(201).send({ reservation, QRCode });
   } catch (e) {

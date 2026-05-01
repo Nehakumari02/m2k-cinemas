@@ -6,7 +6,8 @@ const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
-    height: '100%'
+    height: '100%',
+    paddingTop: '64px'
   }
 }));
 
@@ -16,7 +17,9 @@ function PublicLayout(props) {
   return (
     <div className={classes.root}>
       <Navbar />
-      {children}
+      <div className={classes.content}>
+        {children}
+      </div>
       {withFooter && <Footer />}
     </div>
   );

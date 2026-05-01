@@ -125,3 +125,29 @@ export const deleteUser = id => async dispatch => {
     };
   }
 };
+
+export const addWalletFundsAdmin = (userId, amount) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const url = '/wallet/admin/add';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userId, amount })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      dispatch(setAlert('Funds added successfully', 'success', 5000));
+      dispatch(getUsers()); // Refresh user list
+      return { status: 'success', message: 'Funds added' };
+    } else {
+      throw new Error(data.error || 'Failed to add funds');
+    }
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+    return { status: 'error', message: error.message };
+  }
+};

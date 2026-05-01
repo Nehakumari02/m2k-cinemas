@@ -188,7 +188,20 @@ export default theme => ({
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '100%',
-    zIndex: 10
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    overflowY: 'auto',
+    padding: '80px 0 40px',
+    [theme.breakpoints.down('sm')]: {
+      top: 0,
+      left: 0,
+      transform: 'none',
+      justifyContent: 'flex-start',
+    }
   },
   currentPageShadow: {
     position: 'absolute',
@@ -216,9 +229,12 @@ export default theme => ({
     position: 'relative',
     display: 'block',
     textAlign: 'center',
-    margin: '1.5rem 0',
+    margin: '1rem 0',
     transform: 'translateY(20px)',
-    transition: 'opacity .3s ease, transform .3s ease'
+    transition: 'opacity .3s ease, transform .3s ease',
+    [theme.breakpoints.down('sm')]: {
+      margin: '0.6rem 0',
+    }
   },
   innerNavLink: {
     position: 'relative',
@@ -245,7 +261,7 @@ export default theme => ({
     navIcon: { display: 'block' },
     navLinks: { display: 'none' },
     innerNavLink: {
-      fontSize: '1.8rem',
+      fontSize: '1.2rem',
       letterSpacing: '2px'
     }
   }

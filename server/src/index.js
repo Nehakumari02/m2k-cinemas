@@ -19,6 +19,9 @@ const offersRouter = require('./routes/offers');
 const experiencesRouter = require('./routes/experiences');
 const foodRouter = require('./routes/food');
 const eventRouter = require('./routes/event');
+const walletRouter = require('./routes/wallet');
+const productRouter = require('./routes/products');
+const orderRouter = require('./routes/orders');
 
 const app = express();
 app.disable('x-powered-by');
@@ -58,6 +61,9 @@ app.use(offersRouter);
 app.use(experiencesRouter);
 app.use(foodRouter);
 app.use(eventRouter);
+app.use(walletRouter);
+app.use(productRouter);
+app.use(orderRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 
