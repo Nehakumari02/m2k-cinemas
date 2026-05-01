@@ -4,6 +4,7 @@ const Reservation = require('../models/reservation');
 const User = require('../models/user');
 const userModeling = require('../utils/userModeling');
 const generateQR = require('../utils/generateQRCode');
+const Setting = require('../models/setting');
 
 const router = new express.Router();
 
@@ -55,12 +56,27 @@ router.post('/reservations', auth.simple, async (req, res) => {
 
     user.loyaltyPoints -= pointsUsed;
     const finalAmountPaid = Math.max(0, reservation.total - pointsUsed);
-    const pointsEarned = Math.floor(finalAmountPaid * 0.1);
-    user.loyaltyPoints += pointsEarned;
     
+    // Calculate points earned from settings
+    let pointsEarned = 0;
+    try {
+      const lpSetting = await Setting.findOne({ key: 'loyaltyPointsPer100' });
+      const pointsPer100 = lpSetting ? Number(lpSetting.value) : 0;
+      if (pointsPer100 > 0) {
+        pointsEarned = Math.floor((finalAmountPaid / 100) * pointsPer100);
+      }
+    } catch (e) {
+      console.error('Error calculating loyalty points:', e);
+      // Fallback to 10% if setting lookup fails
+      pointsEarned = Math.floor(finalAmountPaid * 0.1);
+    }
+    
+    user.loyaltyPoints += pointsEarned;
     await user.save();
+    
+    reservation.QRCode = QRCode;
     await reservation.save();
-    res.status(201).send({ reservation, QRCode });
+    res.status(201).send({ status: 'success', data: reservation });
   } catch (e) {
     res.status(400).send(e);
   }

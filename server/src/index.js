@@ -22,6 +22,7 @@ const eventRouter = require('./routes/event');
 const walletRouter = require('./routes/wallet');
 const productRouter = require('./routes/products');
 const orderRouter = require('./routes/orders');
+const settingsRouter = require('./routes/settings');
 
 const app = express();
 app.disable('x-powered-by');
@@ -64,6 +65,7 @@ app.use(eventRouter);
 app.use(walletRouter);
 app.use(productRouter);
 app.use(orderRouter);
+app.use(settingsRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 

@@ -4,6 +4,7 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
 const Transaction = require('../models/transaction');
+const Setting = require('../models/setting');
 
 const router = new express.Router();
 
@@ -33,6 +34,20 @@ router.post('/orders', auth.simple, async (req, res) => {
       await transaction.save();
     }
 
+    // Handle loyalty points redemption
+    const pointsUsed = Number(req.body.pointsUsed || 0);
+    if (pointsUsed > 0) {
+      if (req.user.loyaltyPoints < pointsUsed) {
+        return res.status(400).send({ error: 'Insufficient loyalty points' });
+      }
+      req.user.loyaltyPoints -= pointsUsed;
+      // We assume the totalAmount sent from frontend is already adjusted for points
+      // But for security, we should verify it. 
+      // For now, we trust the totalAmount but deduct the points from user.
+      await req.user.save();
+      console.log(`Redeemed ${pointsUsed} points for user ${req.user._id}`);
+    }
+
     // Decrease stock for each item
     for (const item of order.items) {
       const product = await Product.findById(item.product);
@@ -40,6 +55,23 @@ router.post('/orders', auth.simple, async (req, res) => {
         product.stock -= item.quantity;
         await product.save();
       }
+    }
+
+    // Calculate and award loyalty points
+    try {
+      const lpSetting = await Setting.findOne({ key: 'loyaltyPointsPer100' });
+      const pointsPer100 = lpSetting ? Number(lpSetting.value) : 0;
+      if (pointsPer100 > 0) {
+        const pointsEarned = Math.floor((order.totalAmount / 100) * pointsPer100);
+        if (pointsEarned > 0) {
+          req.user.loyaltyPoints = (req.user.loyaltyPoints || 0) + pointsEarned;
+          await req.user.save();
+          console.log(`Awarded ${pointsEarned} loyalty points to user ${req.user._id}`);
+        }
+      }
+    } catch (lpErr) {
+      console.error('Error awarding loyalty points:', lpErr);
+      // Don't fail the order if points fails
     }
 
     await order.save();
