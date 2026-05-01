@@ -63,9 +63,20 @@ const movieSchema = new Schema({
     trim: true,
     lowercase: true,
   },
+  synopsis: {
+    type: String,
+    required: false,
+    trim: true,
+    lowercase: true,
+  },
   duration: {
     type: Number,
     required: true,
+  },
+  rating: {
+    type: Number,
+    required: false,
+    default: 0,
   },
   releaseDate: {
     type: Date,

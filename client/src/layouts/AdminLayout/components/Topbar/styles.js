@@ -14,7 +14,7 @@ export default theme => ({
     paddingLeft: 0
   },
   brandWrapper: {
-    background: theme.palette.default.dark,
+    background: '#ffffff',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -23,14 +23,9 @@ export default theme => ({
     flexShrink: 0
   },
   logo: {
-    width: 'calc(100% - 160px)',
-    maxWidth: '100%',
-    margin: 'auto',
-    fontFamily: 'Montserrat,sans-serif',
-    fontSize: '22px',
-    fontWeight: 700,
-    letterSpacing: 3,
-    color: theme.palette.common.white
+    height: '32px',
+    width: 'auto',
+    objectFit: 'contain'
   },
   title: {
     marginLeft: theme.spacing(3),

@@ -107,14 +107,22 @@ export default function BookingCheckout(props) {
     ticketPrice,
     selectedSeats,
     seatsAvailable,
+    selectedFood,
     paymentMethod,
     paymentDetails,
+    showFoodStep,
+    onToggleFoodStep,
     onChangePaymentMethod,
     onPaymentFieldChange,
     onBookSeats
   } = props;
 
-  const totalPrice = ticketPrice * selectedSeats;
+  const foodTotal = Object.values(selectedFood || {}).reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const ticketsTotal = ticketPrice * selectedSeats;
+  const totalPrice = ticketsTotal + foodTotal;
 
   return (
     <div className={classes.checkoutBar}>
@@ -132,119 +140,149 @@ export default function BookingCheckout(props) {
             {selectedSeats > 0 ? `${selectedSeats} ticket${selectedSeats > 1 ? 's' : ''}` : '0'}
           </Typography>
         </div>
+
+        {foodTotal > 0 && (
+          <div className={classes.infoBlock}>
+            <Typography className={classes.bannerTitle}>Add-ons</Typography>
+            <Typography className={classes.bannerContent}>
+              ₹{foodTotal}
+            </Typography>
+          </div>
+        )}
+
         <div className={classes.infoBlock}>
-          <Typography className={classes.bannerTitle}>Total</Typography>
+          <Typography className={classes.bannerTitle}>Total Payable</Typography>
           <Typography className={classes.priceHighlight}>
             ₹{totalPrice}
           </Typography>
         </div>
       </div>
 
-      {/* ── Payment Fields ── */}
+      {/* ── Payment Section ── */}
       <div className={classes.paymentSection}>
-        <TextField
-          select
-          value={paymentMethod}
-          label="Payment Method"
-          variant="outlined"
-          size="small"
-          onChange={onChangePaymentMethod}
-          className={classes.selectField}
-          style={{ minWidth: 180 }}
-        >
-          <MenuItem value="card">Card</MenuItem>
-          <MenuItem value="upi">UPI</MenuItem>
-          <MenuItem value="netbanking">Net Banking</MenuItem>
-        </TextField>
-
-        {paymentMethod === 'card' && (
+        {!showFoodStep ? (
+          <Button
+            className={classes.bookButton}
+            disabled={selectedSeats === 0 || seatsAvailable <= 0}
+            onClick={onToggleFoodStep}
+          >
+            Select Payment Method
+          </Button>
+        ) : (
           <>
+            <Button
+              variant="outlined"
+              onClick={onToggleFoodStep}
+              style={{ color: '#64748b', borderColor: '#cbd5e1', borderRadius: 8 }}
+            >
+              Back to Seats
+            </Button>
+
             <TextField
-              label="Card Number"
-              name="cardNumber"
-              value={paymentDetails.cardNumber}
+              select
+              value={paymentMethod}
+              label="Payment Method"
               variant="outlined"
               size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
-              style={{ minWidth: 200 }}
-            />
-            <TextField
-              label="Name on Card"
-              name="nameOnCard"
-              value={paymentDetails.nameOnCard}
-              variant="outlined"
-              size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
+              onChange={onChangePaymentMethod}
+              className={classes.selectField}
               style={{ minWidth: 180 }}
-            />
-            <TextField
-              label="Expiry (MM/YY)"
-              name="expiry"
-              value={paymentDetails.expiry}
-              variant="outlined"
-              size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
-              style={{ minWidth: 130 }}
-            />
-            <TextField
-              label="CVV"
-              name="cvv"
-              value={paymentDetails.cvv}
-              variant="outlined"
-              size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
-              style={{ minWidth: 90 }}
-            />
-          </>
-        )}
-        {paymentMethod === 'upi' && (
-          <TextField
-            label="UPI ID"
-            name="upiId"
-            value={paymentDetails.upiId}
-            variant="outlined"
-            size="small"
-            onChange={onPaymentFieldChange}
-            className={classes.textField}
-            style={{ minWidth: 240 }}
-          />
-        )}
-        {paymentMethod === 'netbanking' && (
-          <>
-            <TextField
-              label="Bank Name"
-              name="bankName"
-              value={paymentDetails.bankName}
-              variant="outlined"
-              size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
-              style={{ minWidth: 200 }}
-            />
-            <TextField
-              label="Account Holder"
-              name="accountHolder"
-              value={paymentDetails.accountHolder}
-              variant="outlined"
-              size="small"
-              onChange={onPaymentFieldChange}
-              className={classes.textField}
-              style={{ minWidth: 200 }}
-            />
-          </>
-        )}
+            >
+              <MenuItem value="card">Card</MenuItem>
+              <MenuItem value="upi">UPI</MenuItem>
+              <MenuItem value="netbanking">Net Banking</MenuItem>
+            </TextField>
 
-        <Button
-          className={classes.bookButton}
-          disabled={seatsAvailable <= 0}
-          onClick={() => onBookSeats()}
-        >
-          Pay & Book
-        </Button>
+            {paymentMethod === 'card' && (
+              <>
+                <TextField
+                  label="Card Number"
+                  name="cardNumber"
+                  value={paymentDetails.cardNumber}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 200 }}
+                />
+                <TextField
+                  label="Name on Card"
+                  name="nameOnCard"
+                  value={paymentDetails.nameOnCard}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 180 }}
+                />
+                <TextField
+                  label="Expiry (MM/YY)"
+                  name="expiry"
+                  value={paymentDetails.expiry}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 130 }}
+                />
+                <TextField
+                  label="CVV"
+                  name="cvv"
+                  value={paymentDetails.cvv}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 90 }}
+                />
+              </>
+            )}
+            {paymentMethod === 'upi' && (
+              <TextField
+                label="UPI ID"
+                name="upiId"
+                value={paymentDetails.upiId}
+                variant="outlined"
+                size="small"
+                onChange={onPaymentFieldChange}
+                className={classes.textField}
+                style={{ minWidth: 240 }}
+              />
+            )}
+            {paymentMethod === 'netbanking' && (
+              <>
+                <TextField
+                  label="Bank Name"
+                  name="bankName"
+                  value={paymentDetails.bankName}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 200 }}
+                />
+                <TextField
+                  label="Account Holder"
+                  name="accountHolder"
+                  value={paymentDetails.accountHolder}
+                  variant="outlined"
+                  size="small"
+                  onChange={onPaymentFieldChange}
+                  className={classes.textField}
+                  style={{ minWidth: 200 }}
+                />
+              </>
+            )}
+
+            <Button
+              className={classes.bookButton}
+              disabled={seatsAvailable <= 0}
+              onClick={() => onBookSeats()}
+            >
+              Pay & Book
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

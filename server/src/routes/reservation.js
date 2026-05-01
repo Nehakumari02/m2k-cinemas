@@ -99,6 +99,7 @@ router.patch('/reservations/:id', auth.enhance, async (req, res) => {
     'username',
     'phone',
     'checkin',
+    'foodItems',
   ];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 

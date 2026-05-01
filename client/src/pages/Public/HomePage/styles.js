@@ -26,7 +26,7 @@ export default theme => ({
     borderBottom: '1px solid rgba(15,23,42,0.08)',
     flexWrap: 'wrap',
     position: 'sticky',
-    top: '64px',
+    top: theme.topBar.height,
     zIndex: 100,
     backdropFilter: 'blur(10px)',
   },
@@ -180,7 +180,7 @@ export default theme => ({
 
   [theme.breakpoints.down('sm')]: {
     tabsBar: {
-      top: '56px',
+      top: theme.topBar.height,
       justifyContent: 'flex-start',
       overflowX: 'auto',
       flexWrap: 'nowrap',

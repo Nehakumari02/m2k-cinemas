@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
   label: {
     fontWeight: 800,
     fontSize: '1rem',
-    color: '#14141c',
+    color: 'white',
     letterSpacing: '0.06em',
     textTransform: 'uppercase',
     whiteSpace: 'nowrap',
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
   },
   bookBtn: {
     padding: '12px 32px',
-    backgroundColor: '#14141c',
+    backgroundColor: 'white',
     color: '#b72429',
     border: 'none',
     borderRadius: '6px',
@@ -98,6 +98,10 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
   const classes = useStyles();
   const history = useHistory();
   const [selectedMovie, setSelectedMovie] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedRating, setSelectedRating] = useState('');
 
   const today = new Date();
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -108,14 +112,29 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
       label: i === 0
         ? 'Today'
         : i === 1
-        ? 'Tomorrow'
-        : d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
+          ? 'Tomorrow'
+          : d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
     };
+  });
+
+  // Extract unique genres and languages from movies
+  const genres = [...new Set(movies.flatMap(m => m.genre ? m.genre.split(',').map(g => g.trim()) : []))].sort();
+  const languages = [...new Set(movies.map(m => m.language).filter(Boolean))].sort();
+
+  // Filter movies based on selections
+  const filteredMovies = movies.filter(m => {
+    const genreMatch = !selectedGenre || (m.genre && m.genre.toLowerCase().includes(selectedGenre.toLowerCase()));
+    const langMatch = !selectedLanguage || (m.language && m.language.toLowerCase() === selectedLanguage.toLowerCase());
+    const ratingMatch = !selectedRating || (m.rating >= parseFloat(selectedRating));
+    // Showtime filter is simplified for this demo as we don't have full showtime integration here
+    return genreMatch && langMatch && ratingMatch;
   });
 
   const handleBook = () => {
     if (selectedMovie) {
       history.push(`/movie/${selectedMovie}`);
+    } else if (filteredMovies.length === 1) {
+      history.push(`/movie/${filteredMovies[0]._id}`);
     } else {
       history.push('/movie/category/nowShowing');
     }
@@ -123,7 +142,65 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
 
   return (
     <div className={classes.bar}>
-      <span className={classes.label}>🎬 Quick Book</span>
+      <span className={classes.label}>🎬 Search & Book</span>
+
+      <div className={classes.selectWrapper}>
+        <select
+          className={classes.select}
+          value={selectedGenre}
+          onChange={e => setSelectedGenre(e.target.value)}
+        >
+          <option value="">Select Genre</option>
+          {genres.map(g => (
+            <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
+          ))}
+        </select>
+        <span className={classes.selectArrow}>▼</span>
+      </div>
+
+      <div className={classes.selectWrapper}>
+        <select
+          className={classes.select}
+          value={selectedLanguage}
+          onChange={e => setSelectedLanguage(e.target.value)}
+        >
+          <option value="">Select Language</option>
+          {languages.map(l => (
+            <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>
+          ))}
+        </select>
+        <span className={classes.selectArrow}>▼</span>
+      </div>
+
+      <div className={classes.selectWrapper}>
+        <select
+          className={classes.select}
+          value={selectedRating}
+          onChange={e => setSelectedRating(e.target.value)}
+        >
+          <option value="">Select Rating</option>
+          <option value="9">9+ Rated</option>
+          <option value="8">8+ Rated</option>
+          <option value="7">7+ Rated</option>
+          <option value="5">5+ Rated</option>
+        </select>
+        <span className={classes.selectArrow}>▼</span>
+      </div>
+
+      <div className={classes.selectWrapper}>
+        <select
+          className={classes.select}
+          value={selectedTime}
+          onChange={e => setSelectedTime(e.target.value)}
+        >
+          <option value="">Select Time</option>
+          <option value="morning">Morning (9am - 12pm)</option>
+          <option value="afternoon">Afternoon (12pm - 4pm)</option>
+          <option value="evening">Evening (4pm - 8pm)</option>
+          <option value="night">Night (8pm - 12am)</option>
+        </select>
+        <span className={classes.selectArrow}>▼</span>
+      </div>
 
       <div className={classes.selectWrapper}>
         <select
@@ -131,36 +208,16 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
           value={selectedMovie}
           onChange={e => setSelectedMovie(e.target.value)}
         >
-          <option value="">Select Movie</option>
-          {movies.map(m => (
+          <option value="">{filteredMovies.length ? 'Select Movie' : 'No Movies Found'}</option>
+          {filteredMovies.map(m => (
             <option key={m._id} value={m._id}>{m.title}</option>
           ))}
         </select>
         <span className={classes.selectArrow}>▼</span>
       </div>
 
-      <div className={classes.selectWrapper}>
-        <select className={classes.select} defaultValue="">
-          <option value="">Select Date</option>
-          {dates.map(d => (
-            <option key={d.value} value={d.value}>{d.label}</option>
-          ))}
-        </select>
-        <span className={classes.selectArrow}>▼</span>
-      </div>
-
-      <div className={classes.selectWrapper}>
-        <select className={classes.select} defaultValue="">
-          <option value="">Select Cinema</option>
-          {cinemas.map(c => (
-            <option key={c._id} value={c._id}>{c.name}</option>
-          ))}
-        </select>
-        <span className={classes.selectArrow}>▼</span>
-      </div>
-
       <button className={classes.bookBtn} onClick={handleBook}>
-        Book Now
+        Search
       </button>
     </div>
   );

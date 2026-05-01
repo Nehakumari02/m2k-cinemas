@@ -12,7 +12,7 @@ const theme = createMuiTheme({
     drawer: 1100
   },
   topBar: {
-    height: '56px'
+    height: '64px'
   }
 });
 

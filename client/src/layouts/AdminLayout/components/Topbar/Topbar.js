@@ -43,7 +43,11 @@ class Topbar extends Component {
       <div className={`${classes.root} , ${ToolbarClasses}`}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.brandWrapper}>
-            <div className={classes.logo}>M2K Cinemas</div>
+            <img 
+              src="https://m2kcinemas.com/Images/logo1.png" 
+              alt="M2K Cinemas" 
+              className={classes.logo} 
+            />
             <IconButton
               className={classes.menuButton}
               aria-label="Menu"

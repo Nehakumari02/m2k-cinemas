@@ -8,8 +8,14 @@ import {
   SHOW_INVITATION_FORM,
   RESET_CHECKOUT,
   SET_SUGGESTED_SEATS,
-  SET_QR_CODE
+  SET_QR_CODE,
+  SET_SELECTED_FOOD
 } from '../types';
+
+export const setSelectedFood = (item, quantity) => ({
+  type: SET_SELECTED_FOOD,
+  payload: { item, quantity }
+});
 
 export const setSelectedSeats = seats => ({
   type: SET_SELECTED_SEATS,

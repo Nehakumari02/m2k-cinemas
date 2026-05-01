@@ -9,6 +9,8 @@ import showtimes from './showtimes';
 import checkout from './checkout';
 import offers from './offers';
 import experiences from './experiences';
+import food from './food';
+import events from './events';
 
 export default combineReducers({
   alertState: alert,
@@ -20,5 +22,7 @@ export default combineReducers({
   showtimeState: showtimes,
   checkoutState: checkout,
   offerState: offers,
-  experienceState: experiences
+  experienceState: experiences,
+  foodState: food,
+  eventState: events
 });

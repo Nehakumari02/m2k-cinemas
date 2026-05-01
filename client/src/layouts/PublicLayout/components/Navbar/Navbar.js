@@ -37,22 +37,36 @@ class Navbar extends Component {
             [classes.navbarColor]: scrollPos > 30
           })}>
           <Link className={classes.logoLink} to="/">
-            <Typography className={classes.logo} variant="h2">
-              M2K Cinemas
-            </Typography>
+            <img 
+              src="https://m2kcinemas.com/Images/logo1.png" 
+              alt="M2K Cinemas" 
+              className={classes.logo} 
+            />
           </Link>
           <div className={classes.navLinks}>
             <Link className={classes.navLink} to="/">
-              Home
+              Movies
             </Link>
             <Link className={classes.navLink} to="/cinemas">
               Cinemas
             </Link>
+            <Link className={classes.navLink} to="/food-combos">
+              Food & Combos
+            </Link>
             <Link className={classes.navLink} to="/offers">
               Offers
             </Link>
+            <Link className={classes.navLink} to="/events">
+              Events
+            </Link>
             <Link className={classes.navLink} to="/showtimings">
               Showtimings
+            </Link>
+            <Link className={classes.navLink} to="/about-us">
+              About Us
+            </Link>
+            <Link className={classes.navLink} to="/contact-us">
+              Contact Us
             </Link>
           </div>
 
@@ -92,7 +106,9 @@ class Navbar extends Component {
 
           <div className={classes.navMobile}>
             <div
-              className={classes.navIcon}
+              className={classnames(classes.navIcon, {
+                [classes.navIconActive]: showMenu
+              })}
               onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
               <div
                 className={classnames(
@@ -116,13 +132,13 @@ class Navbar extends Component {
             [classes.nav]: true
           })}>
           <div className={classes.navContent}>
-            <div className={classes.currentPageShadow}>Movies</div>
+            <div className={classes.currentPageShadow}>M2K</div>
             <ul
               className={classes.innerNav}
               onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
               <li className={classes.innerNavListItem}>
                 <Link className={classes.innerNavLink} to="/">
-                  Home
+                  Movies
                 </Link>
               </li>
               <li className={classes.innerNavListItem}>
@@ -131,8 +147,18 @@ class Navbar extends Component {
                 </Link>
               </li>
               <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/food-combos">
+                  Food & Combos
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
                 <Link className={classes.innerNavLink} to="/offers">
                   Offers
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/events">
+                  Events
                 </Link>
               </li>
               <li className={classes.innerNavListItem}>
@@ -140,6 +166,45 @@ class Navbar extends Component {
                   Showtimings
                 </Link>
               </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/about-us">
+                  About Us
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/contact-us">
+                  Contact Us
+                </Link>
+              </li>
+              {user && (
+                <li className={classes.innerNavListItem}>
+                  <Link
+                    className={classes.innerNavLink}
+                    to={
+                      user.role !== 'guest'
+                        ? '/admin/dashboard'
+                        : '/mydashboard'
+                    }>
+                    Dashboard
+                  </Link>
+                </li>
+              )}
+              {isAuth ? (
+                <li className={classes.innerNavListItem}>
+                  <Link
+                    className={classes.innerNavLink}
+                    onClick={logout}
+                    to="/">
+                    Logout
+                  </Link>
+                </li>
+              ) : (
+                <li className={classes.innerNavListItem}>
+                  <Link className={classes.innerNavLink} to="/login">
+                    Login
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>

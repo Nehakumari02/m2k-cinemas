@@ -45,6 +45,14 @@ const reservationSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  foodItems: [
+    {
+      foodId: { type: Schema.Types.ObjectId, ref: 'Food' },
+      name: String,
+      price: Number,
+      quantity: Number,
+    },
+  ],
 });
 
 const Reservation = mongoose.model('Reservation', reservationSchema);

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Typography, Select } from '@material-ui/core';
+import { withStyles, Typography, Select, FormControl, InputLabel, OutlinedInput } from '@material-ui/core';
 import { Button, TextField, MenuItem } from '@material-ui/core';
 import {
   MuiPickersUtilsProvider,
@@ -28,6 +28,8 @@ class AddMovie extends Component {
     description: '',
     director: '',
     cast: '',
+    rating: '',
+    synopsis: '',
     castMembers: [],
     crewMembers: [],
     castNameInput: '',
@@ -50,7 +52,9 @@ class AddMovie extends Component {
         cast,
         castCrew,
         description,
+        synopsis,
         duration,
+        rating,
         releaseDate,
         endDate
       } = this.props.edit;
@@ -69,7 +73,9 @@ class AddMovie extends Component {
         castMembers,
         crewMembers,
         description,
+        synopsis: synopsis || '',
         duration,
+        rating: rating || '',
         releaseDate,
         endDate
       });
@@ -219,8 +225,10 @@ class AddMovie extends Component {
       language,
       duration,
       description,
+      synopsis,
       director,
       cast,
+      rating,
       castMembers,
       crewMembers,
       castNameInput,
@@ -261,24 +269,24 @@ class AddMovie extends Component {
             />
           </div>
           <div className={classes.field}>
-            <Select
-              multiple
-              displayEmpty
-              className={classes.textField}
-              label="Genre"
-              margin="dense"
-              required
-              value={genre}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('genre', event.target.value)
-              }>
-              {genreData.map((genreItem, index) => (
-                <MenuItem key={genreItem + '-' + index} value={genreItem}>
-                  {genreItem}
-                </MenuItem>
-              ))}
-            </Select>
+            <FormControl variant="outlined" className={classes.textField} required margin="dense">
+              <InputLabel id="genre-label">Genre</InputLabel>
+              <Select
+                labelId="genre-label"
+                multiple
+                value={genre}
+                onChange={event =>
+                  this.handleFieldChange('genre', event.target.value)
+                }
+                input={<OutlinedInput label="Genre" />}
+              >
+                {genreData.map((genreItem, index) => (
+                  <MenuItem key={genreItem + '-' + index} value={genreItem}>
+                    {genreItem}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
           <div className={`${classes.field} ${classes.mediaField}`}>
             <div className={`${classes.textField} ${classes.peopleSection}`}>
@@ -486,6 +494,20 @@ class AddMovie extends Component {
                 this.handleFieldChange('description', event.target.value)
               }
             />
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              className={classes.textField}
+              label="Synopsis"
+              margin="dense"
+              required
+              variant="outlined"
+              value={synopsis}
+              onChange={event =>
+                this.handleFieldChange('synopsis', event.target.value)
+              }
+            />
           </div>
           <div className={classes.field}>
             <TextField
@@ -515,6 +537,18 @@ class AddMovie extends Component {
               variant="outlined"
               onChange={event =>
                 this.handleFieldChange('duration', event.target.value)
+              }
+            />
+            <TextField
+              className={classes.textField}
+              label="Rating (1-10)"
+              margin="dense"
+              type="number"
+              value={rating}
+              variant="outlined"
+              inputProps={{ min: 0, max: 10, step: 0.1 }}
+              onChange={event =>
+                this.handleFieldChange('rating', event.target.value)
               }
             />
           </div>

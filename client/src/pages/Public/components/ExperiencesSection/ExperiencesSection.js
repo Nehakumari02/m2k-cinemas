@@ -170,7 +170,7 @@ function ExperiencesSection({ experiences, getExperiences }) {
     <section className={classes.section}>
       <div className={classes.header}>
         <Typography className={classes.sectionTitle} variant="h2">
-          The PVR Experience
+          The M2K Experience
         </Typography>
       </div>
       <div className={classes.grid}>

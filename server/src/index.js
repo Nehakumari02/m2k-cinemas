@@ -17,6 +17,8 @@ const invitationsRouter = require('./routes/invitations');
 const paymentsRouter = require('./routes/payments');
 const offersRouter = require('./routes/offers');
 const experiencesRouter = require('./routes/experiences');
+const foodRouter = require('./routes/food');
+const eventRouter = require('./routes/event');
 
 const app = express();
 app.disable('x-powered-by');
@@ -54,6 +56,8 @@ app.use(invitationsRouter);
 app.use(paymentsRouter);
 app.use(offersRouter);
 app.use(experiencesRouter);
+app.use(foodRouter);
+app.use(eventRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 

@@ -31,6 +31,7 @@ import BookingForm from './components/BookingForm/BookingForm';
 import BookingSeats from './components/BookingSeats/BookingSeats';
 import BookingCheckout from './components/BookingCheckout/BookingCheckout';
 import BookingInvitation from './components/BookingInvitation/BookingInvitation';
+import BookingFood from './components/BookingFood/BookingFood';
 
 import jsPDF from 'jspdf';
 
@@ -38,6 +39,7 @@ class BookingPage extends Component {
   didSetSuggestion = false;
   isValidObjectId = value => /^[a-f\d]{24}$/i.test(String(value || ''));
   state = {
+    showFoodStep: false,
     paymentMethod: '',
     paymentDetails: {
       cardNumber: '',
@@ -203,7 +205,7 @@ class BookingPage extends Component {
 
   // JSpdf Generator For generating the PDF
   jsPdfGenerator = () => {
-    const { movie, cinema, selectedDate, selectedTime, QRCode } = this.props;
+    const { movie, cinema, selectedDate, selectedTime, QRCode, selectedFood } = this.props;
     const doc = new jsPDF();
     doc.setFont('helvetica');
     doc.setFontType('bold');
@@ -218,7 +220,28 @@ class BookingPage extends Component {
       20,
       40
     );
-    doc.addImage(QRCode, 'JPEG', 15, 40, 160, 160);
+
+    let currentY = 50;
+    const foodItems = Object.values(selectedFood || {});
+    if (foodItems.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Add-ons:', 20, currentY);
+      currentY += 8;
+      doc.setFontType('normal');
+      doc.setFontSize(12);
+      foodItems.forEach(item => {
+        doc.text(`${item.name} x ${item.quantity} - ₹${item.price * item.quantity}`, 25, currentY);
+        currentY += 7;
+      });
+      currentY += 5;
+    }
+
+    doc.setFontType('bold');
+    const ticketsTotal = this.props.selectedSeats.length * cinema.ticketPrice;
+    const foodTotal = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    doc.text(`Total Paid: ₹${ticketsTotal + foodTotal}`, 20, currentY);
+
+    doc.addImage(QRCode, 'JPEG', 15, currentY + 10, 140, 140);
     doc.save(`${movie.title}-${cinema.name}.pdf`);
   };
 
@@ -301,7 +324,16 @@ class BookingPage extends Component {
       }
     }
 
-    const totalAmount = selectedSeats.length * cinema.ticketPrice;
+    const ticketsAmount = selectedSeats.length * cinema.ticketPrice;
+    const foodItems = Object.values(this.props.selectedFood || {}).map(item => ({
+      foodId: item._id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity
+    }));
+    const foodAmount = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const totalAmount = ticketsAmount + foodAmount;
+
     const paymentSuccess = await this.launchPayment(totalAmount);
     if (!paymentSuccess) return;
 
@@ -310,7 +342,8 @@ class BookingPage extends Component {
       startAt: selectedTime,
       seats: this.bookSeats(),
       ticketPrice: cinema.ticketPrice,
-      total: selectedSeats.length * cinema.ticketPrice,
+      total: totalAmount,
+      foodItems,
       movieId: movie._id,
       cinemaId: cinema._id,
       username: user.username,
@@ -721,19 +754,26 @@ class BookingPage extends Component {
 
             {isSeatsStep && cinema && selectedCinema && selectedTime && !showInvitation && (
               <>
-                <BookingSeats
-                  seats={seats}
-                  onSelectSeat={(indexRow, index) =>
-                    this.onSelectSeat(indexRow, index)
-                  }
-                />
+                {!this.state.showFoodStep ? (
+                  <BookingSeats
+                    seats={seats}
+                    onSelectSeat={(indexRow, index) =>
+                      this.onSelectSeat(indexRow, index)
+                    }
+                  />
+                ) : (
+                  <BookingFood />
+                )}
                 <BookingCheckout
                   user={user}
                   ticketPrice={cinema.ticketPrice}
                   seatsAvailable={cinema.seatsAvailable}
                   selectedSeats={selectedSeats.length}
+                  selectedFood={this.props.selectedFood}
                   paymentMethod={paymentMethod}
                   paymentDetails={paymentDetails}
+                  showFoodStep={this.state.showFoodStep}
+                  onToggleFoodStep={() => this.setState({ showFoodStep: !this.state.showFoodStep })}
                   onChangePaymentMethod={this.onChangePaymentMethod}
                   onPaymentFieldChange={this.onPaymentFieldChange}
                   onBookSeats={() => this.checkout()}
@@ -787,8 +827,9 @@ const mapStateToProps = (
   selectedTime: checkoutState.selectedTime,
   showLoginPopup: checkoutState.showLoginPopup,
   showInvitation: checkoutState.showInvitation,
-  invitations: checkoutState.invitations,
+   invitations: checkoutState.invitations,
   QRCode: checkoutState.QRCode,
+  selectedFood: checkoutState.selectedFood,
   suggestedSeats: reservationState.suggestedSeats
 });
 

@@ -186,7 +186,11 @@ class HomePage extends Component {
         <footer className={classes.footer}>
           <div className={classes.footerTop}>
             <div className={classes.footerBrand}>
-              <Typography className={classes.footerLogo}>M2K CINEMAS</Typography>
+              <img 
+                src="https://m2kcinemas.com/Images/logo1.png" 
+                alt="M2K Cinemas" 
+                style={{ height: '50px', marginBottom: '12px', mixBlendMode: 'multiply' }} 
+              />
               <Typography className={classes.footerTagline}>
                 India's Finest Cinematic Experience
               </Typography>
@@ -199,6 +203,8 @@ class HomePage extends Component {
                 <Link to="/cinemas" className={classes.footerLink}>Cinemas</Link>
                 <Link to="/offers" className={classes.footerLink}>Offers</Link>
                 <Link to="/showtimings" className={classes.footerLink}>Showtimings</Link>
+                <Link to="/about-us" className={classes.footerLink}>About Us</Link>
+                <Link to="/contact-us" className={classes.footerLink}>Contact Us</Link>
               </div>
               <div className={classes.footerCol}>
                 <Typography className={classes.footerColTitle}>Account</Typography>
@@ -212,6 +218,19 @@ class HomePage extends Component {
                 <Link to="/experience/4dx" className={classes.footerLink}>4DX</Link>
                 <Link to="/experience/gold" className={classes.footerLink}>GOLD</Link>
                 <Link to="/experience/pxl" className={classes.footerLink}>PXL</Link>
+              </div>
+              <div className={classes.footerCol}>
+                <Typography className={classes.footerColTitle}>Corporate</Typography>
+                <Link to="/careers" className={classes.footerLink}>Careers</Link>
+                <Link to="/media" className={classes.footerLink}>Media</Link>
+                <Link to="/gallery" className={classes.footerLink}>Gallery</Link>
+              </div>
+              <div className={classes.footerCol}>
+                <Typography className={classes.footerColTitle}>Advertise</Typography>
+                <Link to="/advertise" className={classes.footerLink}>Advertise with Us</Link>
+                <Typography variant="caption" style={{ color: '#64748b', marginTop: '8px', maxWidth: '180px', display: 'block', lineHeight: 1.4 }}>
+                  Increase your brand visibility with our amazing branding options.
+                </Typography>
               </div>
             </div>
           </div>

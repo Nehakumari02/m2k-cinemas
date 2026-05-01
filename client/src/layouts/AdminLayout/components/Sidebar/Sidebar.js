@@ -16,6 +16,9 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 import AccountBoxIcon from '@material-ui/icons/AccountBoxOutlined';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
+import FastfoodIcon from '@material-ui/icons/Fastfood';
+import EventIcon from '@material-ui/icons/Event';
+import RateReviewIcon from '@material-ui/icons/RateReview';
 // Component styles
 import styles from './styles';
 
@@ -114,6 +117,45 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Experiences"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/food">
+            <ListItemIcon className={classes.listItemIcon}>
+              <FastfoodIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Food & Combos"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/events">
+            <ListItemIcon className={classes.listItemIcon}>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Events"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/reviews">
+            <ListItemIcon className={classes.listItemIcon}>
+              <RateReviewIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Reviews"
             />
           </ListItem>
           {user && user.role === 'superadmin' && (

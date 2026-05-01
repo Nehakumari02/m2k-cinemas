@@ -8,3 +8,5 @@ export * from './showtimes';
 export * from './checkout';
 export * from './offers';
 export * from './experiences';
+export * from './food';
+export * from './events';

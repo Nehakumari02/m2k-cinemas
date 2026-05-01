@@ -2,9 +2,11 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const upload = require('../utils/multer');
 const Movie = require('../models/movie');
+const Review = require('../models/review');
 const userModeling = require('../utils/userModeling');
 
 const router = new express.Router();
+console.log('Movie Router Loaded');
 
 // Create a movie
 router.post('/movies', auth.enhance, async (req, res) => {
@@ -12,6 +14,49 @@ router.post('/movies', auth.enhance, async (req, res) => {
   try {
     await movie.save();
     res.status(201).send(movie);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Add a review to a movie
+router.post('/movies/:id/reviews', auth.simple, async (req, res) => {
+  const movieId = req.params.id;
+  const { rating, comment, userName } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const movie = await Movie.findById(movieId);
+    if (!movie) return res.sendStatus(404);
+
+    const review = new Review({
+      movieId,
+      userId,
+      userName,
+      rating,
+      comment,
+    });
+
+    await review.save();
+
+    // Update movie average rating
+    const reviews = await Review.find({ movieId });
+    const avgRating = reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
+    movie.rating = parseFloat(avgRating.toFixed(1));
+    await movie.save();
+
+    res.status(201).send({ review, movie });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Get all reviews for a movie
+router.get('/movies/:id/reviews', async (req, res) => {
+  const movieId = req.params.id;
+  try {
+    const reviews = await Review.find({ movieId }).sort({ createdAt: -1 });
+    res.send(reviews);
   } catch (e) {
     res.status(400).send(e);
   }
@@ -140,7 +185,9 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'director',
     'cast',
     'description',
+    'synopsis',
     'duration',
+    'rating',
     'releaseDate',
     'endDate',
   ];
@@ -175,6 +222,43 @@ router.get('/movies/usermodeling/:username', async (req, res) => {
   try {
     const cinemasUserModeled = await userModeling.moviesUserModeling(username);
     res.send(cinemasUserModeled);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Get all reviews (Admin only)
+router.get('/movies/reviews/all', auth.enhance, async (req, res) => {
+  try {
+    const reviews = await Review.find({}).sort({ createdAt: -1 });
+    res.send(reviews);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Delete a review (Admin only)
+router.delete('/movies/reviews/:reviewId', auth.enhance, async (req, res) => {
+  const { reviewId } = req.params;
+  try {
+    const review = await Review.findByIdAndDelete(reviewId);
+    if (!review) return res.sendStatus(404);
+
+    // Recalculate movie rating
+    const movieId = review.movieId;
+    const reviews = await Review.find({ movieId });
+    const movie = await Movie.findById(movieId);
+    if (movie) {
+      if (reviews.length > 0) {
+        const avgRating = reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
+        movie.rating = parseFloat(avgRating.toFixed(1));
+      } else {
+        movie.rating = 0;
+      }
+      await movie.save();
+    }
+
+    res.send({ message: 'Review deleted', movie });
   } catch (e) {
     res.status(400).send(e);
   }
