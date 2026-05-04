@@ -14,6 +14,7 @@ import events from './events';
 import wallet from './wallet';
 import products from './products';
 import cart from './cart';
+import wishlist from './wishlist';
 
 export default combineReducers({
   alertState: alert,
@@ -30,5 +31,6 @@ export default combineReducers({
   eventState: events,
   walletState: wallet,
   productState: products,
-  cartState: cart
+  cartState: cart,
+  wishlistState: wishlist
 });

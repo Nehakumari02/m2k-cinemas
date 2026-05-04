@@ -58,6 +58,8 @@ const CartPage = lazy(() => import('./pages/Public/CartPage'));
 const MerchCheckoutPage = lazy(() => import('./pages/Public/MerchCheckoutPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
+const WishlistPage = lazy(() => import('./pages/Public/WishlistPage/WishlistPage'));
+const MyOrdersPage = lazy(() => import('./pages/Public/MyOrdersPage/MyOrdersPage'));
 
 const Routes = () => {
   return (
@@ -205,6 +207,18 @@ const Routes = () => {
             path="/merch-checkout"
             layout={PublicLayout}
             component={MerchCheckoutPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/wishlist"
+            layout={PublicLayout}
+            component={WishlistPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/myorders"
+            layout={PublicLayout}
+            component={MyOrdersPage}
           />
           <WithLayoutRoute
             exact

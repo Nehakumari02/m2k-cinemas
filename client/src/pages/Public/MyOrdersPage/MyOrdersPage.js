@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makeStyles, Grid, Typography, Container, Box, CircularProgress } from '@material-ui/core';
-import { getWishlist } from '../../../store/actions';
+import { makeStyles, Typography, Container, Box, CircularProgress } from '@material-ui/core';
+import { getMyOrders } from '../../../store/actions';
+import { MyOrderTable } from '../MyDashboard/components';
 import { Link } from 'react-router-dom';
-import MovieCardSimple from '../components/MovieCardSimple/MovieCardSimple';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: '3.2rem',
     textAlign: 'center',
     fontWeight: 800,
-    color: '#1f2937',
+    color: '#0f172a',
     marginBottom: theme.spacing(1),
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
@@ -30,21 +30,22 @@ const useStyles = makeStyles(theme => ({
   emptyState: {
     padding: theme.spacing(8),
     textAlign: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: '12px',
-    marginTop: theme.spacing(4)
+    backgroundColor: '#ffffff',
+    borderRadius: '16px',
+    marginTop: theme.spacing(4),
+    boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
   }
 }));
 
-function WishlistPage(props) {
-  const { wishlist, getWishlist, user } = props;
+function MyOrdersPage(props) {
+  const { orders, getMyOrders, user } = props;
   const classes = useStyles();
 
   useEffect(() => {
     if (user) {
-      getWishlist();
+      getMyOrders();
     }
-  }, [getWishlist, user]);
+  }, [getMyOrders, user]);
 
   if (!user) {
     return (
@@ -61,30 +62,24 @@ function WishlistPage(props) {
       <Container maxWidth="lg" className={classes.page}>
         <Box mb={6} textAlign="center">
           <Typography className={classes.title} variant="h1">
-            My Wishlist
+            My Orders
           </Typography>
           <div style={{ margin: '12px auto', width: '60px', height: '4px', background: '#b72429', borderRadius: '2px' }} />
         </Box>
 
-        {wishlist && wishlist.length > 0 ? (
-          <Grid container spacing={4}>
-            {wishlist.map(movie => (
-              <Grid key={movie._id} item xs={12} sm={6} md={4} lg={3}>
-                <MovieCardSimple movie={movie} />
-              </Grid>
-            ))}
-          </Grid>
+        {orders && orders.length > 0 ? (
+          <MyOrderTable orders={orders} />
         ) : (
-          <Box className={classes.emptyState} style={{ backgroundColor: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <Box className={classes.emptyState}>
             <Typography variant="h5" style={{ color: '#0f172a', fontWeight: 700, marginBottom: '16px' }}>
-              Your wishlist is empty
+              You haven't placed any orders yet
             </Typography>
             <Typography variant="body1" style={{ color: '#64748b' }}>
-              Start adding movies by clicking the heart icon on any movie poster!
+              Explore our shop for exclusive merchandise and more!
             </Typography>
             <Box mt={4}>
-              <Link to="/" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Explore Movies
+              <Link to="/shop" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Visit Shop
               </Link>
             </Box>
           </Box>
@@ -95,10 +90,10 @@ function WishlistPage(props) {
 }
 
 const mapStateToProps = state => ({
-  wishlist: state.wishlistState.wishlist,
+  orders: state.cartState.orders,
   user: state.authState.user
 });
 
-const mapDispatchToProps = { getWishlist };
+const mapDispatchToProps = { getMyOrders };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WishlistPage);
+export default connect(mapStateToProps, mapDispatchToProps)(MyOrdersPage);

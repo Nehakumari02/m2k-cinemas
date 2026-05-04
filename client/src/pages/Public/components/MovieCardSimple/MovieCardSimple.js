@@ -6,6 +6,11 @@ import { makeStyles } from '@material-ui/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
+import IconButton from '@material-ui/core/IconButton';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -61,6 +66,17 @@ const useStyles = makeStyles(theme => ({
     letterSpacing: '0.05em',
     zIndex: 3,
   },
+  wishlistBtn: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    color: '#fff',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    '&:hover': {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    zIndex: 5,
+  },
   bookOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -114,9 +130,29 @@ const useStyles = makeStyles(theme => ({
 
 const MovieCardSimple = props => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const wishlist = useSelector(state => state.wishlistState?.wishlist || []);
+  const user = useSelector(state => state.authState?.user);
   const { movie } = props;
-  const imageUrl = (() => {
-    if (!movie.image) return 'https://source.unsplash.com/featured/?movie,poster';
+  
+  const isWishlisted = wishlist.some(w => (w._id || w) === movie._id);
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      // You can trigger a login modal here if desired, or simply ignore
+      alert('Please log in to add to wishlist');
+      return;
+    }
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(movie._id));
+    } else {
+      dispatch(addToWishlist(movie._id));
+    }
+  };
+
+  const imageUrl = (() => {    if (!movie.image) return 'https://source.unsplash.com/featured/?movie,poster';
     if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
       return movie.image;
     }
@@ -133,6 +169,9 @@ const MovieCardSimple = props => {
             {movie.language && (
               <span className={classes.langBadge}>{movie.language}</span>
             )}
+            <IconButton className={classes.wishlistBtn} onClick={handleWishlistToggle} size="small">
+              {isWishlisted ? <FavoriteIcon style={{ color: '#ff4d4d' }} /> : <FavoriteBorderIcon />}
+            </IconButton>
             <div className={classes.bookOverlay}>
               <button className={classes.bookBtn}>Book Tickets</button>
             </div>

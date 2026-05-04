@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { makeStyles, Grid, Typography, Container, CircularProgress, Box } from '@material-ui/core';
 import { getMovies, getReservations, getCinemas, getMyOrders, getMyRefunds } from '../../../store/actions';
-import { MyReservationTable, MyOrderTable, MyRefundTable } from './components';
+import { MyReservationTable, MyRefundTable } from './components';
 import Account from '../../Admin/Account';
 
 const useStyles = makeStyles(theme => ({
@@ -53,23 +53,20 @@ function MyDashboard(props) {
     getMovies,
     getReservations,
     getCinemas,
-    getMyOrders,
-    getMyRefunds,
-    orders
+    getMyRefunds
   } = props;
 
   useEffect(() => {
     getMovies();
     getReservations();
     getCinemas();
-    getMyOrders();
     
     const fetchRefunds = async () => {
       const refunds = await getMyRefunds();
       if (refunds) setMyRefunds(refunds);
     };
     fetchRefunds();
-  }, [getMovies, getReservations, getCinemas, getMyOrders, getMyRefunds]);
+  }, [getMovies, getReservations, getCinemas, getMyRefunds]);
 
   const classes = useStyles(props);
 
@@ -120,30 +117,7 @@ function MyDashboard(props) {
           </>
         )}
 
-        <Grid item xs={12}>
-          <Typography
-            className={classes.title}
-            variant="h2"
-            color="inherit">
-            My Orders
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          {orders && orders.length > 0 ? (
-            <MyOrderTable orders={orders} />
-          ) : (
-            <Box p={4} textAlign="center" style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
-              <Typography variant="h6" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                You haven't placed any merchandise orders yet.
-              </Typography>
-              <Box mt={2}>
-                <Link to="/shop" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 700 }}>
-                  Browse our Shop
-                </Link>
-              </Box>
-            </Box>
-          )}
-        </Grid>
+
 
         {myRefunds.length > 0 && (
           <>
@@ -171,21 +145,23 @@ function MyDashboard(props) {
   );
 }
 
-const mapStateToProps = ({
-  authState,
-  movieState,
-  reservationState,
-  cinemaState,
-  cartState
-}) => ({
-  user: authState.user,
-  movies: movieState.movies,
-  reservations: reservationState.reservations,
-  cinemas: cinemaState.cinemas,
-  orders: cartState.orders
-});
+const mapStateToProps = (state) => {
+  const {
+    authState,
+    movieState,
+    reservationState,
+    cinemaState,
+    cartState
+  } = state;
+  return {
+    user: authState.user,
+    movies: movieState.movies,
+    reservations: reservationState.reservations,
+    cinemas: cinemaState.cinemas
+  };
+};
 
-const mapDispatchToProps = { getMovies, getReservations, getCinemas, getMyOrders, getMyRefunds };
+const mapDispatchToProps = { getMovies, getReservations, getCinemas, getMyRefunds };
 
 export default connect(
   mapStateToProps,

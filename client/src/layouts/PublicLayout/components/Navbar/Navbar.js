@@ -97,11 +97,18 @@ class Navbar extends Component {
                   </ListItem>
                 )}
                 {user && user.role === 'guest' && (
-                  <ListItem>
-                    <Link className={classes.navLink} to="/mydashboard">
-                      My Orders
-                    </Link>
-                  </ListItem>
+                  <>
+                    <ListItem>
+                      <Link className={classes.navLink} to="/myorders">
+                        My Orders
+                      </Link>
+                    </ListItem>
+                    <ListItem>
+                      <Link className={classes.navLink} to="/wishlist">
+                        My Wishlist
+                      </Link>
+                    </ListItem>
+                  </>
                 )}
 
                 {isAuth ? (
@@ -229,6 +236,20 @@ class Navbar extends Component {
                     My Wallet
                   </Link>
                 </li>
+              )}
+              {user && user.role === 'guest' && (
+                <>
+                  <li className={classes.innerNavListItem}>
+                    <Link className={classes.innerNavLink} to="/myorders">
+                      My Orders
+                    </Link>
+                  </li>
+                  <li className={classes.innerNavListItem}>
+                    <Link className={classes.innerNavLink} to="/wishlist">
+                      My Wishlist
+                    </Link>
+                  </li>
+                </>
               )}
               {isAuth ? (
                 <li className={classes.innerNavListItem}>

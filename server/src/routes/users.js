@@ -243,4 +243,53 @@ router.delete('/users/me', auth.simple, async (req, res) => {
   }
 });
 
+// Get wishlist
+router.get('/users/me/wishlist', auth.simple, async (req, res) => {
+  try {
+    if (!req.user.wishlist) {
+      req.user.wishlist = [];
+    }
+    await req.user.populate('wishlist').execPopulate();
+    res.send(req.user.wishlist);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Add to wishlist
+router.post('/users/me/wishlist', auth.simple, async (req, res) => {
+  try {
+    const { movieId } = req.body;
+    if (!req.user.wishlist) {
+      req.user.wishlist = [];
+    }
+    req.user.wishlist.addToSet(movieId);
+    await req.user.save();
+    await req.user.populate('wishlist').execPopulate();
+    res.send(req.user.wishlist);
+  } catch (e) {
+    console.error('Error in POST /users/me/wishlist:', e);
+    res.status(400).send({ error: e.message });
+  }
+});
+
+// Remove from wishlist
+router.delete('/users/me/wishlist/:movieId', auth.simple, async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    if (!req.user.wishlist) {
+      req.user.wishlist = [];
+    }
+    req.user.wishlist = req.user.wishlist.filter(
+      id => id.toString() !== movieId
+    );
+    await req.user.save();
+    await req.user.populate('wishlist').execPopulate();
+    res.send(req.user.wishlist);
+  } catch (e) {
+    console.error('Error in DELETE /users/me/wishlist:', e);
+    res.status(400).send({ error: e.message });
+  }
+});
+
 module.exports = router;

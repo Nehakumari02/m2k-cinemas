@@ -4,9 +4,33 @@ import { withStyles, Typography } from '@material-ui/core';
 import styles from './styles';
 import { textTruncate } from '../../../../utils';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
+import IconButton from '@material-ui/core/IconButton';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 
 const MovieCard = props => {
+  const dispatch = useDispatch();
+  const wishlist = useSelector(state => state.wishlistState?.wishlist || []);
+  const user = useSelector(state => state.authState?.user);
   const { classes, movie } = props;
+
+  const isWishlisted = wishlist.some(w => (w._id || w) === movie._id);
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      alert('Please log in to add to wishlist');
+      return;
+    }
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(movie._id));
+    } else {
+      dispatch(addToWishlist(movie._id));
+    }
+  };
   const imageUrl = (() => {
     if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
     if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
@@ -22,8 +46,14 @@ const MovieCard = props => {
         <header
           className={classes.header}
           style={{
-            backgroundImage: `url("${encodedImageUrl}")`
+            backgroundImage: `url("${encodedImageUrl}")`,
+            position: 'relative'
           }}>
+          <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+            <IconButton onClick={handleWishlistToggle} size="small" style={{ color: isWishlisted ? '#ff4d4d' : '#fff', backgroundColor: 'rgba(0,0,0,0.4)' }}>
+              {isWishlisted ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+          </div>
           <Typography className={classes.h4} variant="h4" color="inherit">
             {movie.genre}
           </Typography>
