@@ -57,7 +57,12 @@ const reservationSchema = new Schema({
     type: String,
     default: '',
   },
-});
+  status: {
+    type: String,
+    enum: ['Paid', 'Refund Requested', 'Refunded', 'Cancelled'],
+    default: 'Paid',
+  },
+}, { timestamps: true });
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 

@@ -18,7 +18,9 @@ import {
   IconButton,
   Tooltip,
   MenuItem,
-  Chip
+  Chip,
+  FormControlLabel,
+  Switch
 } from '@material-ui/core';
 import { Add, Edit, Delete, Fastfood } from '@material-ui/icons';
 import { getFood, addFood, removeFood, updateFood, uploadFoodImage } from '../../../store/actions';
@@ -163,7 +165,9 @@ const EMPTY_FORM = {
   description: '',
   price: '',
   image: '',
-  type: 'veg'
+  type: 'veg',
+  isWeeklyOffer: false,
+  isMonthlyOffer: false
 };
 
 class FoodList extends Component {
@@ -194,7 +198,9 @@ class FoodList extends Component {
         description: item.description,
         price: item.price,
         image: item.image,
-        type: item.type
+        type: item.type,
+        isWeeklyOffer: item.isWeeklyOffer || false,
+        isMonthlyOffer: item.isMonthlyOffer || false
       },
       isEdit: true,
       selectedId: item._id
@@ -206,9 +212,9 @@ class FoodList extends Component {
   };
 
   handleChange = e => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     this.setState(prev => ({
-      form: { ...prev.form, [name]: value },
+      form: { ...prev.form, [name]: type === 'checkbox' ? checked : value },
     }));
   };
 
@@ -341,6 +347,39 @@ class FoodList extends Component {
               <MenuItem value="veg">Veg</MenuItem>
               <MenuItem value="non-veg">Non-Veg</MenuItem>
             </TextField>
+
+            <Grid container spacing={2} style={{ marginTop: 8 }}>
+              <Grid item xs={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.isWeeklyOffer}
+                      onChange={this.handleChange}
+                      name="isWeeklyOffer"
+                      color="secondary"
+                      type="checkbox"
+                    />
+                  }
+                  label="Weekly Offer"
+                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.isMonthlyOffer}
+                      onChange={this.handleChange}
+                      name="isMonthlyOffer"
+                      color="secondary"
+                      type="checkbox"
+                    />
+                  }
+                  label="Monthly Offer"
+                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
             <Button onClick={this.closeDialog} className={classes.cancelBtn}>Cancel</Button>

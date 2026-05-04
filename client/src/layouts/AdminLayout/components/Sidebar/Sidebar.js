@@ -21,6 +21,8 @@ import EventIcon from '@material-ui/icons/Event';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import StoreIcon from '@material-ui/icons/StoreOutlined';
 import ShippingIcon from '@material-ui/icons/LocalShippingOutlined';
+import StarIcon from '@material-ui/icons/StarBorderOutlined';
+import RedeemIcon from '@material-ui/icons/Redeem';
 // Component styles
 import styles from './styles';
 
@@ -177,6 +179,19 @@ class Sidebar extends Component {
             activeClassName={classes.activeListItem}
             className={classes.listItem}
             component={NavLink}
+            to="/admin/loyalty">
+            <ListItemIcon className={classes.listItemIcon}>
+              <StarIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Loyalty Points"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
             to="/admin/reviews">
             <ListItemIcon className={classes.listItemIcon}>
               <RateReviewIcon />
@@ -184,6 +199,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Reviews"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/refunds">
+            <ListItemIcon className={classes.listItemIcon}>
+              <RedeemIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Refund Requests"
             />
           </ListItem>
           {user && user.role === 'superadmin' && (

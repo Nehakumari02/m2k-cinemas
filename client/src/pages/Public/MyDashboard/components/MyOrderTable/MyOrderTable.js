@@ -14,6 +14,10 @@ import {
   Box
 } from '@material-ui/core';
 import { ExpandMore as KeyboardArrowDownIcon, ExpandLess as KeyboardArrowUpIcon } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { useDispatch } from 'react-redux';
+import { submitRefundRequest } from '../../../../../store/actions';
+import { RefundRequestModal } from '../../../../../components';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,6 +42,8 @@ const useStyles = makeStyles(theme => ({
   statusShipped: { backgroundColor: '#f3e8ff', color: '#6b21a8' },
   statusDelivered: { backgroundColor: '#dcfce7', color: '#166534' },
   statusCancelled: { backgroundColor: '#fee2e2', color: '#991b1b' },
+  statusRefundRequested: { backgroundColor: '#fef3c7', color: '#92400e' },
+  statusRefunded: { backgroundColor: '#d1fae5', color: '#065f46' },
 }));
 
 const Row = (props) => {
@@ -52,8 +58,17 @@ const Row = (props) => {
       case 'Shipped': return classes.statusShipped;
       case 'Delivered': return classes.statusDelivered;
       case 'Cancelled': return classes.statusCancelled;
+      case 'Refund Requested': return classes.statusRefundRequested;
+      case 'Refunded': return classes.statusRefunded;
       default: return '';
     }
+  };
+
+  const dispatch = useDispatch();
+  const [refundModalOpen, setRefundModalOpen] = React.useState(false);
+
+  const handleRefundSubmit = (data) => {
+    dispatch(submitRefundRequest(data));
   };
 
   return (
@@ -72,6 +87,25 @@ const Row = (props) => {
           <Chip label={order.status} size="small" className={getStatusClass(order.status)} />
         </TableCell>
         <TableCell>{order.trackingId || 'N/A'}</TableCell>
+        <TableCell>
+          {order.status === 'Delivered' && (
+            <Button
+              size="small"
+              variant="outlined"
+              color="secondary"
+              onClick={() => setRefundModalOpen(true)}
+            >
+              Refund
+            </Button>
+          )}
+          <RefundRequestModal
+            open={refundModalOpen}
+            onClose={() => setRefundModalOpen(false)}
+            item={order}
+            type="Order"
+            onSubmit={handleRefundSubmit}
+          />
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
@@ -126,6 +160,7 @@ export default function MyOrderTable({ orders }) {
             <TableCell className={classes.headCell}>Payment</TableCell>
             <TableCell className={classes.headCell}>Status</TableCell>
             <TableCell className={classes.headCell}>Tracking ID</TableCell>
+            <TableCell className={classes.headCell}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

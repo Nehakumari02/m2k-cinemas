@@ -47,6 +47,7 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
   const classes = useStyles();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [pointsUsed, setPointsUsed] = useState(0);
 
   useEffect(() => {
     getWalletData();
@@ -64,6 +65,8 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
   const [paymentMethod, setPaymentMethod] = useState('Card');
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const loyaltyPoints = user?.loyaltyPoints || 0;
+  const finalTotal = Math.max(0, subtotal - pointsUsed);
 
   const handleInputChange = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
@@ -80,9 +83,10 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
         quantity: item.quantity,
         price: item.price
       })),
-      totalAmount: subtotal,
+      totalAmount: finalTotal,
       shippingAddress: address,
-      paymentMethod
+      paymentMethod,
+      pointsUsed
     };
 
     try {
@@ -229,8 +233,30 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
               <Divider />
               <Box mt={3} display="flex" justifyContent="space-between">
                 <Typography variant="h6" style={{ fontWeight: 800 }}>Total Payable</Typography>
-                <Typography variant="h6" style={{ fontWeight: 800, color: '#b72429' }}>₹{subtotal}</Typography>
+                <Typography variant="h6" style={{ fontWeight: 800, color: '#b72429' }}>₹{finalTotal}</Typography>
               </Box>
+
+              {loyaltyPoints > 0 && (
+                <Box mt={3}>
+                  <TextField
+                    fullWidth
+                    label={`Use Loyalty Points (Available: ${loyaltyPoints})`}
+                    type="number"
+                    variant="outlined"
+                    value={pointsUsed || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10) || 0;
+                      setPointsUsed(Math.min(val, loyaltyPoints, subtotal));
+                    }}
+                    helperText={`1 Point = ₹1 Discount`}
+                  />
+                  {pointsUsed > 0 && (
+                    <Typography variant="caption" style={{ color: '#22c55e', fontWeight: 700, marginTop: 4, display: 'block' }}>
+                      ✓ ₹{pointsUsed} discount applied from points!
+                    </Typography>
+                  )}
+                </Box>
+              )}
 
               <Button
                 type="submit"
@@ -238,11 +264,11 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
                 variant="contained"
                 color="primary"
                 className={classes.submitBtn}
-                disabled={loading || (paymentMethod === 'Wallet' && walletBalance < subtotal)}
+                disabled={loading || (paymentMethod === 'Wallet' && walletBalance < finalTotal)}
               >
-                {loading ? <CircularProgress size={24} color="inherit" /> : `Place Order (₹${subtotal})`}
+                {loading ? <CircularProgress size={24} color="inherit" /> : `Place Order (₹${finalTotal})`}
               </Button>
-              {paymentMethod === 'Wallet' && walletBalance < subtotal && (
+              {paymentMethod === 'Wallet' && walletBalance < finalTotal && (
                 <Typography color="error" variant="caption" align="center" display="block" style={{ marginTop: 8 }}>
                   Insufficient wallet balance.
                 </Typography>

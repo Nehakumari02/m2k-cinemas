@@ -11,13 +11,18 @@ import {
   TablePagination
 } from '@material-ui/core';
 
-import { Portlet, PortletContent } from '../../../../../components';
+import { Portlet, PortletContent, RefundRequestModal } from '../../../../../components';
+import { Button, Chip } from '@material-ui/core';
+import { connect } from 'react-redux';
+import { submitRefundRequest } from '../../../../../store/actions';
 import styles from './styles';
 
 class ReservationsTable extends Component {
   state = {
     rowsPerPage: 10,
-    page: 0
+    page: 0,
+    refundModalOpen: false,
+    selectedReservation: null
   };
 
   static propTypes = {
@@ -68,6 +73,8 @@ class ReservationsTable extends Component {
                 <TableCell align="left">Start At</TableCell>
                 <TableCell align="left">Ticket Price</TableCell>
                 <TableCell align="left">Total</TableCell>
+                <TableCell align="left">Status</TableCell>
+                <TableCell align="left">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -96,10 +103,39 @@ class ReservationsTable extends Component {
                     <TableCell className={classes.tableCell}>
                       {reservation.total}
                     </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      <Chip 
+                        label={reservation.status || 'Paid'} 
+                        size="small"
+                        style={{ 
+                          backgroundColor: reservation.status === 'Refund Requested' ? '#fef3c7' : reservation.status === 'Refunded' ? '#dcfce7' : '#e0f2fe',
+                          color: reservation.status === 'Refund Requested' ? '#92400e' : reservation.status === 'Refunded' ? '#166534' : '#075985'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {(!reservation.status || reservation.status === 'Paid') && (
+                        <Button 
+                          size="small" 
+                          variant="outlined" 
+                          color="secondary"
+                          onClick={() => this.setState({ refundModalOpen: true, selectedReservation: reservation })}
+                        >
+                          Refund
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
             </TableBody>
           </Table>
+          <RefundRequestModal
+            open={this.state.refundModalOpen}
+            onClose={() => this.setState({ refundModalOpen: false, selectedReservation: null })}
+            item={this.state.selectedReservation}
+            type="Reservation"
+            onSubmit={this.props.submitRefundRequest}
+          />
           <TablePagination
             backIconButtonProps={{
               'aria-label': 'Previous Page'
@@ -121,4 +157,4 @@ class ReservationsTable extends Component {
   }
 }
 
-export default withStyles(styles)(ReservationsTable);
+export default connect(null, { submitRefundRequest })(withStyles(styles)(ReservationsTable));

@@ -30,6 +30,14 @@ const foodSchema = new Schema({
     type: String,
     enum: ['veg', 'non-veg'],
     default: 'veg'
+  },
+  isWeeklyOffer: {
+    type: Boolean,
+    default: false
+  },
+  isMonthlyOffer: {
+    type: Boolean,
+    default: false
   }
 });
 

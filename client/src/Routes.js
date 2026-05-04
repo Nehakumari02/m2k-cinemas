@@ -21,6 +21,8 @@ const EventList = lazy(() => import('./pages/Admin/EventList/EventList'));
 const ReviewList = lazy(() => import('./pages/Admin/ReviewList'));
 const ProductList = lazy(() => import('./pages/Admin/ProductList'));
 const OrderList = lazy(() => import('./pages/Admin/OrderList'));
+const LoyaltySettings = lazy(() => import('./pages/Admin/LoyaltySettings/LoyaltySettings'));
+const RefundManagement = lazy(() => import('./pages/Admin/RefundManagement/RefundManagement'));
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -214,21 +216,18 @@ const Routes = () => {
             exact
             path="/movie/:id"
             layout={PublicLayout}
-            layoutProps={{ withFooter: false }}
             component={MoviePage}
           />
           <WithLayoutRoute
             exact
             path="/movie/booking/:id"
             layout={PublicLayout}
-            layoutProps={{ withFooter: false }}
             component={BookingPage}
           />
           <WithLayoutRoute
             exact
             path="/movie/booking/:id/seats"
             layout={PublicLayout}
-            layoutProps={{ withFooter: false }}
             component={BookingPage}
           />
           <ProtectedRoute
@@ -311,9 +310,21 @@ const Routes = () => {
           />
           <ProtectedRoute
             exact
+            path="/admin/loyalty"
+            layout={AdminLayout}
+            component={LoyaltySettings}
+          />
+          <ProtectedRoute
+            exact
             path="/admin/reviews"
             layout={AdminLayout}
             component={ReviewList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/refunds"
+            layout={AdminLayout}
+            component={RefundManagement}
           />
           <Route path="*" component={() => '404 NOT FOUND'} />
         </Switch>

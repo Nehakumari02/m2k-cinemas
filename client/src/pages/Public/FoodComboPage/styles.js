@@ -207,5 +207,55 @@ export default (theme) => ({
     '&:hover': {
       backgroundColor: '#1b5e20'
     }
+  },
+  dealBadge: {
+    position: 'absolute',
+    top: 20,
+    left: -35,
+    backgroundColor: '#ff9800',
+    color: '#fff',
+    padding: '8px 40px',
+    fontWeight: 800,
+    fontSize: '0.75rem',
+    textTransform: 'uppercase',
+    transform: 'rotate(-45deg)',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+    zIndex: 10,
+    letterSpacing: '1px',
+    animation: '$pulse 2s infinite'
+  },
+  weekdayBadge: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    backgroundColor: '#4caf50',
+    color: '#fff',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontWeight: 700,
+    fontSize: '0.7rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+    zIndex: 10,
+    textTransform: 'uppercase'
+  },
+  originalPrice: {
+    textDecoration: 'line-through',
+    color: '#9ca3af',
+    fontSize: '0.9rem',
+    marginRight: theme.spacing(1)
+  },
+  '@keyframes pulse': {
+    '0%': {
+      boxShadow: '0 4px 10px rgba(255, 152, 0, 0.2)'
+    },
+    '50%': {
+      boxShadow: '0 4px 20px rgba(255, 152, 0, 0.6)'
+    },
+    '100%': {
+      boxShadow: '0 4px 10px rgba(255, 152, 0, 0.2)'
+    }
   }
 });

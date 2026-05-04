@@ -16,6 +16,7 @@ import CinemaCard from '../components/CinemaCard/CinemaCard';
 import QuickBookBar from '../components/QuickBookBar/QuickBookBar';
 import ExperiencesSection from '../components/ExperiencesSection/ExperiencesSection';
 import OffersSection from '../components/OffersSection/OffersSection';
+import FoodSection from '../components/FoodSection/FoodSection';
 import styles from './styles';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -165,6 +166,9 @@ class HomePage extends Component {
         {/* ── Offers For You ── */}
         <OffersSection />
 
+        {/* ── Food & Combos ── */}
+        <FoodSection />
+
         {/* ── Cinemas ── */}
         <div id="cinemas" className={classes.cinemasSection}>
           <div className={classes.cinemasTitleBlock}>
@@ -182,81 +186,7 @@ class HomePage extends Component {
           </Grid>
         </div>
 
-        {/* ── Footer ── */}
-        <footer className={classes.footer}>
-          <div className={classes.footerTop}>
-            <div className={classes.footerBrand}>
-              <img 
-                src="https://m2kcinemas.com/Images/logo1.png" 
-                alt="M2K Cinemas" 
-                style={{ height: '50px', marginBottom: '12px', mixBlendMode: 'multiply' }} 
-              />
-              <Typography className={classes.footerTagline}>
-                India's Finest Cinematic Experience
-              </Typography>
-              <div style={{ marginTop: '20px' }}>
-                <Typography variant="caption" style={{ color: '#64748b', display: 'block', lineHeight: 1.6 }}>
-                  <strong>M2K Corporate Park, Sector-51</strong><br />
-                  Gurugram, Haryana - 122003<br />
-                  Phone: +91 0124 4525000<br />
-                  Email: <a href="mailto:info@m2kcinemas.com" style={{ color: '#b72429', textDecoration: 'none' }}>info@m2kcinemas.com</a>
-                </Typography>
-              </div>
-            </div>
-            <div className={classes.footerLinks}>
-              <div className={classes.footerCol}>
-                <Typography className={classes.footerColTitle}>Explore</Typography>
-                <Link to="/movie/category/nowShowing" className={classes.footerLink}>Now Showing</Link>
-                <Link to="/movie/category/comingSoon" className={classes.footerLink}>Coming Soon</Link>
-                <Link to="/cinemas" className={classes.footerLink}>Cinemas</Link>
-                <Link to="/offers" className={classes.footerLink}>Offers</Link>
-                <Link to="/showtimings" className={classes.footerLink}>Showtimings</Link>
-                <Link to="/about-us" className={classes.footerLink}>About Us</Link>
-                <Link to="/contact-us" className={classes.footerLink}>Contact Us</Link>
-              </div>
-              <div className={classes.footerCol}>
-                <Typography className={classes.footerColTitle}>Account</Typography>
-                <Link to="/login" className={classes.footerLink}>Login</Link>
-                <Link to="/register" className={classes.footerLink}>Register</Link>
-                <Link to="/mydashboard" className={classes.footerLink}>My Dashboard</Link>
-              </div>
-              <div className={classes.footerCol}>
-                <Typography className={classes.footerColTitle}>Experience</Typography>
-                <Link to="/experience/imax" className={classes.footerLink}>IMAX</Link>
-                <Link to="/experience/4dx" className={classes.footerLink}>4DX</Link>
-                <Link to="/experience/gold" className={classes.footerLink}>GOLD</Link>
-                <Link to="/experience/pxl" className={classes.footerLink}>PXL</Link>
-              </div>
-              <div className={classes.footerCol}>
-                <Typography className={classes.footerColTitle}>Corporate</Typography>
-                <Link to="/careers" className={classes.footerLink}>Careers</Link>
-                <Link to="/media" className={classes.footerLink}>Media</Link>
-                <Link to="/gallery" className={classes.footerLink}>Gallery</Link>
-              </div>
-              <div className={classes.footerCol}>
-                <Typography className={classes.footerColTitle}>Advertise</Typography>
-                <Link to="/advertise" className={classes.footerLink}>Advertise with Us</Link>
-                <Typography variant="caption" style={{ color: '#64748b', marginTop: '8px', maxWidth: '180px', display: 'block', lineHeight: 1.4 }}>
-                  Increase your brand visibility with our amazing branding options.
-                </Typography>
-              </div>
-            </div>
-          </div>
-          <div className={classes.footerBottom}>
-            <Typography className={classes.footerCopy}>
-              © {new Date().getFullYear()} M2K Cinemas. All rights reserved.
-              <span style={{ margin: '0 12px', color: '#cbd5e1' }}>|</span>
-              <Link to="/privacy-policy" style={{ color: '#64748b', textDecoration: 'none' }}>Privacy Policy</Link>
-              <span style={{ margin: '0 12px', color: '#cbd5e1' }}>|</span>
-              <Link to="/terms-conditions" style={{ color: '#64748b', textDecoration: 'none' }}>Terms & Conditions</Link>
-            </Typography>
-            <div className={classes.footerSocials}>
-              {['📘', '🐦', '📸', '▶️'].map((icon, i) => (
-                <span key={i} className={classes.socialIcon}>{icon}</span>
-              ))}
-            </div>
-          </div>
-        </footer>
+        {/* Footer is handled by PublicLayout */}
       </Fragment>
     );
   }

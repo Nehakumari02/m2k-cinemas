@@ -23,6 +23,7 @@ const walletRouter = require('./routes/wallet');
 const productRouter = require('./routes/products');
 const orderRouter = require('./routes/orders');
 const settingsRouter = require('./routes/settings');
+const refundRouter = require('./routes/refunds');
 
 const app = express();
 app.disable('x-powered-by');
@@ -66,6 +67,7 @@ app.use(walletRouter);
 app.use(productRouter);
 app.use(orderRouter);
 app.use(settingsRouter);
+app.use(refundRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 
