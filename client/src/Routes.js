@@ -8,7 +8,8 @@ import { AdminLayout, PublicLayout } from './layouts';
 
 // Admin
 const DashboardPage = lazy(() => import('./pages/Admin/Dashboard'));
-const MovieList = lazy(() => import('./pages/Admin/MovieList'));
+const MovieList = lazy(() => import('./pages/Admin/MovieList/MovieList'));
+const ReviewList = lazy(() => import('./pages/Admin/ReviewList/ReviewList'));
 const CinemaList = lazy(() => import('./pages/Admin/CinemaList'));
 const ShowtimeList = lazy(() => import('./pages/Admin/ShowtimeList'));
 const ReservationList = lazy(() => import('./pages/Admin/ReservationList'));
@@ -18,7 +19,6 @@ const OfferList = lazy(() => import('./pages/Admin/OfferList'));
 const ExperienceList = lazy(() => import('./pages/Admin/ExperienceList'));
 const FoodList = lazy(() => import('./pages/Admin/FoodList/FoodList'));
 const EventList = lazy(() => import('./pages/Admin/EventList/EventList'));
-const ReviewList = lazy(() => import('./pages/Admin/ReviewList'));
 const ProductList = lazy(() => import('./pages/Admin/ProductList'));
 const OrderList = lazy(() => import('./pages/Admin/OrderList'));
 const LoyaltySettings = lazy(() => import('./pages/Admin/LoyaltySettings/LoyaltySettings'));
@@ -279,6 +279,12 @@ const Routes = () => {
             path="/admin/movies"
             layout={AdminLayout}
             component={MovieList}
+          />
+          <WithLayoutRoute
+            exact
+            path="/admin/reviews"
+            layout={AdminLayout}
+            component={ReviewList}
           />
           <ProtectedRoute
             exact

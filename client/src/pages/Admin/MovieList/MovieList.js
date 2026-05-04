@@ -13,8 +13,7 @@ import { match } from '../../../utils';
 class MovieList extends Component {
   state = { search: '' };
   componentDidMount() {
-    const { movies, getMovies } = this.props;
-    if (!movies.length) getMovies();
+    this.props.getMovies(true);
   }
 
   renderMovies() {

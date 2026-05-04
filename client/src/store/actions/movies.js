@@ -108,9 +108,9 @@ export const uploadMovieCastCrewImages = (id, files) => async dispatch => {
   }
 };
 
-export const getMovies = () => async dispatch => {
+export const getMovies = (all = false) => async dispatch => {
   try {
-    const url = '/movies';
+    const url = all ? '/movies?all=true' : '/movies';
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }

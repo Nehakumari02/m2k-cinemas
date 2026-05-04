@@ -27,7 +27,7 @@ class ReservationList extends Component {
     } = this.props;
 
     if (!reservations.length) await getReservations();
-    if (!movies.length) await getMovies();
+    await getMovies(true);
     if (!cinemas.length) await getCinemas();
     this.setState({ loading: false });
   }

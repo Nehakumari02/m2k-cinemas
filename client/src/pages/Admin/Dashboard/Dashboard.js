@@ -27,7 +27,7 @@ class Dashboard extends Component {
   componentDidMount() {
     this.props.getUsers();
     this.props.getCinemas();
-    this.props.getMovies();
+    this.props.getMovies(true);
     this.props.getReservations();
   }
 

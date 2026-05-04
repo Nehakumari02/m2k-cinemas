@@ -15,3 +15,4 @@ export * from './products';
 export * from './cart';
 export * from './refund';
 export * from './wishlist';
+export * from './reviews';

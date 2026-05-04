@@ -86,6 +86,10 @@ const movieSchema = new Schema({
     type: Date,
     required: true,
   },
+  isPublished: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const Movie = mongoose.model('Movie', movieSchema);

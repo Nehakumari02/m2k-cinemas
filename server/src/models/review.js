@@ -31,6 +31,15 @@ const reviewSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  status: {
+    type: String,
+    enum: ['Pending', 'Approved', 'Rejected'],
+    default: 'Pending',
+  },
+  isHighlighted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Review = mongoose.model('Review', reviewSchema);

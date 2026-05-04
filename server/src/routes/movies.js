@@ -39,11 +39,13 @@ router.post('/movies/:id/reviews', auth.simple, async (req, res) => {
 
     await review.save();
 
-    // Update movie average rating
-    const reviews = await Review.find({ movieId });
-    const avgRating = reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
-    movie.rating = parseFloat(avgRating.toFixed(1));
-    await movie.save();
+    // Update movie average rating (only from Approved reviews)
+    const approvedReviews = await Review.find({ movieId, status: 'Approved' });
+    if (approvedReviews.length > 0) {
+      const avgRating = approvedReviews.reduce((acc, cur) => acc + cur.rating, 0) / approvedReviews.length;
+      movie.rating = parseFloat(avgRating.toFixed(1));
+      await movie.save();
+    }
 
     res.status(201).send({ review, movie });
   } catch (e) {
@@ -54,8 +56,10 @@ router.post('/movies/:id/reviews', auth.simple, async (req, res) => {
 // Get all reviews for a movie
 router.get('/movies/:id/reviews', async (req, res) => {
   const movieId = req.params.id;
+  const { all } = req.query;
   try {
-    const reviews = await Review.find({ movieId }).sort({ createdAt: -1 });
+    const query = all === 'true' ? { movieId } : { movieId, status: 'Approved' };
+    const reviews = await Review.find(query).sort({ createdAt: -1 });
     res.send(reviews);
   } catch (e) {
     res.status(400).send(e);
@@ -150,8 +154,9 @@ router.post(
 
 // Get all movies
 router.get('/movies', async (req, res) => {
+  const { all } = req.query;
   try {
-    const movies = await Movie.find({});
+    const movies = all === 'true' ? await Movie.find({}) : await Movie.find({ isPublished: { $ne: false } });
     res.send(movies);
   } catch (e) {
     res.status(400).send(e);
@@ -190,6 +195,7 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'rating',
     'releaseDate',
     'endDate',
+    'isPublished',
   ];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
@@ -244,9 +250,42 @@ router.delete('/movies/reviews/:reviewId', auth.enhance, async (req, res) => {
     const review = await Review.findByIdAndDelete(reviewId);
     if (!review) return res.sendStatus(404);
 
-    // Recalculate movie rating
+    // Recalculate movie rating (only from Approved reviews)
     const movieId = review.movieId;
-    const reviews = await Review.find({ movieId });
+    const approvedReviews = await Review.find({ movieId, status: 'Approved' });
+    const movie = await Movie.findById(movieId);
+    if (movie) {
+      if (approvedReviews.length > 0) {
+        const avgRating = approvedReviews.reduce((acc, cur) => acc + cur.rating, 0) / approvedReviews.length;
+        movie.rating = parseFloat(avgRating.toFixed(1));
+      } else {
+        movie.rating = 0;
+      }
+      await movie.save();
+    }
+
+    res.send({ message: 'Review deleted', movie });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+// Update a review (Admin only)
+router.put('/movies/reviews/:reviewId', auth.enhance, async (req, res) => {
+  const { reviewId } = req.params;
+  const { status, isHighlighted } = req.body;
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) return res.sendStatus(404);
+
+    if (status) review.status = status;
+    if (isHighlighted !== undefined) review.isHighlighted = isHighlighted;
+
+    await review.save();
+
+    // Recalculate movie rating only if status changed to/from Approved
+    const movieId = review.movieId;
+    const reviews = await Review.find({ movieId, status: 'Approved' });
     const movie = await Movie.findById(movieId);
     if (movie) {
       if (reviews.length > 0) {
@@ -258,7 +297,7 @@ router.delete('/movies/reviews/:reviewId', auth.enhance, async (req, res) => {
       await movie.save();
     }
 
-    res.send({ message: 'Review deleted', movie });
+    res.send({ review, movie });
   } catch (e) {
     res.status(400).send(e);
   }

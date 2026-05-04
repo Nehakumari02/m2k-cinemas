@@ -1,0 +1,3 @@
+export const GET_REVIEWS = 'GET_REVIEWS';
+export const UPDATE_REVIEW = 'UPDATE_REVIEW';
+export const DELETE_REVIEW = 'DELETE_REVIEW';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Typography, Select, FormControl, InputLabel, OutlinedInput } from '@material-ui/core';
+import { withStyles, Typography, Select, FormControl, InputLabel, OutlinedInput, FormControlLabel, Switch } from '@material-ui/core';
 import { Button, TextField, MenuItem } from '@material-ui/core';
 import {
   MuiPickersUtilsProvider,
@@ -39,7 +39,8 @@ class AddMovie extends Component {
     crewFiles: [],
     backdropFiles: [],
     releaseDate: new Date(),
-    endDate: new Date()
+    endDate: new Date(),
+    isPublished: true
   };
 
   componentDidMount() {
@@ -56,7 +57,8 @@ class AddMovie extends Component {
         duration,
         rating,
         releaseDate,
-        endDate
+        endDate,
+        isPublished
       } = this.props.edit;
       const castMembers = Array.isArray(castCrew)
         ? castCrew.filter(item => String(item.role || '').toLowerCase() === 'cast')
@@ -77,7 +79,8 @@ class AddMovie extends Component {
         duration,
         rating: rating || '',
         releaseDate,
-        endDate
+        endDate,
+        isPublished: isPublished !== undefined ? isPublished : true
       });
     }
   }
@@ -238,7 +241,8 @@ class AddMovie extends Component {
       castFiles,
       crewFiles,
       releaseDate,
-      endDate
+      endDate,
+      isPublished
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
@@ -606,6 +610,20 @@ class AddMovie extends Component {
                 }}
               />
             </MuiPickersUtilsProvider>
+          </div>
+          <div className={classes.field}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isPublished}
+                  onChange={event =>
+                    this.handleFieldChange('isPublished', event.target.checked)
+                  }
+                  color="primary"
+                />
+              }
+              label="Published (visible to users)"
+            />
           </div>
           <div className={classes.field}>
             <FileUpload

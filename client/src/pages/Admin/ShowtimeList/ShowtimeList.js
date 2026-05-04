@@ -31,7 +31,7 @@ class ShowtimeList extends Component {
       getCinemas
     } = this.props;
     if (!showtimes.length) getShowtimes();
-    if (!movies.length) getMovies();
+    getMovies(true);
     if (!cinemas.length) getCinemas();
   }
 

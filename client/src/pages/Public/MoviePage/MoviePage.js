@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Container, Typography, Grid, Box, TextField, Button, Paper, Divider } from '@material-ui/core';
+import { Container, Typography, Grid, Box, TextField, Button, Paper, Divider, Chip } from '@material-ui/core';
+import { Star as StarIcon } from '@material-ui/icons';
 import { Rating } from '@material-ui/lab';
 import MovieBanner from '../components/MovieBanner/MovieBanner';
 import { getMovie, onSelectMovie } from '../../../store/actions';
@@ -63,13 +64,11 @@ class MoviePage extends Component {
       const data = await response.json();
       
       if (response.ok) {
-        this.props.setAlert('Review submitted successfully!', 'success');
-        this.setState(prev => ({
-          reviews: [data.review, ...prev.reviews],
+        this.props.setAlert('Review submitted successfully! It will appear once approved by the admin.', 'success');
+        this.setState({
           rating: 0,
           comment: ''
-        }));
-        this.props.getMovie(movie._id); // Refresh movie data for average rating
+        });
       } else {
         this.props.setAlert(data.message || 'Error submitting review', 'error');
       }
@@ -233,8 +232,36 @@ class MoviePage extends Component {
                 </Typography>
                 
                 {reviews.length ? (
-                  reviews.map((rev, i) => (
-                    <Paper key={i} elevation={0} style={{ padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', marginBottom: '16px' }}>
+                  reviews
+                    .sort((a, b) => (b.isHighlighted ? 1 : 0) - (a.isHighlighted ? 1 : 0))
+                    .map((rev, i) => (
+                    <Paper 
+                      key={i} 
+                      elevation={0} 
+                      style={{ 
+                        padding: '24px', 
+                        borderRadius: '16px', 
+                        border: rev.isHighlighted ? '2px solid #fbbf24' : '1px solid #f1f5f9', 
+                        marginBottom: '16px',
+                        position: 'relative',
+                        background: rev.isHighlighted ? '#fffef0' : '#fff'
+                      }}
+                    >
+                      {rev.isHighlighted && (
+                        <Chip 
+                          icon={<StarIcon style={{ color: '#fff', fontSize: '0.8rem' }} />}
+                          label="Featured Review" 
+                          size="small" 
+                          style={{ 
+                            position: 'absolute', 
+                            top: -12, 
+                            right: 16, 
+                            backgroundColor: '#fbbf24', 
+                            color: '#fff',
+                            fontWeight: 800
+                          }} 
+                        />
+                      )}
                       <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                         <Typography variant="subtitle1" style={{ fontWeight: 700, color: '#1e293b' }}>
                           {rev.userName}

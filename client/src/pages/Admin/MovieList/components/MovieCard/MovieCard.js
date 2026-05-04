@@ -2,14 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/core';
-import { Typography } from '@material-ui/core';
+import { Typography, Chip } from '@material-ui/core';
 import { AccessTime as AccessTimeIcon } from '@material-ui/icons';
 import { Paper } from '../../../../../components';
 
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: '100%',
-    paddingBottom: theme.spacing(2)
+    paddingBottom: theme.spacing(2),
+    position: 'relative'
+  },
+  unpublished: {
+    opacity: 0.6,
+    filter: 'grayscale(0.5)'
+  },
+  statusBadge: {
+    position: 'absolute',
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+    zIndex: 1
   },
   imageWrapper: {
     height: '200px',
@@ -60,9 +71,18 @@ function MovieCard(props) {
   const classes = useStyles(props);
   const { className, movie } = props;
 
-  const rootClassName = classNames(classes.root, className);
+  const rootClassName = classNames(classes.root, className, {
+    [classes.unpublished]: movie.isPublished === false
+  });
   return (
     <Paper className={rootClassName}>
+      <div className={classes.statusBadge}>
+        <Chip
+          label={movie.isPublished !== false ? 'Published' : 'Unpublished'}
+          color={movie.isPublished !== false ? 'primary' : 'secondary'}
+          size="small"
+        />
+      </div>
       <div className={classes.imageWrapper}>
         <img alt="movie" className={classes.image} src={movie.image} />
       </div>
