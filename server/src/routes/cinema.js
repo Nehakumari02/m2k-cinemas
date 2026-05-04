@@ -63,20 +63,29 @@ router.get('/cinemas/:id', async (req, res) => {
 // Update cinema by id
 router.patch('/cinemas/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'ticketPrice', 'city', 'seats', 'seatsAvailable'];
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
-
-  if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
-
   try {
     const cinema = await Cinema.findById(_id);
-    updates.forEach((update) => (cinema[update] = req.body[update]));
+    if (!cinema) return res.status(404).send({ error: 'Cinema not found' });
+
+    const updates = Object.keys(req.body);
+    console.log('UPDATING CINEMA:', _id, updates);
+
+    updates.forEach((update) => {
+      // Only update fields that are not internal Mongoose fields
+      if (update !== '_id' && update !== '__v') {
+        cinema[update] = req.body[update];
+      }
+    });
+
+    if (updates.includes('seats')) {
+      cinema.markModified('seats');
+    }
+
     await cinema.save();
-    if (!cinema) return res.sendStatus(404);
     return res.send(cinema);
   } catch (e) {
-    return res.status(400).send(e);
+    console.error('CINEMA UPDATE ERROR:', e);
+    return res.status(400).send({ error: e.message });
   }
 });
 

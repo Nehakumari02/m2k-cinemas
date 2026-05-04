@@ -12,6 +12,11 @@ const cinemaSchema = new Schema({
     type: Number,
     required: true,
   },
+  specialPrice: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
   city: {
     type: String,
     required: true,

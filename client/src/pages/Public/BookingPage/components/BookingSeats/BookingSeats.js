@@ -1,11 +1,13 @@
 import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/styles';
+import classNames from 'classnames';
 
 const SEAT_COLORS = {
   available: '#3a3a4a',
   reserved: '#1e1e26',
   selected: '#b72429',
-  suggested: '#00bcd4'
+  suggested: '#00bcd4',
+  special: '#FFD700'
 };
 
 const useStyles = makeStyles(theme => ({
@@ -132,6 +134,14 @@ const useStyles = makeStyles(theme => ({
     boxShadow: '0 0 10px rgba(183,36,41,0.6)',
     color: '#fff'
   },
+  seatSpecial: {
+    boxShadow: '0 0 10px rgba(255, 215, 0, 0.4)',
+    '&::after': {
+      content: '"💎"',
+      fontSize: '0.6rem',
+      display: 'block'
+    }
+  },
 
   /* ── Aisle Gap ── */
   aisleGap: {
@@ -208,6 +218,8 @@ function getSeatBgColor(seatValue, category) {
   if (seatValue === 1) return SEAT_COLORS.reserved;
   if (seatValue === 2) return SEAT_COLORS.selected;
   if (seatValue === 3) return SEAT_COLORS.suggested;
+  if (seatValue === 5) return SEAT_COLORS.special; // special, unselected
+  if (seatValue === 6) return '#FFB800';            // special, selected (deeper gold)
   // Use a visible version of category color for available seats
   return category.color + '33'; // 20% opacity hex
 }
@@ -269,26 +281,25 @@ export default function BookingSeats({ seats, onSelectSeat }) {
             <div className={classes.row}>
               <span className={classes.rowLabel}>{rowLetter}</span>
               <div className={classes.seatsGroup}>
-                {seatRow.map((seat, seatIndex) => {
-                  const isReserved = seat === 1;
-                  const isSelected = seat === 2;
-                  const bg = getSeatBgColor(seat, category);
-
+                {seatRow.map((seatValue, seatIndex) => {
                   return (
                     <Fragment key={seatIndex}>
                       {seatIndex === aisleAt && (
                         <div className={classes.aisleGap} />
                       )}
                       <button
-                        className={`${classes.seat} ${
-                          isReserved ? classes.seatReserved : ''
-                        } ${isSelected ? classes.seatSelected : ''}`}
-                        style={{ backgroundColor: bg }}
+                        className={classNames(
+                          classes.seat,
+                          seatValue === 1 && classes.seatReserved,
+                          seatValue === 2 && classes.seatSelected,
+                          (seatValue === 5 || seatValue === 6) && classes.seatSpecial
+                        )}
+                        style={{ backgroundColor: getSeatBgColor(seatValue, category) }}
                         onClick={() =>
-                          !isReserved && onSelectSeat(rowIndex, seatIndex)
+                          seatValue !== 1 && onSelectSeat(rowIndex, seatIndex)
                         }
                         title={`Row ${rowLetter} Seat ${seatIndex + 1}${
-                          isReserved ? ' (Reserved)' : ''
+                          seatValue === 1 ? ' (Reserved)' : ''
                         }`}>
                         {seatIndex + 1}
                       </button>
@@ -304,20 +315,41 @@ export default function BookingSeats({ seats, onSelectSeat }) {
 
       {/* ── Legend ── */}
       <div className={classes.legend}>
-        {[
-          { color: '#42a5f533', label: 'Available' },
-          { color: SEAT_COLORS.reserved, label: 'Booked' },
-          { color: SEAT_COLORS.selected, label: 'Selected' },
-          { color: SEAT_COLORS.suggested, label: 'Recommended' }
-        ].map(item => (
-          <div key={item.label} className={classes.legendItem}>
-            <div
-              className={classes.legendSeat}
-              style={{ backgroundColor: item.color }}
-            />
-            {item.label}
-          </div>
-        ))}
+        <div className={classes.legendItem}>
+          <div
+            className={classes.legendSeat}
+            style={{ backgroundColor: '#42a5f533' }}
+          />
+          Available
+        </div>
+        <div className={classes.legendItem}>
+          <div
+            className={classes.legendSeat}
+            style={{ backgroundColor: SEAT_COLORS.reserved }}
+          />
+          Booked
+        </div>
+        <div className={classes.legendItem}>
+          <div
+            className={classes.legendSeat}
+            style={{ backgroundColor: SEAT_COLORS.selected }}
+          />
+          Selected
+        </div>
+        <div className={classes.legendItem}>
+          <div
+            className={classes.legendSeat}
+            style={{ backgroundColor: SEAT_COLORS.suggested }}
+          />
+          Suggested
+        </div>
+        <div className={classes.legendItem}>
+          <div
+            className={classes.legendSeat}
+            style={{ backgroundColor: SEAT_COLORS.special }}
+          />
+          Special (Diamond)
+        </div>
         <div className={classes.legendItem}>
           <span style={{ color: '#b72429', fontWeight: 700 }}>●</span> GOLD
         </div>

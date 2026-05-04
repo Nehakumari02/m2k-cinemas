@@ -22,7 +22,8 @@ import {
   addReservation,
   setSuggestedSeats,
   setQRCode,
-  getWalletData
+  getWalletData,
+  getOffers
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
@@ -72,6 +73,7 @@ class BookingPage extends Component {
     user ? getCinemasUserModeling(user.username) : getCinemas();
     getShowtimes();
     getReservations();
+    this.props.getOffers();
     if (user) {
       getSuggestedReservationSeats(user.username);
       getWalletData();
@@ -256,15 +258,25 @@ class BookingPage extends Component {
   onSelectSeat = (row, seat) => {
     const { cinema, setSelectedSeats } = this.props;
     const seats = [...cinema.seats];
-    const newSeats = [...seats];
-    if (seats[row][seat] === 1) {
-      newSeats[row][seat] = 1;
-    } else if (seats[row][seat] === 2) {
-      newSeats[row][seat] = 0;
-    } else if (seats[row][seat] === 3) {
-      newSeats[row][seat] = 2;
+    const val = seats[row][seat];
+
+    if (val === 1) {
+      // Reserved — do nothing
+    } else if (val === 2) {
+      // De-select normal seat
+      seats[row][seat] = 0;
+    } else if (val === 6) {
+      // De-select special seat — restore to 5
+      seats[row][seat] = 5;
+    } else if (val === 3) {
+      // Suggested seat → select
+      seats[row][seat] = 2;
+    } else if (val === 5) {
+      // Special seat → selected special (value 6)
+      seats[row][seat] = 6;
     } else {
-      newSeats[row][seat] = 2;
+      // Normal available seat → select
+      seats[row][seat] = 2;
     }
     setSelectedSeats([row, seat]);
   };
@@ -332,7 +344,15 @@ class BookingPage extends Component {
       }
     }
 
-    const ticketsAmount = selectedSeats.length * cinema.ticketPrice;
+    const ticketsAmount = selectedSeats.reduce((acc, [row, col]) => {
+      const seatVal = Number(cinema.seats[row][col]);
+      // 6 = selected special seat, 5 = special seat (unselected)
+      const isSpecial = seatVal === 6 || seatVal === 5;
+      const price = isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0
+        ? Number(cinema.specialPrice)
+        : Number(cinema.ticketPrice);
+      return acc + price;
+    }, 0);
     const foodItems = Object.values(this.props.selectedFood || {}).map(item => ({
       foodId: item._id,
       name: item.name,
@@ -850,6 +870,12 @@ class BookingPage extends Component {
                   discountPercentage={this.state.discountPercentage}
                   onApplyCoupon={this.onApplyCoupon}
                   onRemoveCoupon={this.onRemoveCoupon}
+                  offers={this.props.offers}
+                  totalTicketsPrice={selectedSeats.reduce((acc, [row, col]) => {
+                    const seatVal = Number(cinema.seats[row][col]);
+                    const isSpecial = seatVal === 6 || seatVal === 5;
+                    return acc + (isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0 ? Number(cinema.specialPrice) : Number(cinema.ticketPrice));
+                  }, 0)}
                 />
               </>
             )}
@@ -881,7 +907,8 @@ const mapStateToProps = (
     showtimeState,
     reservationState,
     checkoutState,
-    walletState
+    walletState,
+    offerState
   },
   ownProps
 ) => ({
@@ -906,7 +933,8 @@ const mapStateToProps = (
   selectedFood: checkoutState.selectedFood,
   suggestedSeats: reservationState.suggestedSeats,
   walletBalance: walletState.balance,
-  loyaltyPoints: walletState.loyaltyPoints
+  loyaltyPoints: walletState.loyaltyPoints,
+  offers: offerState.offers
 });
 
 const mapDispatchToProps = {
@@ -929,7 +957,8 @@ const mapDispatchToProps = {
   resetCheckout,
   setAlert,
   setQRCode,
-  getWalletData
+  getWalletData,
+  getOffers
 };
 
 export default connect(

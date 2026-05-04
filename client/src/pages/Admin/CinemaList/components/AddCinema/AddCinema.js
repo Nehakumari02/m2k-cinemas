@@ -35,8 +35,9 @@ class AddCinema extends Component {
     name: '',
     image: null,
     ticketPrice: '',
+    specialPrice: '',
     city: '',
-    rowConfigs: [{ seats: 10 }],
+    rowConfigs: [{ seats: 10, specials: [] }],
     notification: {}
   };
 
@@ -46,8 +47,15 @@ class AddCinema extends Component {
       // Parse existing seats 2D array back into row configs
       const rowConfigs =
         seats && seats.length > 0
-          ? seats.map(row => ({ seats: Array.isArray(row) ? row.length : 0 }))
-          : [{ seats: 10 }];
+          ? seats.map(row => {
+              const rowSeats = Array.isArray(row) ? row : [];
+              const specials = [];
+              rowSeats.forEach((val, idx) => {
+                if (Number(val) === 5) specials.push(idx);
+              });
+              return { seats: rowSeats.length, specials };
+            })
+          : [{ seats: 10, specials: [] }];
       this.setState({ ...rest, rowConfigs });
     }
   }
@@ -60,7 +68,7 @@ class AddCinema extends Component {
   handleAddRow = () => {
     if (this.state.rowConfigs.length >= 26) return;
     this.setState(prev => ({
-      rowConfigs: [...prev.rowConfigs, { seats: 10 }]
+      rowConfigs: [...prev.rowConfigs, { seats: 10, specials: [] }]
     }));
   };
 
@@ -74,7 +82,30 @@ class AddCinema extends Component {
     const numVal = Math.max(0, Math.min(20, Number(value) || 0));
     this.setState(prev => {
       const rowConfigs = [...prev.rowConfigs];
-      rowConfigs[index] = { ...rowConfigs[index], seats: numVal };
+      // Filter out specials that are now out of bounds
+      rowConfigs[index] = { 
+        ...rowConfigs[index], 
+        seats: numVal,
+        specials: rowConfigs[index].specials.filter(s => s < numVal)
+      };
+      return { rowConfigs };
+    });
+  };
+
+  handleToggleSpecial = (rowIndex, seatIndex) => {
+    this.setState(prev => {
+      // Deep clone rowConfigs to guarantee React detects the change
+      const rowConfigs = prev.rowConfigs.map((row, i) => {
+        if (i !== rowIndex) return row;
+        const specials = Array.isArray(row.specials) ? [...row.specials] : [];
+        const idx = specials.indexOf(seatIndex);
+        if (idx > -1) {
+          specials.splice(idx, 1);
+        } else {
+          specials.push(seatIndex);
+        }
+        return { ...row, specials };
+      });
       return { rowConfigs };
     });
   };
@@ -82,7 +113,7 @@ class AddCinema extends Component {
   // ── Build seats 2D array from rowConfigs ──
   buildSeatsFromConfigs = () => {
     return this.state.rowConfigs.map(row =>
-      Array.from({ length: row.seats }, () => 0)
+      Array.from({ length: row.seats }, (_, i) => (row.specials.includes(i) ? 5 : 0))
     );
   };
 
@@ -93,10 +124,17 @@ class AddCinema extends Component {
   // ── Submit ──
   onSubmitAction = async type => {
     const { getCinemas, createCinemas, updateCinemas, removeCinemas } = this.props;
-    const { _id, name, image, ticketPrice, city } = this.state;
+    const { _id, name, image, ticketPrice, specialPrice, city } = this.state;
     const seats = this.buildSeatsFromConfigs();
     const seatsAvailable = this.getTotalSeats();
-    const cinema = { name, ticketPrice, city, seatsAvailable, seats };
+    const cinema = { 
+      name, 
+      ticketPrice: Number(ticketPrice), 
+      specialPrice: specialPrice ? Number(specialPrice) : 0, 
+      city, 
+      seatsAvailable, 
+      seats 
+    };
 
     let notification = {};
     if (type === 'create') {
@@ -113,7 +151,8 @@ class AddCinema extends Component {
   // ── Render Live Preview ──
   renderPreview = () => {
     const { classes } = this.props;
-    const { rowConfigs } = this.state;
+    // Always read directly from state for freshness
+    const rowConfigs = this.state.rowConfigs;
     const totalRows = rowConfigs.length;
 
     if (totalRows === 0 || this.getTotalSeats() === 0) {
@@ -173,9 +212,21 @@ class AddCinema extends Component {
                       {si === aisleAt && (
                         <div className={classes.previewAisle} />
                       )}
-                      <div
+                      <button
+                        type="button"
                         className={classes.previewSeat}
-                        style={{ backgroundColor: cat.color + '33' }}
+                        style={{ 
+                          backgroundColor: row.specials.includes(si) ? '#FFD700' : cat.color + '33',
+                          cursor: 'pointer',
+                          border: row.specials.includes(si) ? '2px solid #FF8C00' : '2px solid transparent',
+                          boxShadow: row.specials.includes(si) ? '0 0 8px rgba(255,215,0,0.7)' : 'none'
+                        }}
+                        title={row.specials.includes(si) ? 'Special Seat (click to remove)' : 'Click to mark as Special'}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          this.handleToggleSpecial(rowIndex, si);
+                        }}
                       />
                     </Fragment>
                   ))}
@@ -191,7 +242,7 @@ class AddCinema extends Component {
 
   render() {
     const { classes, className } = this.props;
-    const { name, image, ticketPrice, city, rowConfigs, notification } = this.state;
+    const { name, image, ticketPrice, specialPrice, city, rowConfigs, notification } = this.state;
     const totalSeats = this.getTotalSeats();
     const totalRows = rowConfigs.length;
 
@@ -247,12 +298,21 @@ class AddCinema extends Component {
           <div className={classes.field}>
             <TextField
               className={classes.textField}
-              label="Ticket Price"
+              label="Normal Ticket Price"
               margin="dense"
               type="number"
               value={ticketPrice}
               variant="outlined"
               onChange={e => this.handleFieldChange('ticketPrice', e.target.value)}
+            />
+            <TextField
+              className={classes.textField}
+              label="Special Ticket Price"
+              margin="dense"
+              type="number"
+              value={specialPrice}
+              variant="outlined"
+              onChange={e => this.handleFieldChange('specialPrice', e.target.value)}
             />
           </div>
         </form>
@@ -348,6 +408,9 @@ class AddCinema extends Component {
           {/* ── Live Preview ── */}
           <div className={classes.previewSection}>
             <div className={classes.previewTitle}>Live Seat Map Preview</div>
+            <div style={{ textAlign: 'center', color: '#FFD700', fontSize: '0.7rem', marginBottom: 8, fontWeight: 600 }}>
+              💎 Click any seat to mark it as Special (Golden = Special)
+            </div>
             {this.renderPreview()}
           </div>
         </div>

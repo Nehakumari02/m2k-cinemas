@@ -104,16 +104,19 @@ export const updateCinemas = (image, cinema, id) => async dispatch => {
       },
       body: JSON.stringify(cinema)
     });
+    const responseData = await response.json();
     if (response.ok) {
       dispatch(setAlert('Cinema Updated', 'success', 5000));
       if (image) dispatch(uploadCinemaImage(id, image));
       return { status: 'success', message: 'Cinema Updated' };
+    } else {
+      return { status: 'error', message: responseData.error || 'Update failed' };
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return {
       status: 'error',
-      message: ' Cinema have not been updated, try again.'
+      message: error.message || ' Cinema have not been updated, try again.'
     };
   }
 };

@@ -103,7 +103,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FoodSection = ({ food, getFood }) => {
+const FoodSection = ({ food, getFood, addToCart }) => {
   const classes = useStyles();
 
   useEffect(() => {

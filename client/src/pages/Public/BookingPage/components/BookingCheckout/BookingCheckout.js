@@ -122,7 +122,9 @@ export default function BookingCheckout(props) {
     appliedCoupon,
     discountPercentage,
     onApplyCoupon,
-    onRemoveCoupon
+    onRemoveCoupon,
+    totalTicketsPrice,
+    offers = []
   } = props;
 
   const [couponInput, setCouponInput] = useState('');
@@ -160,7 +162,7 @@ export default function BookingCheckout(props) {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const ticketsTotal = ticketPrice * selectedSeats;
+  const ticketsTotal = totalTicketsPrice !== undefined ? totalTicketsPrice : (ticketPrice * selectedSeats);
   const subTotal = ticketsTotal + foodTotal;
   const discountValue = Math.floor((subTotal * (discountPercentage || 0)) / 100);
   const afterDiscountTotal = subTotal - discountValue;
@@ -231,26 +233,45 @@ export default function BookingCheckout(props) {
             </Button>
 
             {!appliedCoupon ? (
-              <Box display="flex" alignItems="center" gridGap={8}>
-                <TextField
-                  label="Promo Code"
-                  variant="outlined"
-                  size="small"
-                  value={couponInput}
-                  onChange={e => setCouponInput(e.target.value)}
-                  error={!!couponError}
-                  helperText={couponError}
-                  style={{ width: 180 }}
-                />
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  onClick={handleApplyCoupon}
-                  disabled={isApplyingCoupon || !couponInput}
-                  style={{ height: 40 }}
-                >
-                  {isApplyingCoupon ? '...' : 'Apply'}
-                </Button>
+              <Box display="flex" flexDirection="column" gridGap={8}>
+                <Box display="flex" alignItems="flex-start" gridGap={8}>
+                  <TextField
+                    label="Promo Code"
+                    variant="outlined"
+                    size="small"
+                    value={couponInput}
+                    onChange={e => setCouponInput(e.target.value)}
+                    error={!!couponError}
+                    helperText={couponError}
+                    style={{ width: 180 }}
+                  />
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={handleApplyCoupon}
+                    disabled={isApplyingCoupon || !couponInput}
+                    style={{ height: 40 }}
+                  >
+                    {isApplyingCoupon ? '...' : 'Apply'}
+                  </Button>
+                </Box>
+                {offers && offers.length > 0 && (
+                  <Box display="flex" flexWrap="wrap" gridGap={8}>
+                    {offers.filter(offer => offer.isActive && new Date(offer.validTill) > new Date()).map(offer => (
+                      <Button
+                        key={offer._id}
+                        size="small"
+                        variant="outlined"
+                        style={{ color: '#b72429', borderColor: 'rgba(183,36,41,0.5)', textTransform: 'none', padding: '2px 8px' }}
+                        onClick={() => {
+                          setCouponInput(offer.code);
+                        }}
+                      >
+                        {offer.code} ({offer.discountPercentage}% OFF)
+                      </Button>
+                    ))}
+                  </Box>
+                )}
               </Box>
             ) : (
               <Box display="flex" alignItems="center" gridGap={8} bgcolor="#f0fdf4" p={1} borderRadius={4} border="1px solid #bbf7d0">

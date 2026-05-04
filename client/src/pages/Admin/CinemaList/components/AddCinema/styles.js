@@ -230,6 +230,13 @@ export default theme => ({
     height: '14px',
     borderRadius: '4px 4px 1px 1px',
     position: 'relative',
+    appearance: 'none',
+    padding: 0,
+    outline: 'none',
+    transition: 'transform 0.1s ease, box-shadow 0.15s ease',
+    '&:hover': {
+      transform: 'scale(1.2) translateY(-1px)',
+    },
     '&::before': {
       content: '""',
       position: 'absolute',
