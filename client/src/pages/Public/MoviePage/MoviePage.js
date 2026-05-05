@@ -31,8 +31,12 @@ class MoviePage extends Component {
   fetchReviews = async (movieId) => {
     try {
       const response = await fetch(`/movies/${movieId}/reviews`);
-      const data = await response.json();
-      this.setState({ reviews: data, loadingReviews: false });
+      if (response.ok) {
+        const data = await response.json();
+        this.setState({ reviews: data, loadingReviews: false });
+      } else {
+        this.setState({ reviews: [], loadingReviews: false });
+      }
     } catch (e) {
       console.error('Error fetching reviews:', e);
       this.setState({ loadingReviews: false });

@@ -38,6 +38,7 @@ class AddMovie extends Component {
     castFiles: [],
     crewFiles: [],
     backdropFiles: [],
+    backdropImages: [],
     releaseDate: new Date(),
     endDate: new Date(),
     isPublished: true
@@ -80,7 +81,10 @@ class AddMovie extends Component {
         rating: rating || '',
         releaseDate,
         endDate,
-        isPublished: isPublished !== undefined ? isPublished : true
+        isPublished: isPublished !== undefined ? isPublished : true,
+        backdropImages: Array.isArray(this.props.edit.backdropImages)
+          ? this.props.edit.backdropImages
+          : []
       });
     }
   }
@@ -150,20 +154,18 @@ class AddMovie extends Component {
       : [];
 
     const castCrew = [
-      ...castMembers.map((item, index) => ({
+      ...castMembers.map(item => ({
         name: item.name,
         role: 'Cast',
-        image: item.image || (existingCast[index] && existingCast[index].image) || ''
+        image: item.image || ''
       })),
-      ...crewMembers.map((item, index) => ({
+      ...crewMembers.map(item => ({
         name: item.name,
         role: item.role,
-        image: item.image || (existingCrew[index] && existingCrew[index].image) || ''
+        image: item.image || ''
       }))
     ];
-    const backdropImages = Array.isArray(this.props.edit.backdropImages)
-      ? this.props.edit.backdropImages
-      : [];
+    const backdropImages = this.state.backdropImages;
     const movie = { ...rest, genre: genre.join(','), castCrew, backdropImages };
     this.props.updateMovie(
       this.props.edit._id,
@@ -214,6 +216,12 @@ class AddMovie extends Component {
   removeBackdropFile = index => {
     this.setState(prev => ({
       backdropFiles: prev.backdropFiles.filter((_, idx) => idx !== index)
+    }));
+  };
+
+  removeExistingBackdrop = index => {
+    this.setState(prev => ({
+      backdropImages: prev.backdropImages.filter((_, idx) => idx !== index)
     }));
   };
 
@@ -271,6 +279,17 @@ class AddMovie extends Component {
                 this.handleFieldChange('title', event.target.value)
               }
             />
+            <TextField
+              className={classes.textField}
+              label="Director (Display)"
+              margin="dense"
+              required
+              value={director}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('director', event.target.value)
+              }
+            />
           </div>
           <div className={classes.field}>
             <FormControl variant="outlined" className={classes.textField} required margin="dense">
@@ -291,6 +310,17 @@ class AddMovie extends Component {
                 ))}
               </Select>
             </FormControl>
+            <TextField
+              className={classes.textField}
+              label="Cast (Display)"
+              margin="dense"
+              required
+              value={cast}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('cast', event.target.value)
+              }
+            />
           </div>
           <div className={`${classes.field} ${classes.mediaField}`}>
             <div className={`${classes.textField} ${classes.peopleSection}`}>
@@ -322,9 +352,16 @@ class AddMovie extends Component {
                 {castMembers.length ? (
                   castMembers.map((member, index) => (
                     <div key={`${member.name}-${index}`} className={classes.memberRow}>
-                      <Typography variant="caption" className={classes.memberText}>
-                        {index + 1}. {member.name}
-                      </Typography>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {member.image ? (
+                          <img src={member.image} className={classes.avatar} alt={member.name} />
+                        ) : (
+                          <div className={classes.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.6rem', background: '#f1f5f9' }}>NA</div>
+                        )}
+                        <Typography variant="caption" className={classes.memberText}>
+                          {member.name}
+                        </Typography>
+                      </div>
                       <Button size="small" color="secondary" onClick={() => this.removeCastMember(index)}>
                         Remove
                       </Button>
@@ -407,9 +444,16 @@ class AddMovie extends Component {
                 {crewMembers.length ? (
                   crewMembers.map((member, index) => (
                     <div key={`${member.role}-${member.name}-${index}`} className={classes.memberRow}>
-                      <Typography variant="caption" className={classes.memberText}>
-                        {index + 1}. {member.role}: {member.name}
-                      </Typography>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {member.image ? (
+                          <img src={member.image} className={classes.avatar} alt={member.name} />
+                        ) : (
+                          <div className={classes.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.6rem', background: '#f1f5f9' }}>NA</div>
+                        )}
+                        <Typography variant="caption" className={classes.memberText}>
+                          <strong>{member.role}:</strong> {member.name}
+                        </Typography>
+                      </div>
                       <Button size="small" color="secondary" onClick={() => this.removeCrewMember(index)}>
                         Remove
                       </Button>
@@ -454,6 +498,28 @@ class AddMovie extends Component {
               <Typography variant="caption" style={{ color: '#64748b', display: 'block', marginBottom: 8 }}>
                 Upload gallery/backdrop images for movie detail and booking page.
               </Typography>
+              
+              {/* Existing Backdrops */}
+              {!!this.state.backdropImages.length && (
+                <div style={{ marginBottom: 16 }}>
+                  <Typography variant="caption" className={classes.listTitle}>
+                    Current Backdrops
+                  </Typography>
+                  <div className={classes.galleryContainer}>
+                    {this.state.backdropImages.map((url, idx) => (
+                      <div key={`existing-${idx}`} className={classes.backdropThumb}>
+                        <img src={url} alt={`backdrop-${idx}`} />
+                        <Button 
+                          className={classes.removeBtn} 
+                          onClick={() => this.removeExistingBackdrop(idx)}>
+                          Delete
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <input
                 type="file"
                 accept="image/*"
@@ -463,21 +529,28 @@ class AddMovie extends Component {
                   event.target.value = '';
                 }}
               />
-              <Typography variant="caption">
+              <Typography variant="caption" style={{ display: 'block', marginTop: 4 }}>
                 {backdropFiles.length
-                  ? `${backdropFiles.length} backdrop image(s) selected`
-                  : 'No backdrop files selected'}
+                  ? `${backdropFiles.length} new backdrop image(s) selected`
+                  : 'No new backdrop files selected'}
               </Typography>
+              
+              {/* New Backdrop Previews */}
               {!!backdropFiles.length && (
-                <div style={{ marginTop: 4 }}>
+                <div className={classes.galleryContainer}>
                   {backdropFiles.map((file, idx) => (
-                    <div key={`${file.name}-${idx}`} className={classes.memberRow}>
-                      <Typography variant="caption" className={classes.memberText}>
-                        {idx + 1}. {file.name}
-                      </Typography>
-                      <Button size="small" color="secondary" onClick={() => this.removeBackdropFile(idx)}>
-                        Remove
+                    <div key={`new-${idx}`} className={classes.backdropThumb} style={{ borderColor: '#3b82f6' }}>
+                      <img src={URL.createObjectURL(file)} alt={`new-backdrop-${idx}`} />
+                      <Button 
+                        className={classes.removeBtn} 
+                        onClick={() => this.removeBackdropFile(idx)}>
+                        Cancel
                       </Button>
+                      <Typography 
+                        variant="caption" 
+                        style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(59, 130, 246, 0.8)', color: 'white', textAlign: 'center', fontSize: '0.5rem' }}>
+                        NEW
+                      </Typography>
                     </div>
                   ))}
                 </div>
@@ -556,30 +629,7 @@ class AddMovie extends Component {
               }
             />
           </div>
-          <div className={classes.field}>
-            <TextField
-              className={classes.textField}
-              label="Director"
-              margin="dense"
-              required
-              value={director}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('director', event.target.value)
-              }
-            />
-            <TextField
-              className={classes.textField}
-              label="Cast"
-              margin="dense"
-              required
-              value={cast}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('cast', event.target.value)
-              }
-            />
-          </div>
+          {/* The redundant fields were moved to the top for better organization */}
           <div className={classes.field}>
             <MuiPickersUtilsProvider utils={MomentUtils}>
               <KeyboardDatePicker

@@ -97,5 +97,50 @@ export default theme => ({
   },
   infoMessage: {
     marginLeft: theme.spacing(3)
+  },
+  galleryContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+    gap: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    width: '100%'
+  },
+  backdropThumb: {
+    position: 'relative',
+    width: '100%',
+    paddingBottom: '56.25%', // 16:9
+    borderRadius: 8,
+    overflow: 'hidden',
+    border: '1px solid #e2e8f0',
+    '& img': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover'
+    }
+  },
+  removeBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+    color: 'white',
+    padding: '2px 6px',
+    minWidth: 0,
+    fontSize: '0.6rem',
+    borderRadius: '4px',
+    '&:hover': {
+      backgroundColor: 'rgb(220, 38, 38)'
+    }
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    objectFit: 'cover',
+    marginRight: theme.spacing(1),
+    border: '1px solid #e2e8f0'
   }
 });

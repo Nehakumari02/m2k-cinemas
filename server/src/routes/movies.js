@@ -204,6 +204,8 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
   try {
     const movie = await Movie.findById(_id);
     updates.forEach((update) => (movie[update] = req.body[update]));
+    if (updates.includes('backdropImages')) movie.markModified('backdropImages');
+    if (updates.includes('castCrew')) movie.markModified('castCrew');
     await movie.save();
     return !movie ? res.sendStatus(404) : res.send(movie);
   } catch (e) {

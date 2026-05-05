@@ -52,9 +52,12 @@ const useStyles = makeStyles(theme => ({
     color: '#334155',
   },
   activeDateChip: {
-    backgroundColor: '#b72429',
-    borderColor: '#b72429',
-    color: '#fff',
+    backgroundColor: '#b72429 !important',
+    borderColor: '#b72429 !important',
+    color: '#fff !important',
+    '& .MuiChip-label': {
+      color: '#fff !important',
+    },
   },
   card: {
     display: 'flex',
@@ -247,7 +250,7 @@ function ShowtimingsPage({
               key={date}
               label={label}
               clickable
-              variant="outlined"
+              variant={active ? 'default' : 'outlined'}
               onClick={() => setSelectedDate(date)}
               className={`${classes.dateChip} ${active ? classes.activeDateChip : ''}`}
             />

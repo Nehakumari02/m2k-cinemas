@@ -136,9 +136,11 @@ export const getMovie = id => async dispatch => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
-    const movie = await response.json();
-    if (response.ok) {
+    const movie = response.ok ? await response.json() : null;
+    if (response.ok && movie) {
       dispatch({ type: SELECT_MOVIE, payload: movie });
+    } else {
+      dispatch(setAlert('Movie not found or server error', 'error', 5000));
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));

@@ -39,10 +39,10 @@ class Navbar extends Component {
             [classes.navbarColor]: scrollPos > 30
           })}>
           <Link className={classes.logoLink} to="/">
-            <img 
-              src="https://m2kcinemas.com/Images/logo1.png" 
-              alt="M2K Cinemas" 
-              className={classes.logo} 
+            <img
+              src="https://m2kcinemas.com/Images/logo1.png"
+              alt="M2K Cinemas"
+              className={classes.logo}
             />
           </Link>
           <div className={classes.navLinks}>
