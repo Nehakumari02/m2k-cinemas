@@ -5,6 +5,7 @@ import { Typography } from '@material-ui/core';
 import { Paper } from '../../../../components';
 import { EventSeat, AttachMoney, LocationOn, ArrowForward } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -110,10 +111,7 @@ const useStyles = makeStyles(theme => ({
 function CinemaCard(props) {
   const classes = useStyles(props);
   const { className, cinema, linkToDetails = false } = props;
-  const cinemaImage =
-    cinema && cinema.image
-      ? cinema.image
-      : 'https://source.unsplash.com/featured/?cinema';
+  const cinemaImage = normalizeImage(cinema && cinema.image);
 
   const rootClassName = classNames(classes.root, className);
   const content = (

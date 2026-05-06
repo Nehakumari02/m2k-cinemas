@@ -12,6 +12,7 @@ import { textTruncate } from '../../../../utils';
 import { Link } from 'react-router-dom';
 import ArrowRightAlt from '@material-ui/icons/ArrowRightAlt';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import { normalizeImage } from '../../../../utils/imageUrl';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -29,21 +30,14 @@ function MovieBanner(props) {
   const { movie, fullDescription } = props;
   const classes = useStyles(props);
   if (!movie) return null;
-  const imageUrl = (() => {
-    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
-    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
-      return movie.image;
-    }
-    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
-  })();
-  const encodedImageUrl = encodeURI(imageUrl);
+  const imageUrl = normalizeImage(movie.image);
 
   return (
     <div className={classes.movieHero}>
       <div
         className={classes.heroBackdrop}
         style={{
-          backgroundImage: `url("${encodedImageUrl}")`
+          backgroundImage: `url("${imageUrl}")`
         }}
       />
       <div className={classes.infoSection}>
@@ -110,7 +104,7 @@ function MovieBanner(props) {
 
       {/* Poster */}
       <div className={classes.posterWrapper}>
-        <img className={classes.posterImage} src={encodedImageUrl} alt={movie.title} />
+        <img className={classes.posterImage} src={imageUrl} alt={movie.title} />
       </div>
 
       {/* Actions */}

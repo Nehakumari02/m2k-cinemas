@@ -38,7 +38,6 @@ router.post(
   auth.enhance,
   upload('experiences').single('file'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { file } = req;
     const experienceId = req.params.id;
     try {
@@ -49,7 +48,7 @@ router.post(
       }
       const experience = await Experience.findById(experienceId);
       if (!experience) return res.sendStatus(404);
-      experience.image = `${url}/${file.path}`;
+      experience.image = `/${file.path}`;
       await experience.save();
       return res.send({ experience, file });
     } catch (e) {

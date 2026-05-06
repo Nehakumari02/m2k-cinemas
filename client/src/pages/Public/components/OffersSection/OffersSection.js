@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Close } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getOffers } from '../../../../store/actions';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -267,10 +268,7 @@ function OffersSection({ offers: storeOffers, getOffers }) {
   const getOfferImage = offer => {
     const fallback = '/images/offers/offer1.png';
     if (!offer || !offer.image) return fallback;
-    if (offer.image.startsWith('http://') || offer.image.startsWith('https://')) {
-      return encodeURI(offer.image);
-    }
-    return encodeURI(offer.image.startsWith('/') ? offer.image : `/${offer.image}`);
+    return normalizeImage(offer.image);
   };
 
   useEffect(() => {

@@ -83,7 +83,6 @@ router.post(
   auth.enhance,
   upload('offers').single('file'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { file } = req;
     const offerId = req.params.id;
     try {
@@ -94,7 +93,7 @@ router.post(
       }
       const offer = await Offer.findById(offerId);
       if (!offer) return res.sendStatus(404);
-      offer.image = `${url}/${file.path}`;
+      offer.image = `/${file.path}`;
       await offer.save();
       res.send({ offer, file });
     } catch (e) {

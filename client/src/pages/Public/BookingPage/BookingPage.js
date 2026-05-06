@@ -25,6 +25,7 @@ import {
   getWalletData,
   getOffers
 } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
 import styles from './styles';
@@ -172,7 +173,7 @@ class BookingPage extends Component {
         key: configData.keyId,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
-        name: 'Cinema Plus',
+        name: 'M2k Cinemas',
         description: 'Movie ticket payment',
         order_id: orderData.order.id,
         handler: async response => {
@@ -361,11 +362,11 @@ class BookingPage extends Component {
     }));
     const foodAmount = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const subTotal = ticketsAmount + foodAmount;
-    
+
     // Apply coupon discount
     const discountValue = Math.floor((subTotal * this.state.discountPercentage) / 100);
     const afterDiscountTotal = subTotal - discountValue;
-    
+
     // Apply points discount
     const finalAmount = Math.max(0, afterDiscountTotal - pointsUsed);
 
@@ -509,7 +510,7 @@ class BookingPage extends Component {
     const filteredReservations = reservations.filter(
       reservation =>
         new Date(reservation.date).toLocaleDateString() ===
-          new Date(selectedDate).toLocaleDateString() &&
+        new Date(selectedDate).toLocaleDateString() &&
         reservation.startAt === selectedTime
     );
     if (filteredReservations.length && selectedDate && selectedTime) {
@@ -689,13 +690,6 @@ class BookingPage extends Component {
     } = this.props;
     const isSeatsStep = location.pathname.endsWith('/seats');
     const { paymentMethod, paymentDetails } = this.state;
-    const normalizeImage = value => {
-      if (!value) return '';
-      if (value.startsWith('http://') || value.startsWith('https://')) {
-        return encodeURI(value);
-      }
-      return encodeURI(value.startsWith('/') ? value : `/${value}`);
-    };
     const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
     const castMembers = castCrew.filter(
       member => String(member.role || '').toLowerCase() === 'cast'
@@ -739,93 +733,93 @@ class BookingPage extends Component {
             {!isSeatsStep &&
               (selectedCinema || selectedDate || selectedTime) &&
               (castMembers.length || crewMembers.length || backdropImages.length) && (
-              <div className={classes.mediaSection}>
-                {!!castMembers.length && (
-                  <div className={classes.peopleBlock}>
-                    <Typography variant="h5" className={classes.sectionTitle}>
-                      Cast
-                    </Typography>
-                    <div className={classes.peopleScroller}>
-                      {castMembers.map((member, index) => {
-                        const memberImage = member.image
-                          ? normalizeImage(member.image)
-                          : 'https://source.unsplash.com/featured/?portrait';
-                        return (
-                          <div
-                            key={`${member.name || 'cast'}-${index}`}
-                            className={classes.personCard}>
-                            <img
-                              src={memberImage}
-                              alt={member.name || 'Cast'}
-                              className={classes.personImage}
-                            />
-                            <Typography variant="body2" className={classes.personName}>
-                              {member.name || 'Unknown'}
-                            </Typography>
-                            <Typography variant="caption" className={classes.personRole}>
-                              Cast
-                            </Typography>
-                          </div>
-                        );
-                      })}
+                <div className={classes.mediaSection}>
+                  {!!castMembers.length && (
+                    <div className={classes.peopleBlock}>
+                      <Typography variant="h5" className={classes.sectionTitle}>
+                        Cast
+                      </Typography>
+                      <div className={classes.peopleScroller}>
+                        {castMembers.map((member, index) => {
+                          const memberImage = member.image
+                            ? normalizeImage(member.image)
+                            : 'https://source.unsplash.com/featured/?portrait';
+                          return (
+                            <div
+                              key={`${member.name || 'cast'}-${index}`}
+                              className={classes.personCard}>
+                              <img
+                                src={memberImage}
+                                alt={member.name || 'Cast'}
+                                className={classes.personImage}
+                              />
+                              <Typography variant="body2" className={classes.personName}>
+                                {member.name || 'Unknown'}
+                              </Typography>
+                              <Typography variant="caption" className={classes.personRole}>
+                                Cast
+                              </Typography>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {!!crewMembers.length && (
-                  <div className={classes.peopleBlock}>
-                    <Typography variant="h5" className={classes.sectionTitle}>
-                      Crew
-                    </Typography>
-                    <div className={classes.peopleScroller}>
-                      {crewMembers.map((member, index) => {
-                        const memberImage = member.image
-                          ? normalizeImage(member.image)
-                          : 'https://source.unsplash.com/featured/?portrait';
-                        return (
-                          <div
-                            key={`${member.role || 'crew'}-${member.name || 'crew'}-${index}`}
-                            className={classes.personCard}>
-                            <img
-                              src={memberImage}
-                              alt={member.name || 'Crew'}
-                              className={classes.personImage}
-                            />
-                            <Typography variant="body2" className={classes.personName}>
-                              {member.name || 'Unknown'}
-                            </Typography>
-                            <Typography variant="caption" className={classes.personRole}>
-                              {member.role || 'Crew'}
-                            </Typography>
-                          </div>
-                        );
-                      })}
+                  {!!crewMembers.length && (
+                    <div className={classes.peopleBlock}>
+                      <Typography variant="h5" className={classes.sectionTitle}>
+                        Crew
+                      </Typography>
+                      <div className={classes.peopleScroller}>
+                        {crewMembers.map((member, index) => {
+                          const memberImage = member.image
+                            ? normalizeImage(member.image)
+                            : 'https://source.unsplash.com/featured/?portrait';
+                          return (
+                            <div
+                              key={`${member.role || 'crew'}-${member.name || 'crew'}-${index}`}
+                              className={classes.personCard}>
+                              <img
+                                src={memberImage}
+                                alt={member.name || 'Crew'}
+                                className={classes.personImage}
+                              />
+                              <Typography variant="body2" className={classes.personName}>
+                                {member.name || 'Unknown'}
+                              </Typography>
+                              <Typography variant="caption" className={classes.personRole}>
+                                {member.role || 'Crew'}
+                              </Typography>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {!!backdropImages.length && (
-                  <div className={classes.backdropBlock}>
-                    <Typography variant="h5" className={classes.sectionTitle}>
-                      Movie Stills
-                    </Typography>
-                    <Grid container spacing={2}>
-                      {backdropImages.map((image, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={`${image}-${index}`}>
-                          <div className={classes.backdropCard}>
-                            <img
-                              src={normalizeImage(image)}
-                              alt={`Backdrop ${index + 1}`}
-                              className={classes.backdropImage}
-                            />
-                          </div>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </div>
-                )}
-              </div>
-            )}
+                  {!!backdropImages.length && (
+                    <div className={classes.backdropBlock}>
+                      <Typography variant="h5" className={classes.sectionTitle}>
+                        Movie Stills
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {backdropImages.map((image, index) => (
+                          <Grid item xs={12} sm={6} md={4} key={`${image}-${index}`}>
+                            <div className={classes.backdropCard}>
+                              <img
+                                src={normalizeImage(image)}
+                                alt={`Backdrop ${index + 1}`}
+                                className={classes.backdropImage}
+                              />
+                            </div>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </div>
+                  )}
+                </div>
+              )}
             {showInvitation && !!selectedSeats.length && (
               <BookingInvitation
                 selectedSeats={selectedSeats}
@@ -928,7 +922,7 @@ const mapStateToProps = (
   selectedTime: checkoutState.selectedTime,
   showLoginPopup: checkoutState.showLoginPopup,
   showInvitation: checkoutState.showInvitation,
-   invitations: checkoutState.invitations,
+  invitations: checkoutState.invitations,
   QRCode: checkoutState.QRCode,
   selectedFood: checkoutState.selectedFood,
   suggestedSeats: reservationState.suggestedSeats,

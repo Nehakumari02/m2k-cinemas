@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, Button, Chip, Box } from '@material-ui/core';
 import { getCinema, getShowtimes, getMovies } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -186,7 +187,7 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
   return (
     <Container className={classes.page} maxWidth="lg">
       <div className={classes.hero}>
-        <div className={classes.heroImage} style={{ backgroundImage: `url("${encodeURI(image)}")` }} />
+        <div className={classes.heroImage} style={{ backgroundImage: `url("${normalizeImage(image)}")` }} />
         <div className={classes.heroBackdrop} />
         <div className={classes.heroOverlay}>
           <Typography variant="h3" className={classes.title}>{cinema.name}</Typography>

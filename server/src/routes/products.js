@@ -42,7 +42,6 @@ router.post(
   auth.enhance,
   upload('products').single('file'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { file } = req;
     const productId = req.params.id;
     try {
@@ -53,7 +52,7 @@ router.post(
       }
       const product = await Product.findById(productId);
       if (!product) return res.sendStatus(404);
-      product.image = `${url}/${file.path}`;
+      product.image = `/${file.path}`;
       await product.save();
       res.send({ product, file });
     } catch (e) {

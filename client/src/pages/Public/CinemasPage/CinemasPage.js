@@ -55,6 +55,9 @@ const useStyles = makeStyles(theme => ({
     '& .MuiInputLabel-root': { color: '#64748b' },
     '& .MuiInputBase-input': { color: '#0f172a' },
     '& .MuiSelect-icon': { color: '#64748b' },
+    '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+      transform: 'translate(14px, -14px) scale(0.75)',
+    }
   },
   sectionMeta: {
     marginBottom: theme.spacing(2),

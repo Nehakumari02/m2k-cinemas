@@ -4,6 +4,7 @@ import { Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getExperiences } from '../../../../store/actions';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const EXPERIENCES = [
   {
@@ -182,7 +183,7 @@ function ExperiencesSection({ experiences, getExperiences }) {
               className={classes.card}
               style={{
                 background: exp.image
-                  ? `linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.75)), url("${encodeURI(
+                  ? `linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.75)), url("${normalizeImage(
                       exp.image
                     )}") center/cover no-repeat`
                   : exp.gradient

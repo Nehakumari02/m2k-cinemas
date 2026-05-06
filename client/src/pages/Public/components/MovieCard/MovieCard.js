@@ -4,6 +4,7 @@ import { withStyles, Typography } from '@material-ui/core';
 import styles from './styles';
 import { textTruncate } from '../../../../utils';
 import { Link } from 'react-router-dom';
+import { normalizeImage } from '../../../../utils/imageUrl';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
 import IconButton from '@material-ui/core/IconButton';
@@ -31,14 +32,7 @@ const MovieCard = props => {
       dispatch(addToWishlist(movie._id));
     }
   };
-  const imageUrl = (() => {
-    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
-    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
-      return movie.image;
-    }
-    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
-  })();
-  const encodedImageUrl = encodeURI(imageUrl);
+  const imageUrl = normalizeImage(movie.image);
 
   return (
     <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
@@ -46,7 +40,7 @@ const MovieCard = props => {
         <header
           className={classes.header}
           style={{
-            backgroundImage: `url("${encodedImageUrl}")`,
+            backgroundImage: `url("${imageUrl}")`,
             position: 'relative'
           }}>
           <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>

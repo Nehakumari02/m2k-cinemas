@@ -4,6 +4,7 @@ import { Typography, Grid, Button, Card, CardMedia, CardContent, CircularProgres
 import { Add as AddIcon, Remove as RemoveIcon } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { getFood, setSelectedFood } from '../../../../../store/actions';
+import { normalizeImage } from '../../../../../utils/imageUrl';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -38,7 +39,7 @@ const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood }) => {
             return (
               <Grid item key={item._id} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
-                  <div className={classes.media} style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <div className={classes.media} style={{ backgroundImage: `url(${normalizeImage(item.image)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                     <div className={item.type === 'veg' ? classes.vegDot : classes.nonVegDot} />
                   </div>
                   <CardContent className={classes.content}>

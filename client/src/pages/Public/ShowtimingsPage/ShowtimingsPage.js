@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, Chip, MenuItem, TextField, Button } from '@material-ui/core';
 import { getMovies, getCinemas, getShowtimes } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -127,12 +128,6 @@ const toDateKey = date => {
   return `${y}-${m}-${d}`;
 };
 
-const normalizeImage = image => {
-  if (!image) return '/images/movie.png';
-  if (/^https?:\/\//i.test(image)) return encodeURI(image);
-  const src = image.startsWith('/') ? image : `/${image}`;
-  return encodeURI(src);
-};
 
 function ShowtimingsPage({
   movies,

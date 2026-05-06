@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
 import { getFood, addToCart } from '../../../../store/actions';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -134,7 +135,7 @@ const FoodSection = ({ food, getFood, addToCart }) => {
               <Card className={classes.card}>
                 <CardMedia
                   className={classes.media}
-                  image={item.image || 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=500&q=80'}
+                  image={normalizeImage(item.image) || 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=500&q=80'}
                   title={item.name}
                 >
                   <div className={classes.priceBadge}>₹{item.price}</div>

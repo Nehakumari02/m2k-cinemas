@@ -4,6 +4,7 @@ import { Typography, Grid, Button, Card, CardMedia, CardContent, Container, Chip
 import { connect } from 'react-redux';
 import { setAlert } from '../../../store/actions/alert';
 import { getFood } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -88,7 +89,7 @@ const FoodComboPage = ({ setAlert, getFood, foodState }) => {
                   <div className={classes.imageWrapper}>
                     <CardMedia
                       className={classes.media}
-                      image={item.image}
+                      image={normalizeImage(item.image)}
                       title={item.name}
                     />
                     {item.category === 'Combos' && (

@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import { Typography, Chip } from '@material-ui/core';
 import { AccessTime as AccessTimeIcon } from '@material-ui/icons';
 import { Paper } from '../../../../../components';
+import { normalizeImage } from '../../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -84,7 +85,7 @@ function MovieCard(props) {
         />
       </div>
       <div className={classes.imageWrapper}>
-        <img alt="movie" className={classes.image} src={movie.image} />
+        <img alt="movie" className={classes.image} src={normalizeImage(movie.image)} />
       </div>
       <div className={classes.details}>
         <Typography className={classes.title} variant="h4">

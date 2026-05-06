@@ -9,6 +9,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import { textTruncate } from '../../../../utils';
 import { Link } from 'react-router-dom';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const MovieCard = props => {
   const dispatch = useDispatch();
@@ -32,13 +33,7 @@ const MovieCard = props => {
     }
   };
 
-  const imageUrl = (() => {    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
-    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
-      return movie.image;
-    }
-    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
-  })();
-  const encodedImageUrl = encodeURI(imageUrl);
+  const imageUrl = normalizeImage(movie.image);
 
   return (
     <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
@@ -88,7 +83,7 @@ const MovieCard = props => {
         <div
           className={classes.blurBackground}
           style={{
-            backgroundImage: `url("${encodedImageUrl}")`
+            backgroundImage: `url("${imageUrl}")`
           }}
         />
       </Paper>

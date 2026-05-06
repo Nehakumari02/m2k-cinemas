@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Grid, Typography } from '@material-ui/core';
+import { normalizeImage } from '../../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   movieInfos: {
@@ -82,14 +83,7 @@ export default function MovieInfo(props) {
       </Grid>
     );
 
-  const imageUrl = (() => {
-    if (!movie.image) return 'https://source.unsplash.com/featured/?movie';
-    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
-      return movie.image;
-    }
-    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
-  })();
-  const encodedImageUrl = encodeURI(imageUrl);
+  const imageUrl = normalizeImage(movie.image);
 
   return (
     <Grid item xs={12} md={12} lg={3}>
@@ -97,7 +91,7 @@ export default function MovieInfo(props) {
         <div
           className={classes.background}
           style={{
-            backgroundImage: `url("${encodedImageUrl}")`
+            backgroundImage: `url("${imageUrl}")`
           }}
         />
         <Typography className={classes.title}>{movie.title}</Typography>

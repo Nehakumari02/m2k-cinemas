@@ -29,6 +29,7 @@ import {
   updateOffer,
   removeOffer,
 } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const styles = theme => ({
   root: {
@@ -293,12 +294,7 @@ class OfferList extends Component {
   };
 
   getOfferImage = offer => {
-    const fallback = '/images/offers/offer1.png';
-    if (!offer || !offer.image) return fallback;
-    if (offer.image.startsWith('http://') || offer.image.startsWith('https://')) {
-      return encodeURI(offer.image);
-    }
-    return encodeURI(offer.image.startsWith('/') ? offer.image : `/${offer.image}`);
+    return normalizeImage(offer && offer.image);
   };
 
   render() {
@@ -383,7 +379,7 @@ class OfferList extends Component {
             <label htmlFor="offer-image-upload">
               <div className={classes.imageUpload}>
                 {imagePreview ? (
-                  <img src={imagePreview} alt="preview" className={classes.previewImg} />
+                  <img src={normalizeImage(imagePreview)} alt="preview" className={classes.previewImg} />
                 ) : (
                   <>
                     <PhotoCamera className={classes.uploadIcon} />

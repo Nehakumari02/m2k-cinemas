@@ -71,7 +71,6 @@ router.post(
   auth.enhance,
   upload('movies').single('file'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { file } = req;
     const movieId = req.params.id;
     try {
@@ -82,7 +81,7 @@ router.post(
       }
       const movie = await Movie.findById(movieId);
       if (!movie) return res.sendStatus(404);
-      movie.image = `${url}/${file.path}`;
+      movie.image = `/${file.path}`;
       await movie.save();
       res.send({ movie, file });
     } catch (e) {
@@ -97,7 +96,6 @@ router.post(
   auth.enhance,
   upload('movies').array('files'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { files = [] } = req;
     const movieId = req.params.id;
     try {
@@ -108,7 +106,7 @@ router.post(
       }
       const movie = await Movie.findById(movieId);
       if (!movie) return res.sendStatus(404);
-      const uploaded = files.map(file => `${url}/${file.path}`);
+      const uploaded = files.map(file => `/${file.path}`);
       movie.backdropImages = [...(movie.backdropImages || []), ...uploaded];
       movie.markModified('backdropImages');
       await movie.save();
@@ -124,7 +122,6 @@ router.post(
   auth.enhance,
   upload('movies').array('files'),
   async (req, res, next) => {
-    const url = `${req.protocol}://${req.get('host')}`;
     const { files = [] } = req;
     const movieId = req.params.id;
     try {
@@ -139,7 +136,7 @@ router.post(
       const castCrew = Array.isArray(movie.castCrew) ? movie.castCrew : [];
       files.forEach((file, index) => {
         if (castCrew[index]) {
-          castCrew[index].image = `${url}/${file.path}`;
+          castCrew[index].image = `/${file.path}`;
         }
       });
       movie.castCrew = castCrew;

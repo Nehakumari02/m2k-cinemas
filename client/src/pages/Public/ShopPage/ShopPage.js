@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { makeStyles, Grid, Container, Typography, Card, CardMedia, CardContent, CardActions, Button, IconButton, Chip, Box } from '@material-ui/core';
 import { AddShoppingCart as AddCartIcon, FilterList as FilterIcon } from '@material-ui/icons';
 import { getProducts, addToCart } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -94,7 +95,7 @@ const ShopPage = ({ getProducts, addToCart, productState: { products, loading } 
               <Box className={classes.media}>
                 <CardMedia
                   style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
-                  image={product.image || 'https://via.placeholder.com/300?text=Merchandise'}
+                  image={normalizeImage(product.image) || 'https://via.placeholder.com/300?text=Merchandise'}
                   title={product.name}
                 />
                 <Chip label={product.category} className={classes.categoryChip} size="small" />

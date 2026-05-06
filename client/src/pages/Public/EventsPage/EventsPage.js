@@ -5,6 +5,7 @@ import { History, Event as EventIcon, Update } from '@material-ui/icons';
 import moment from 'moment';
 import { getEvents } from '../../../store/actions';
 import useStyles from './styles';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const EventsPage = ({ getEvents, eventState }) => {
   const classes = useStyles();
@@ -54,7 +55,7 @@ const EventsPage = ({ getEvents, eventState }) => {
           <div className={classes.dateOverlay}>{event.date}</div>
           <CardMedia 
             className={classes.media} 
-            image={event.image} 
+            image={normalizeImage(event.image)} 
             title={event.title}
           />
         </div>

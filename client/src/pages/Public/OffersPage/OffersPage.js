@@ -4,6 +4,7 @@ import { Typography, Button, Dialog, DialogContent, Slide, IconButton } from '@m
 import { Close } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { getOffers } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -78,7 +79,7 @@ function OffersPage({ offers: storeOffers, getOffers }) {
           >
             <img
               className={classes.cardImage}
-              src={offer.image}
+              src={normalizeImage(offer.image)}
               alt={offer.title}
             />
             <div className={classes.cardBody}>
@@ -108,7 +109,7 @@ function OffersPage({ offers: storeOffers, getOffers }) {
         {selectedOffer && (
           <>
             <div style={{ position: 'relative' }}>
-              <img src={selectedOffer.image} alt={selectedOffer.title} className={classes.dialogImage} />
+              <img src={normalizeImage(selectedOffer.image)} alt={selectedOffer.title} className={classes.dialogImage} />
               <IconButton className={classes.closeBtn} onClick={() => setSelectedOffer(null)} size="small">
                 <Close />
               </IconButton>

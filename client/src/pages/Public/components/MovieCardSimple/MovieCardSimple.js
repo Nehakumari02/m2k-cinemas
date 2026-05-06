@@ -11,6 +11,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
+import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -152,20 +153,14 @@ const MovieCardSimple = props => {
     }
   };
 
-  const imageUrl = (() => {    if (!movie.image) return 'https://source.unsplash.com/featured/?movie,poster';
-    if (movie.image.startsWith('http://') || movie.image.startsWith('https://')) {
-      return movie.image;
-    }
-    return movie.image.startsWith('/') ? movie.image : `/${movie.image}`;
-  })();
-  const encodedImageUrl = encodeURI(imageUrl);
+  const imageUrl = normalizeImage(movie.image);
 
   return (
     <Link to={`/movie/${movie._id}`} className={classes.link} style={{ textDecoration: 'none' }}>
       <Card className={classes.card}>
         <CardActionArea component="div">
           <div className={classes.mediaWrapper}>
-            <img className={classes.mediaImage} src={encodedImageUrl} alt={movie.title} />
+            <img className={classes.mediaImage} src={imageUrl} alt={movie.title} />
             {movie.language && (
               <span className={classes.langBadge}>{movie.language}</span>
             )}

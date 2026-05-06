@@ -24,6 +24,7 @@ import {
 } from '@material-ui/core';
 import { Add, Edit, Delete, Fastfood } from '@material-ui/icons';
 import { getFood, addFood, removeFood, updateFood, uploadFoodImage } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const styles = theme => ({
   root: {
@@ -282,7 +283,7 @@ class FoodList extends Component {
             {food.map(item => (
               <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
                 <Card className={classes.card} elevation={0}>
-                  <CardMedia component="img" className={classes.cardMedia} image={item.image} alt={item.name} />
+                  <CardMedia component="img" className={classes.cardMedia} image={normalizeImage(item.image)} alt={item.name} />
                   <CardContent className={classes.cardContent}>
                     <Chip 
                       label={item.type.toUpperCase()} 

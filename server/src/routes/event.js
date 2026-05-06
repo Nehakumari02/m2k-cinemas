@@ -8,7 +8,8 @@ const router = new express.Router();
 // Upload event image
 router.post('/events/upload', auth.enhance, upload('events').single('image'), async (req, res) => {
   try {
-    const url = `${req.protocol}://${req.get('host')}/uploads/events/${req.file.filename}`;
+    const url = `/uploads/events/${req.file.filename}`;
+
     res.send({ url });
   } catch (e) {
     res.status(400).send(e);

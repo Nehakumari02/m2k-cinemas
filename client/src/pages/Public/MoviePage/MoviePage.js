@@ -9,6 +9,7 @@ import MovieBanner from '../components/MovieBanner/MovieBanner';
 import { getMovie, onSelectMovie } from '../../../store/actions';
 import { setAlert } from '../../../store/actions/alert';
 import { setAuthHeaders } from '../../../utils';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 class MoviePage extends Component {
   state = {
@@ -85,13 +86,6 @@ class MoviePage extends Component {
   render() {
     const { movie, user } = this.props;
     const { reviews, rating, comment } = this.state;
-    const normalizeImage = value => {
-      if (!value) return '';
-      if (value.startsWith('http://') || value.startsWith('https://')) {
-        return encodeURI(value);
-      }
-      return encodeURI(value.startsWith('/') ? value : `/${value}`);
-    };
     const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
     const castMembers = castCrew.filter(
       member => String(member.role || '').toLowerCase() === 'cast'
