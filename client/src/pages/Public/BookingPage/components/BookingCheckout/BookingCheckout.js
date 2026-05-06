@@ -124,7 +124,8 @@ export default function BookingCheckout(props) {
     onApplyCoupon,
     onRemoveCoupon,
     totalTicketsPrice,
-    offers = []
+    offers = [],
+    timeLeft
   } = props;
 
   const [couponInput, setCouponInput] = useState('');
@@ -168,6 +169,12 @@ export default function BookingCheckout(props) {
   const afterDiscountTotal = subTotal - discountValue;
   const finalPrice = Math.max(0, afterDiscountTotal - (pointsUsed || 0));
 
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className={classes.checkoutBar}>
       {/* ── Info Row ── */}
@@ -210,6 +217,18 @@ export default function BookingCheckout(props) {
             </Typography>
           )}
         </div>
+
+        {timeLeft !== undefined && showFoodStep && (
+          <div className={classes.infoBlock} style={{ marginLeft: 'auto' }}>
+            <Typography className={classes.bannerTitle}>Time Left</Typography>
+            <Typography 
+              className={classes.priceHighlight} 
+              style={{ color: timeLeft < 60 ? '#ef4444' : '#b72429' }}
+            >
+              {formatTime(timeLeft)}
+            </Typography>
+          </div>
+        )}
       </div>
 
       {/* ── Payment Section ── */}

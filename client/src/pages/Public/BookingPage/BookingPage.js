@@ -23,7 +23,10 @@ import {
   setSuggestedSeats,
   setQRCode,
   getWalletData,
-  getOffers
+  getOffers,
+  confirmReservation,
+  cancelPendingReservation,
+  setPendingReservation
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { ResponsiveDialog } from '../../../components';
@@ -55,8 +58,10 @@ class BookingPage extends Component {
     },
     pointsUsed: 0,
     appliedCoupon: null,
-    discountPercentage: 0
+    discountPercentage: 0,
+    timeLeft: 420 // 7 minutes
   };
+  timer = null;
 
   componentDidMount() {
     const {
@@ -110,6 +115,37 @@ class BookingPage extends Component {
       getCinema(selectedCinema);
     }
   }
+
+  componentWillUnmount() {
+    this.stopTimer();
+    const { pendingReservationId, cancelPendingReservation, resetCheckout } = this.props;
+    if (pendingReservationId) {
+      cancelPendingReservation(pendingReservationId);
+      resetCheckout();
+    }
+  }
+
+  startTimer = () => {
+    this.stopTimer();
+    this.setState({ timeLeft: 420 });
+    this.timer = setInterval(() => {
+      this.setState(prevState => {
+        if (prevState.timeLeft <= 1) {
+          this.stopTimer();
+          this.props.setAlert('Session expired. Seats have been released.', 'warning', 5000);
+          this.props.cancelPendingReservation(this.props.pendingReservationId);
+          this.props.resetCheckout();
+          this.setState({ showFoodStep: false });
+          return { timeLeft: 0 };
+        }
+        return { timeLeft: prevState.timeLeft - 1 };
+      });
+    }, 1000);
+  };
+
+  stopTimer = () => {
+    if (this.timer) clearInterval(this.timer);
+  };
 
   loadRazorpayScript = () =>
     new Promise(resolve => {
@@ -295,7 +331,9 @@ class BookingPage extends Component {
       addReservation,
       toggleLoginPopup,
       showInvitationForm,
-      setQRCode
+      setQRCode,
+      pendingReservationId,
+      confirmReservation
     } = this.props;
     const { paymentMethod, paymentDetails, pointsUsed } = this.state;
 
@@ -404,28 +442,89 @@ class BookingPage extends Component {
       paymentSuccess = await this.launchPayment(finalAmount);
     }
 
-    if (!paymentSuccess) return;
+    const response = pendingReservationId 
+      ? await this.props.confirmReservation(pendingReservationId, {
+          total: afterDiscountTotal,
+          pointsUsed: pointsUsed,
+          foodItems
+        })
+      : await addReservation({
+          date: selectedDate,
+          startAt: selectedTime,
+          seats: this.bookSeats(),
+          ticketPrice: cinema.ticketPrice,
+          total: afterDiscountTotal,
+          pointsUsed: pointsUsed,
+          foodItems,
+          movieId: movie._id,
+          cinemaId: cinema._id,
+          username: user.username,
+          phone: user.phone
+        });
 
-    const response = await addReservation({
-      date: selectedDate,
-      startAt: selectedTime,
-      seats: this.bookSeats(),
-      ticketPrice: cinema.ticketPrice,
-      total: afterDiscountTotal, // Sending the post-coupon total
-      pointsUsed: pointsUsed,
-      foodItems,
-      movieId: movie._id,
-      cinemaId: cinema._id,
-      username: user.username,
-      phone: user.phone
-    });
     if (response.status === 'success') {
+      this.stopTimer();
       const { data } = response;
-      setQRCode(data.QRCode);
+      setQRCode(data.QRCode || (data.reservation && data.reservation.QRCode));
       getReservations();
       showInvitationForm();
     }
   }
+
+  onToggleFoodStep = async () => {
+    const { 
+      showFoodStep, 
+      timeLeft 
+    } = this.state;
+    const { 
+      selectedSeats, 
+      isAuth, 
+      toggleLoginPopup, 
+      addReservation,
+      selectedDate,
+      selectedTime,
+      cinema,
+      movie,
+      user,
+      setPendingReservation,
+      pendingReservationId,
+      cancelPendingReservation
+    } = this.props;
+
+    if (!showFoodStep) {
+      // Moving TO payment step
+      if (selectedSeats.length === 0) return;
+      if (!isAuth) return toggleLoginPopup();
+
+      const res = await addReservation({
+        date: selectedDate,
+        startAt: selectedTime,
+        seats: this.bookSeats(),
+        ticketPrice: Number(cinema.ticketPrice || 0),
+        total: Number(selectedSeats.length * (cinema.ticketPrice || 0)),
+        foodItems: [],
+        movieId: movie._id,
+        cinemaId: cinema._id,
+        username: user.username,
+        phone: user.phone,
+        status: 'Pending'
+      });
+
+      if (res.status === 'success') {
+        setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
+        this.startTimer();
+        this.setState({ showFoodStep: true });
+      }
+    } else {
+      // Moving BACK to seats
+      if (pendingReservationId) {
+        cancelPendingReservation(pendingReservationId);
+        setPendingReservation(null, null);
+      }
+      this.stopTimer();
+      this.setState({ showFoodStep: false });
+    }
+  };
 
   onChangePaymentMethod = event =>
     this.setState({ paymentMethod: event.target.value });
@@ -457,17 +556,17 @@ class BookingPage extends Component {
 
   bookSeats() {
     const { cinema, selectedSeats } = this.props;
+    if (!cinema || selectedSeats.length === 0) return [];
     const seats = [...cinema.seats];
 
-    if (selectedSeats.length === 0) return;
-
     const bookedSeats = seats
-      .map(row =>
-        row.map((seat, i) => (seat === 2 ? i : -1)).filter(seat => seat !== -1)
+      .map((row, rowIndex) =>
+        row
+          .map((seat, i) => (seat === 2 || seat === 6 ? i : -1))
+          .filter(seat => seat !== -1)
+          .map(seatIndex => [rowIndex, seatIndex])
       )
-      .map((seats, i) => (seats.length ? seats.map(seat => [i, seat]) : -1))
-      .filter(seat => seat !== -1)
-      .reduce((a, b) => a.concat(b));
+      .reduce((a, b) => a.concat(b), []);
 
     return bookedSeats;
   }
@@ -502,23 +601,27 @@ class BookingPage extends Component {
   }
 
   onGetReservedSeats = () => {
-    const { reservations, cinema, selectedDate, selectedTime } = this.props;
+    const { reservations, cinema, selectedDate, selectedTime, pendingReservationId } = this.props;
 
     if (!cinema) return [];
-    const newSeats = [...cinema.seats];
+    const newSeats = JSON.parse(JSON.stringify(cinema.seats));
 
     const filteredReservations = reservations.filter(
       reservation =>
         new Date(reservation.date).toLocaleDateString() ===
         new Date(selectedDate).toLocaleDateString() &&
-        reservation.startAt === selectedTime
+        reservation.startAt === selectedTime &&
+        reservation._id !== pendingReservationId // Don't mark current user's pending seats as reserved for them
     );
     if (filteredReservations.length && selectedDate && selectedTime) {
       const reservedSeats = filteredReservations
         .map(reservation => reservation.seats)
-        .reduce((a, b) => a.concat(b));
-      reservedSeats.forEach(([row, seat]) => (newSeats[row][seat] = 1));
-      return newSeats;
+        .reduce((a, b) => a.concat(b), []);
+      reservedSeats.forEach(([row, seat]) => {
+        if (newSeats[row] && newSeats[row][seat] !== undefined) {
+          newSeats[row][seat] = 1;
+        }
+      });
     }
     return newSeats;
   };
@@ -852,7 +955,7 @@ class BookingPage extends Component {
                   paymentMethod={paymentMethod}
                   paymentDetails={paymentDetails}
                   showFoodStep={this.state.showFoodStep}
-                  onToggleFoodStep={() => this.setState({ showFoodStep: !this.state.showFoodStep })}
+                  onToggleFoodStep={this.onToggleFoodStep}
                   onChangePaymentMethod={this.onChangePaymentMethod}
                   onPaymentFieldChange={this.onPaymentFieldChange}
                   onBookSeats={() => this.checkout()}
@@ -865,6 +968,7 @@ class BookingPage extends Component {
                   onApplyCoupon={this.onApplyCoupon}
                   onRemoveCoupon={this.onRemoveCoupon}
                   offers={this.props.offers}
+                  timeLeft={this.state.timeLeft}
                   totalTicketsPrice={selectedSeats.reduce((acc, [row, col]) => {
                     const seatVal = Number(cinema.seats[row][col]);
                     const isSpecial = seatVal === 6 || seatVal === 5;
@@ -925,6 +1029,8 @@ const mapStateToProps = (
   invitations: checkoutState.invitations,
   QRCode: checkoutState.QRCode,
   selectedFood: checkoutState.selectedFood,
+  pendingReservationId: checkoutState.pendingReservationId,
+  reservationExpiresAt: checkoutState.reservationExpiresAt,
   suggestedSeats: reservationState.suggestedSeats,
   walletBalance: walletState.balance,
   loyaltyPoints: walletState.loyaltyPoints,
@@ -952,7 +1058,10 @@ const mapDispatchToProps = {
   setAlert,
   setQRCode,
   getWalletData,
-  getOffers
+  getOffers,
+  confirmReservation,
+  cancelPendingReservation,
+  setPendingReservation
 };
 
 export default connect(

@@ -9,7 +9,8 @@ import {
   RESET_CHECKOUT,
   SET_SUGGESTED_SEATS,
   SET_QR_CODE,
-  SET_SELECTED_FOOD
+  SET_SELECTED_FOOD,
+  SET_PENDING_RESERVATION
 } from '../types';
 
 export const setSelectedFood = (item, quantity) => ({
@@ -52,3 +53,7 @@ export const setQRCode = QRCode => ({
 export const toggleLoginPopup = () => ({ type: TOGGLE_LOGIN_POPUP });
 export const showInvitationForm = () => ({ type: SHOW_INVITATION_FORM });
 export const resetCheckout = () => ({ type: RESET_CHECKOUT });
+export const setPendingReservation = (id, expiresAt) => ({
+  type: SET_PENDING_RESERVATION,
+  payload: { id, expiresAt }
+});

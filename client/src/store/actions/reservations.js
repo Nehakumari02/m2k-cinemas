@@ -154,3 +154,51 @@ export const removeReservation = id => async dispatch => {
     };
   }
 };
+export const confirmReservation = (id, finalData) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const url = '/reservations/confirm/' + id;
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    const responseData = await response.json();
+    if (response.ok) {
+      dispatch(setAlert('Reservation Confirmed', 'success', 5000));
+      return { 
+        status: 'success', 
+        data: { 
+          reservation: responseData.reservation, 
+          QRCode: responseData.QRCode 
+        } 
+      };
+    }
+    dispatch(setAlert(responseData.error || 'Confirmation failed', 'error', 5000));
+    return { status: 'error', message: responseData.error };
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+    return { status: 'error' };
+  }
+};
+
+export const cancelPendingReservation = id => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const url = '/reservations/pending/' + id;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (response.ok) {
+      return { status: 'success' };
+    }
+  } catch (error) {
+    console.error('Cancel pending reservation failed', error);
+  }
+};

@@ -12,8 +12,6 @@ const router = new express.Router();
 router.post('/reservations', auth.simple, async (req, res) => {
   const reservation = new Reservation(req.body);
 
-  const QRCode = await generateQR(`https://elcinema.herokuapp.com/#/checkin/${reservation._id}`);
-
   try {
     const reservationDate = new Date(reservation.date);
     const startOfDay = new Date(reservationDate);
@@ -25,6 +23,10 @@ router.post('/reservations', auth.simple, async (req, res) => {
       cinemaId: reservation.cinemaId,
       startAt: reservation.startAt,
       date: { $gte: startOfDay, $lte: endOfDay },
+      $or: [
+        { status: { $ne: 'Pending' } },
+        { status: 'Pending', expiresAt: { $gt: new Date() } }
+      ]
     });
 
     const existingSeats = new Set(
@@ -47,6 +49,12 @@ router.post('/reservations', auth.simple, async (req, res) => {
       });
     }
 
+    if (reservation.status === 'Pending') {
+      reservation.expiresAt = new Date(Date.now() + 7 * 60 * 1000); // 7 minutes
+      await reservation.save();
+      return res.status(201).send({ reservation });
+    }
+
     const pointsUsed = req.body.pointsUsed || 0;
     const user = await User.findById(req.user._id);
 
@@ -67,18 +75,19 @@ router.post('/reservations', auth.simple, async (req, res) => {
       }
     } catch (e) {
       console.error('Error calculating loyalty points:', e);
-      // Fallback to 10% if setting lookup fails
       pointsEarned = Math.floor(finalAmountPaid * 0.1);
     }
     
     user.loyaltyPoints += pointsEarned;
     await user.save();
     
+    const QRCode = await generateQR(`https://elcinema.herokuapp.com/#/checkin/${reservation._id}`);
     reservation.QRCode = QRCode;
     await reservation.save();
-    res.status(201).send({ status: 'success', data: reservation });
+    res.status(201).send({ reservation, QRCode });
   } catch (e) {
-    res.status(400).send(e);
+    console.error('Reservation creation error:', e);
+    res.status(400).send({ error: e.message || 'Reservation could not be created.' });
   }
 });
 
@@ -157,6 +166,70 @@ router.delete('/reservations/:id', auth.enhance, async (req, res) => {
 });
 
 // User modeling get suggested seats
+// Confirm a pending reservation
+router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id);
+    if (!reservation) return res.status(404).send({ error: 'Reservation not found' });
+    if (reservation.status !== 'Pending') return res.status(400).send({ error: 'Reservation is already confirmed or cancelled' });
+
+    // Update reservation data with final details from payment step
+    const { total, pointsUsed, foodItems } = req.body;
+    if (total !== undefined) reservation.total = total;
+    if (foodItems !== undefined) reservation.foodItems = foodItems;
+
+    const QRCode = await generateQR(`https://elcinema.herokuapp.com/#/checkin/${reservation._id}`);
+    
+    // Process loyalty points
+    const pUsed = pointsUsed || 0;
+    const user = await User.findById(req.user._id);
+    if (user.loyaltyPoints < pUsed) {
+      return res.status(400).send({ error: 'Insufficient loyalty points' });
+    }
+
+    user.loyaltyPoints -= pUsed;
+    const finalAmountPaid = Math.max(0, reservation.total - pUsed);
+    
+    let pointsEarned = 0;
+    try {
+      const lpSetting = await Setting.findOne({ key: 'loyaltyPointsPer100' });
+      const pointsPer100 = lpSetting ? Number(lpSetting.value) : 0;
+      if (pointsPer100 > 0) {
+        pointsEarned = Math.floor((finalAmountPaid / 100) * pointsPer100);
+      }
+    } catch (e) {
+      pointsEarned = Math.floor(finalAmountPaid * 0.1);
+    }
+    
+    user.loyaltyPoints += pointsEarned;
+    await user.save();
+    
+    reservation.status = 'Paid';
+    reservation.QRCode = QRCode;
+    reservation.expiresAt = undefined; // Remove expiry
+    await reservation.save();
+    
+    res.send({ reservation, QRCode });
+  } catch (e) {
+    console.error('Reservation confirmation error:', e);
+    res.status(400).send({ error: e.message || 'Reservation could not be confirmed.' });
+  }
+});
+
+// Cancel a pending reservation
+router.delete('/reservations/pending/:id', auth.simple, async (req, res) => {
+  try {
+    const reservation = await Reservation.findOneAndDelete({
+      _id: req.params.id,
+      status: 'Pending'
+    });
+    if (!reservation) return res.status(404).send({ error: 'Pending reservation not found' });
+    res.send({ status: 'success', message: 'Pending reservation cancelled' });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.get('/reservations/usermodeling/:username', async (req, res) => {
   const { username } = req.params;
   try {

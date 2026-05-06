@@ -9,7 +9,8 @@ import {
   SET_INVITATION,
   SET_SUGGESTED_SEATS,
   SET_QR_CODE,
-  SET_SELECTED_FOOD
+  SET_SELECTED_FOOD,
+  SET_PENDING_RESERVATION
 } from '../types';
 
 const initialState = {
@@ -22,7 +23,9 @@ const initialState = {
   showInvitation: false,
   invitations: {},
   QRCode: '',
-  selectedFood: {}
+  selectedFood: {},
+  pendingReservationId: null,
+  reservationExpiresAt: null
 };
 
 const setSelectedFood = (state, { item, quantity }) => {
@@ -99,6 +102,11 @@ const toggleLoginPopup = state => ({
   ...state,
   showLoginPopup: !state.showLoginPopup
 });
+const setPendingReservation = (state, { id, expiresAt }) => ({
+  ...state,
+  pendingReservationId: id,
+  reservationExpiresAt: expiresAt
+});
 const showInvitationForm = state => ({
   ...state,
   showInvitation: !state.showInvitation
@@ -128,6 +136,8 @@ export default function(state = initialState, action) {
       return setQRCode(state, payload);
     case SET_SELECTED_FOOD:
       return setSelectedFood(state, payload);
+    case SET_PENDING_RESERVATION:
+      return setPendingReservation(state, payload);
     case RESET_CHECKOUT:
       return resetCheckout();
     default:

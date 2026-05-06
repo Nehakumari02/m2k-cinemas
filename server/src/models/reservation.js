@@ -59,8 +59,12 @@ const reservationSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Paid', 'Refund Requested', 'Refunded', 'Cancelled'],
+    enum: ['Paid', 'Pending', 'Refund Requested', 'Refunded', 'Cancelled'],
     default: 'Paid',
+  },
+  expiresAt: {
+    type: Date,
+    index: { expiresAfterSeconds: 0 }
   },
 }, { timestamps: true });
 
