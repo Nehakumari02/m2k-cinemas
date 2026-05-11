@@ -58,8 +58,16 @@ function OffersPage({ offers: storeOffers, getOffers }) {
     getOffers();
   }, []);
 
-  const handleOfferClick = (offer) => {
-    setSelectedOffer(offer);
+  const getOfferImage = offer => {
+    const fallback = '/images/offers/offer1.png';
+    if (!offer || !offer.image) return fallback;
+    return normalizeImage(offer.image);
+  };
+
+  const formatValidTill = offer => {
+    if (!offer || !offer.validTill) return '';
+    const d = new Date(offer.validTill);
+    return Number.isNaN(d.getTime()) ? String(offer.validTill) : d.toLocaleDateString();
   };
 
   return (
@@ -72,21 +80,23 @@ function OffersPage({ offers: storeOffers, getOffers }) {
 
       <div className={classes.grid}>
         {offers.map(offer => (
-          <div key={offer.id} className={classes.cardContainer}>
+          <div key={offer._id || offer.id} className={classes.cardContainer}>
             <div className={classes.cardInner}>
-              {/* Front Face */}
-              <div className={classes.cardFront}>
+              {/* Front Face — same structure as home OffersSection */}
+              <div className={`${classes.cardFace} ${classes.cardFront}`}>
                 <img
                   className={classes.cardImage}
-                  src={normalizeImage(offer.image)}
+                  src={getOfferImage(offer)}
                   alt={offer.title}
                 />
                 <div className={classes.cardBody}>
-                  <span className={classes.codeBadge}>{offer.code}</span>
-                  <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                  <div className={classes.cardBodyMain}>
+                    <span className={classes.codeBadge}>{offer.code}</span>
+                    <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                  </div>
                   <div className={classes.cardFooter}>
                     <span className={classes.validTill}>
-                      Valid till: <span>{offer.validTill}</span>
+                      Valid till: <span>{formatValidTill(offer)}</span>
                     </span>
                     <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700 }}>
                       Hover to Reveal
@@ -95,28 +105,34 @@ function OffersPage({ offers: storeOffers, getOffers }) {
                 </div>
               </div>
 
-              {/* Back Face */}
-              <div className={classes.cardBack} onClick={() => handleOfferClick(offer)}>
-                <div className={classes.dialogCodeBox} style={{
-                  width: '100%',
-                  marginBottom: '16px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px dashed rgba(255,255,255,0.2)'
-                }}>
-                  <Typography className={classes.dialogCodeLabel} style={{ color: 'rgba(255,255,255,0.5)' }}>Promo Code</Typography>
-                  <Typography className={classes.dialogCodeValue} style={{ fontSize: '1.2rem', color: '#fff' }}>
-                    {offer.code}
-                  </Typography>
+              {/* Back Face — mirror image + body + View details (same as home) */}
+              <div
+                className={`${classes.cardFace} ${classes.cardBack}`}
+                onClick={() => setSelectedOffer(offer)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedOffer(offer);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Offer details: ${offer.title}`}>
+                <img className={classes.cardImage} src={getOfferImage(offer)} alt="" />
+                <div className={classes.cardBody}>
+                  <div className={classes.cardBodyMain}>
+                    <span className={classes.codeBadge}>{offer.code}</span>
+                    <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                  </div>
+                  <div className={classes.cardFooter}>
+                    <span className={classes.validTill}>
+                      Valid till: <span>{formatValidTill(offer)}</span>
+                    </span>
+                    <Button type="button" className={classes.viewBtn} size="small" tabIndex={-1}>
+                      View details
+                    </Button>
+                  </div>
                 </div>
-                <Typography variant="h6" style={{ fontWeight: 800, color: '#fff', marginBottom: '8px' }}>
-                  {offer.title}
-                </Typography>
-                <Typography variant="body2" style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '16px' }}>
-                  {offer.description}
-                </Typography>
-                <Button className={classes.viewBtn} fullWidth style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
-                  View Full Details
-                </Button>
               </div>
             </div>
           </div>
@@ -133,7 +149,7 @@ function OffersPage({ offers: storeOffers, getOffers }) {
         {selectedOffer && (
           <>
             <div style={{ position: 'relative' }}>
-              <img src={normalizeImage(selectedOffer.image)} alt={selectedOffer.title} className={classes.dialogImage} />
+              <img src={getOfferImage(selectedOffer)} alt={selectedOffer.title} className={classes.dialogImage} />
               <IconButton className={classes.closeBtn} onClick={() => setSelectedOffer(null)} size="small">
                 <Close />
               </IconButton>

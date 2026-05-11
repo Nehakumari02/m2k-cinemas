@@ -80,33 +80,54 @@ const useStyles = makeStyles(theme => ({
   track: {
     display: 'flex',
     gap: theme.spacing(3),
-    padding: theme.spacing(0, 4),
-    transition: 'transform 0.4s cubic-bezier(0.25,0.8,0.25,1)',
-    willChange: 'transform',
+    padding: theme.spacing(0, 4, 2),
+    // Use margin for horizontal scroll — translateX on this ancestor can mirror text
+    // inside cards in Safari when combined with opacity / layers.
+    transition: 'margin-left 0.4s cubic-bezier(0.25,0.8,0.25,1)',
+    willChange: 'margin-left',
+  },
+  trackWrap: {
+    overflowX: 'hidden',
+    overflowY: 'visible',
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(3),
   },
   cardInner: {
     position: 'relative',
     width: '100%',
     height: '100%',
-    transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-    transformStyle: 'preserve-3d',
     cursor: 'pointer',
+    transformStyle: 'preserve-3d',
+    WebkitTransformStyle: 'preserve-3d',
+    transition: 'transform 0.75s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   cardContainer: {
     minWidth: '320px',
     maxWidth: '320px',
     height: '340px',
-    perspective: '1000px',
     flexShrink: 0,
+    isolation: 'isolate',
+    perspective: '1100px',
+    WebkitPerspective: '1100px',
     '&:hover $cardInner': {
       transform: 'rotateY(180deg)',
     },
+    '&:hover $cardFace': {
+      animation: 'none',
+    },
+    '&:hover $cardFront': {
+      pointerEvents: 'none',
+    },
+    '&:hover $cardBack': {
+      pointerEvents: 'auto',
+    },
   },
-  cardFront: {
+  cardFace: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backfaceVisibility: 'hidden',
+    left: 0,
+    top: 0,
     borderRadius: '14px',
     overflow: 'hidden',
     background: '#ffffff',
@@ -114,26 +135,18 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0 4px 12px rgba(15,23,42,0.05)',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+  },
+  cardFront: {
+    transform: 'rotateY(0deg) translateZ(1px)',
+    WebkitTransform: 'rotateY(0deg) translateZ(1px)',
     animation: '$pulse 3s infinite',
   },
   cardBack: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backfaceVisibility: 'hidden',
-    borderRadius: '14px',
-    overflow: 'hidden',
-    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
-    border: '1px solid #d9e2ef',
-    borderTop: '4px solid #b72429',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: theme.spacing(3),
-    transform: 'rotateY(180deg)',
-    boxShadow: '0 12px 30px rgba(15,23,42,0.14)',
-    textAlign: 'center',
+    transform: 'rotateY(180deg) translateZ(1px)',
+    WebkitTransform: 'rotateY(180deg) translateZ(1px)',
+    pointerEvents: 'none',
   },
   card: {
     display: 'none', // deprecated by new structure but kept to avoid breakage if referenced elsewhere
@@ -141,23 +154,35 @@ const useStyles = makeStyles(theme => ({
   cardImage: {
     width: '100%',
     height: '180px',
+    flexShrink: 0,
     objectFit: 'cover',
     display: 'block',
     borderBottom: '1px solid rgba(15,23,42,0.08)',
   },
   cardBody: {
-    padding: theme.spacing(2, 2.5),
+    flex: 1,
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    padding: theme.spacing(2, 2.5, 2),
+  },
+  cardBodyMain: {
+    flex: '0 0 auto',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
   cardTitle: {
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#0f172a',
     marginBottom: theme.spacing(0.5),
+    marginTop: 0,
     lineHeight: 1.4,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
+    maxHeight: '2.8em',
+    display: 'block',
   },
   cardDesc: {
     fontSize: '0.78rem',
@@ -173,7 +198,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: theme.spacing(1),
     borderTop: '1px solid rgba(15,23,42,0.08)',
+    marginTop: 'auto',
     paddingTop: theme.spacing(1.5),
   },
   validTill: {
@@ -209,6 +236,7 @@ const useStyles = makeStyles(theme => ({
     background: 'rgba(183,36,41,0.1)',
     border: '1px dashed rgba(183,36,41,0.35)',
     marginBottom: theme.spacing(1.5),
+    alignSelf: 'flex-start',
   },
   dialogPaper: {
     backgroundColor: '#ffffff',
@@ -306,7 +334,7 @@ function OffersSection({ offers: storeOffers, getOffers }) {
 
   useEffect(() => {
     getOffers();
-  }, [offers]);
+  }, [getOffers]);
 
   const getOfferImage = offer => {
     const fallback = '/images/offers/offer1.png';
@@ -316,10 +344,10 @@ function OffersSection({ offers: storeOffers, getOffers }) {
 
   useEffect(() => {
     const track = trackRef.current;
-    if (track) {
-      setMaxScroll(track.scrollWidth - track.parentElement.offsetWidth);
+    if (track && track.parentElement) {
+      setMaxScroll(Math.max(0, track.scrollWidth - track.parentElement.offsetWidth));
     }
-  }, []);
+  }, [offers.length]);
 
   const scroll = dir => {
     const step = 340;
@@ -362,24 +390,26 @@ function OffersSection({ offers: storeOffers, getOffers }) {
           <Typography variant="body2">No active offers available right now.</Typography>
         </div>
       ) : (
-        <div style={{ overflow: 'hidden', padding: '4px 0' }}>
+        <div className={classes.trackWrap}>
           <div
             ref={trackRef}
             className={classes.track}
-            style={{ transform: `translateX(-${scrollPos}px)` }}>
+            style={{ marginLeft: `-${scrollPos}px` }}>
             {offers.map(offer => (
               <div key={offer._id} className={classes.cardContainer}>
                 <div className={classes.cardInner}>
                   {/* Front Face */}
-                  <div className={classes.cardFront}>
+                  <div className={`${classes.cardFace} ${classes.cardFront}`}>
                     <img
                       className={classes.cardImage}
                       src={getOfferImage(offer)}
                       alt={offer.title}
                     />
                     <div className={classes.cardBody}>
-                      <span className={classes.codeBadge}>{offer.code}</span>
-                      <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                      <div className={classes.cardBodyMain}>
+                        <span className={classes.codeBadge}>{offer.code}</span>
+                        <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                      </div>
                       <div className={classes.cardFooter}>
                         <span className={classes.validTill}>
                           Valid till: <span>{new Date(offer.validTill).toLocaleDateString()}</span>
@@ -391,30 +421,38 @@ function OffersSection({ offers: storeOffers, getOffers }) {
                     </div>
                   </div>
 
-                  {/* Back Face */}
+                  {/* Back Face — same layout as front; 3D flip on hover */}
                   <div
-                    className={classes.cardBack}
-                    onClick={() => setSelectedOffer(offer)}>
-                    <div className={classes.dialogCodeBox} style={{
-                      width: '100%',
-                      marginBottom: '16px',
-                      background: 'rgba(183,36,41,0.06)',
-                      border: '1px dashed rgba(183,36,41,0.35)'
-                    }}>
-                      <Typography className={classes.dialogCodeLabel} style={{ color: '#64748b' }}>Promo Code</Typography>
-                      <Typography className={classes.dialogCodeValue} style={{ fontSize: '1.2rem', color: '#b72429' }}>
-                        {offer.code}
-                      </Typography>
+                    className={`${classes.cardFace} ${classes.cardBack}`}
+                    onClick={() => setSelectedOffer(offer)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedOffer(offer);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Offer details: ${offer.title}`}>
+                    <img
+                      className={classes.cardImage}
+                      src={getOfferImage(offer)}
+                      alt=""
+                    />
+                    <div className={classes.cardBody}>
+                      <div className={classes.cardBodyMain}>
+                        <span className={classes.codeBadge}>{offer.code}</span>
+                        <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                      </div>
+                      <div className={classes.cardFooter}>
+                        <span className={classes.validTill}>
+                          Valid till: <span>{new Date(offer.validTill).toLocaleDateString()}</span>
+                        </span>
+                        <Button type="button" className={classes.viewBtn} size="small" tabIndex={-1}>
+                          View details
+                        </Button>
+                      </div>
                     </div>
-                    <Typography variant="h6" style={{ fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
-                      {offer.title}
-                    </Typography>
-                    <Typography variant="body2" style={{ color: '#475569', marginBottom: '16px' }}>
-                      {offer.description}
-                    </Typography>
-                    <Button className={classes.viewBtn} fullWidth style={{ color: '#b72429', borderColor: 'rgba(183,36,41,0.4)' }}>
-                      View Full Details
-                    </Button>
                   </div>
                 </div>
               </div>
