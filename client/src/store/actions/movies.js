@@ -184,6 +184,16 @@ export const addMovie = (image, newMovie, backdropFiles = [], castCrewFiles = []
       if (castCrewFiles.length)
         await dispatch(uploadMovieCastCrewImages(movie._id, castCrewFiles));
       dispatch(getMovies());
+    } else {
+      dispatch(
+        setAlert(
+          (movie && movie.error && movie.error.message) ||
+            movie.message ||
+            'Unable to save movie',
+          'error',
+          5000
+        )
+      );
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
@@ -208,6 +218,13 @@ export const updateMovie = (
       },
       body: JSON.stringify(movie)
     });
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      responseData = {};
+    }
     if (response.ok) {
       dispatch(onSelectMovie(null));
       dispatch(setAlert('Movie have been saved!', 'success', 5000));
@@ -217,6 +234,21 @@ export const updateMovie = (
       if (castCrewFiles.length)
         await dispatch(uploadMovieCastCrewImages(movieId, castCrewFiles));
       dispatch(getMovies());
+    } else {
+      const rawError =
+        typeof responseText === 'string' && responseText.trim().length
+          ? responseText
+          : '';
+      dispatch(
+        setAlert(
+          (responseData && responseData.error && responseData.error.message) ||
+            responseData.message ||
+            rawError ||
+            'Unable to update movie',
+          'error',
+          5000
+        )
+      );
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));

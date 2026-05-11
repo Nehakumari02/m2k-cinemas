@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 import { Rating } from '@material-ui/lab';
 import {
@@ -9,10 +9,11 @@ import {
   withStyles
 } from '@material-ui/core';
 import { textTruncate } from '../../../../utils';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import ArrowRightAlt from '@material-ui/icons/ArrowRightAlt';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import { normalizeImage } from '../../../../utils/imageUrl';
+import { ContentWarningModal } from '../../../../components';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -29,8 +30,24 @@ const StyledRating = withStyles({
 function MovieBanner(props) {
   const { movie, fullDescription } = props;
   const classes = useStyles(props);
+  const history = useHistory();
+  const [showWarning, setShowWarning] = useState(false);
   if (!movie) return null;
   const imageUrl = normalizeImage(movie.image);
+
+  const onBookTickets = (e) => {
+    if (e) e.preventDefault();
+    if (movie.contentWarning) {
+      setShowWarning(true);
+    } else {
+      history.push(`/movie/booking/${movie._id}`);
+    }
+  };
+
+  const handleContinue = () => {
+    setShowWarning(false);
+    history.push(`/movie/booking/${movie._id}`);
+  };
 
   return (
     <div className={classes.movieHero}>
@@ -110,12 +127,10 @@ function MovieBanner(props) {
       {/* Actions */}
       <div className={classes.movieActions}>
         {fullDescription ? (
-          <Link to={`/movie/booking/${movie._id}`} style={{ textDecoration: 'none' }}>
-            <Button variant="contained" className={classes.button}>
-              Book Now
-              <ArrowRightAlt className={classes.buttonIcon} />
-            </Button>
-          </Link>
+          <Button variant="contained" className={classes.button} onClick={onBookTickets}>
+            Book Now
+            <ArrowRightAlt className={classes.buttonIcon} />
+          </Button>
         ) : (
           <>
             <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
@@ -124,15 +139,19 @@ function MovieBanner(props) {
                 <ArrowRightAlt className={classes.buttonIcon} />
               </Button>
             </Link>
-            <Link to={`/movie/booking/${movie._id}`} style={{ textDecoration: 'none' }}>
-              <Button variant="contained" className={classes.button}>
-                Book Now
-                <ArrowRightAlt className={classes.buttonIcon} />
-              </Button>
-            </Link>
+            <Button variant="contained" className={classes.button} onClick={onBookTickets}>
+              Book Now
+              <ArrowRightAlt className={classes.buttonIcon} />
+            </Button>
           </>
         )}
       </div>
+      <ContentWarningModal
+        open={showWarning}
+        handleClose={() => setShowWarning(false)}
+        handleContinue={handleContinue}
+        movie={movie}
+      />
     </div>
   );
 }

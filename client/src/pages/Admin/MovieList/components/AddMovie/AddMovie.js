@@ -10,7 +10,7 @@ import {
 } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import styles from './styles';
-import { genreData, languageData } from '../../../../../data/MovieDataService';
+import { genreData, languageData, formatData } from '../../../../../data/MovieDataService';
 import {
   addMovie,
   updateMovie,
@@ -30,6 +30,7 @@ class AddMovie extends Component {
     cast: '',
     rating: '',
     synopsis: '',
+    contentWarning: '',
     castMembers: [],
     crewMembers: [],
     castNameInput: '',
@@ -41,7 +42,8 @@ class AddMovie extends Component {
     backdropImages: [],
     releaseDate: new Date(),
     endDate: new Date(),
-    isPublished: true
+    isPublished: true,
+    format: '2D'
   };
 
   componentDidMount() {
@@ -55,11 +57,13 @@ class AddMovie extends Component {
         castCrew,
         description,
         synopsis,
+        contentWarning,
         duration,
         rating,
         releaseDate,
         endDate,
-        isPublished
+        isPublished,
+        format
       } = this.props.edit;
       const castMembers = Array.isArray(castCrew)
         ? castCrew.filter(item => String(item.role || '').toLowerCase() === 'cast')
@@ -77,11 +81,12 @@ class AddMovie extends Component {
         crewMembers,
         description,
         synopsis: synopsis || '',
+        contentWarning: contentWarning || '',
         duration,
         rating: rating || '',
-        releaseDate,
         endDate,
         isPublished: isPublished !== undefined ? isPublished : true,
+        format: format || '2D',
         backdropImages: Array.isArray(this.props.edit.backdropImages)
           ? this.props.edit.backdropImages
           : []
@@ -110,48 +115,77 @@ class AddMovie extends Component {
 
   onAddMovie = () => {
     const {
-      image,
       genre,
       castMembers,
       crewMembers,
       castFiles,
       crewFiles,
       backdropFiles,
-      castNameInput,
-      crewNameInput,
-      crewRoleInput,
-      ...rest
+      title,
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      rating,
+      synopsis,
+      contentWarning,
+      releaseDate,
+      endDate,
+      isPublished,
+      format,
+      image
     } = this.state;
     const castCrew = [
       ...castMembers.map(item => ({ name: item.name, role: 'Cast', image: item.image || '' })),
       ...crewMembers.map(item => ({ name: item.name, role: item.role, image: item.image || '' }))
     ];
     const backdropImages = [];
-    const movie = { ...rest, genre: genre.join(','), castCrew, backdropImages };
+    const movie = {
+      title,
+      genre: genre.join(','),
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      rating,
+      synopsis,
+      contentWarning,
+      castCrew,
+      backdropImages,
+      releaseDate,
+      endDate,
+      isPublished,
+      format
+    };
     this.props.addMovie(image, movie, backdropFiles, [...castFiles, ...crewFiles]);
   };
 
   onUpdateMovie = () => {
     const {
-      image,
       genre,
       castMembers,
       crewMembers,
       castFiles,
       crewFiles,
       backdropFiles,
-      castNameInput,
-      crewNameInput,
-      crewRoleInput,
-      ...rest
+      title,
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      rating,
+      synopsis,
+      contentWarning,
+      releaseDate,
+      endDate,
+      isPublished,
+      format,
+      backdropImages,
+      image
     } = this.state;
-
-    const existingCast = Array.isArray(this.props.edit.castCrew)
-      ? this.props.edit.castCrew.filter(item => String(item.role || '').toLowerCase() === 'cast')
-      : [];
-    const existingCrew = Array.isArray(this.props.edit.castCrew)
-      ? this.props.edit.castCrew.filter(item => String(item.role || '').toLowerCase() !== 'cast')
-      : [];
 
     const castCrew = [
       ...castMembers.map(item => ({
@@ -165,8 +199,24 @@ class AddMovie extends Component {
         image: item.image || ''
       }))
     ];
-    const backdropImages = this.state.backdropImages;
-    const movie = { ...rest, genre: genre.join(','), castCrew, backdropImages };
+    const movie = {
+      title,
+      genre: genre.join(','),
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      rating,
+      synopsis,
+      contentWarning,
+      castCrew,
+      backdropImages,
+      releaseDate,
+      endDate,
+      isPublished,
+      format
+    };
     this.props.updateMovie(
       this.props.edit._id,
       movie,
@@ -237,6 +287,7 @@ class AddMovie extends Component {
       duration,
       description,
       synopsis,
+      contentWarning,
       director,
       cast,
       rating,
@@ -250,7 +301,8 @@ class AddMovie extends Component {
       crewFiles,
       releaseDate,
       endDate,
-      isPublished
+      isPublished,
+      format
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
@@ -585,6 +637,19 @@ class AddMovie extends Component {
                 this.handleFieldChange('synopsis', event.target.value)
               }
             />
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              className={classes.textField}
+              label="Content Warning (optional)"
+              margin="dense"
+              variant="outlined"
+              value={contentWarning}
+              onChange={event =>
+                this.handleFieldChange('contentWarning', event.target.value)
+              }
+            />
           </div>
           <div className={classes.field}>
             <TextField
@@ -628,6 +693,23 @@ class AddMovie extends Component {
                 this.handleFieldChange('rating', event.target.value)
               }
             />
+            <TextField
+              select
+              className={classes.textField}
+              label="Format"
+              margin="dense"
+              required
+              value={format}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('format', event.target.value)
+              }>
+              {formatData.map((formatItem, index) => (
+                <MenuItem key={formatItem + '-' + index} value={formatItem}>
+                  {formatItem}
+                </MenuItem>
+              ))}
+            </TextField>
           </div>
           {/* The redundant fields were moved to the top for better organization */}
           <div className={classes.field}>

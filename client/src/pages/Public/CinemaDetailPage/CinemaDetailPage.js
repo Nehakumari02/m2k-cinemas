@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, Button, Chip, Box } from '@material-ui/core';
 import { getCinema, getShowtimes, getMovies } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import { ContentWarningModal } from '../../../components';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -117,8 +118,24 @@ const useStyles = makeStyles(theme => ({
 
 function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShowtimes, getMovies }) {
   const classes = useStyles();
+  const history = useHistory();
   const cinemaId = match.params.id;
   const [selectedDate, setSelectedDate] = useState('');
+  const [warningMovie, setWarningMovie] = useState(null);
+
+  const onBookTickets = (movie) => {
+    if (movie.contentWarning) {
+      setWarningMovie(movie);
+    } else {
+      history.push(`/movie/booking/${movie._id}`);
+    }
+  };
+
+  const handleContinue = () => {
+    const id = warningMovie._id;
+    setWarningMovie(null);
+    history.push(`/movie/booking/${id}`);
+  };
 
   useEffect(() => {
     getCinema(cinemaId);
@@ -253,11 +270,10 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
                     ))}
                 </div>
                 <Button
-                  component={Link}
-                  to={`/movie/booking/${movie._id}`}
                   variant="contained"
                   size="small"
                   className={classes.bookButton}
+                  onClick={() => onBookTickets(movie)}
                 >
                   Book Tickets
                 </Button>
@@ -272,6 +288,12 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
           </Grid>
         )}
       </Grid>
+      <ContentWarningModal
+        open={!!warningMovie}
+        handleClose={() => setWarningMovie(null)}
+        handleContinue={handleContinue}
+        movie={warningMovie}
+      />
     </Container>
   );
 }

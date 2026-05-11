@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, Chip, MenuItem, TextField, Button } from '@material-ui/core';
 import { getMovies, getCinemas, getShowtimes } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import { ContentWarningModal } from '../../../components';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -138,7 +139,23 @@ function ShowtimingsPage({
   getShowtimes,
 }) {
   const classes = useStyles();
+  const history = useHistory();
   const [selectedDate, setSelectedDate] = useState('');
+  const [warningMovie, setWarningMovie] = useState(null);
+
+  const onBookTickets = (movie) => {
+    if (movie.contentWarning) {
+      setWarningMovie(movie);
+    } else {
+      history.push(`/movie/booking/${movie._id}`);
+    }
+  };
+
+  const handleContinue = () => {
+    const id = warningMovie._id;
+    setWarningMovie(null);
+    history.push(`/movie/booking/${id}`);
+  };
   const [selectedMovie, setSelectedMovie] = useState('all');
   const [selectedCinema, setSelectedCinema] = useState('all');
 
@@ -321,8 +338,7 @@ function ShowtimingsPage({
                     size="small"
                     variant="contained"
                     className={classes.bookButton}
-                    component={Link}
-                    to={`/movie/booking/${item.movie._id}`}
+                    onClick={() => onBookTickets(item.movie)}
                   >
                     Book Tickets
                   </Button>
@@ -338,6 +354,12 @@ function ShowtimingsPage({
           </Grid>
         )}
       </Grid>
+      <ContentWarningModal
+        open={!!warningMovie}
+        handleClose={() => setWarningMovie(null)}
+        handleContinue={handleContinue}
+        movie={warningMovie}
+      />
     </Container>
   );
 }

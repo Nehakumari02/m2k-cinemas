@@ -5,13 +5,14 @@ import { normalizeImage } from '../../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
   movieInfos: {
-    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    background: '#ffffff',
     position: 'relative',
     height: '100%',
     minHeight: '600px',
     borderRadius: '14px',
     overflow: 'hidden',
-    border: '1px solid rgba(15,23,42,0.08)',
+    border: '1px solid #d8e2f0',
+    boxShadow: '0 8px 20px rgba(15,23,42,0.06)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -34,15 +35,31 @@ const useStyles = makeStyles(theme => ({
     }
   },
   title: {
-    padding: theme.spacing(2, 3),
-    color: '#b72429',
-    fontSize: '1.5rem',
+    padding: theme.spacing(2, 2.5, 1),
+    color: '#122947',
+    fontSize: '1.25rem',
     fontWeight: 800,
     textTransform: 'capitalize',
     letterSpacing: '0.02em',
   },
+  metaRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: theme.spacing(0.8),
+    padding: theme.spacing(0, 2.5, 1.5),
+  },
+  metaChip: {
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    color: '#19365a',
+    background: '#eef4ff',
+    border: '1px solid #cfddf7',
+    borderRadius: 999,
+    padding: theme.spacing(0.35, 1),
+    lineHeight: 1.3,
+  },
   info: {
-    padding: theme.spacing(0, 3, 3),
+    padding: theme.spacing(0, 2.5, 2.5),
     width: '100%',
   },
   infoBox: {
@@ -50,15 +67,26 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1.5),
   },
   infoLabel: {
-    fontSize: '0.65rem',
+    fontSize: '0.66rem',
     textTransform: 'uppercase',
-    color: 'rgba(183,36,41,0.6)',
+    color: '#5a6c85',
     letterSpacing: '0.1em',
     fontWeight: 700,
   },
   infoValue: {
-    fontSize: '0.82rem',
-    color: '#334155',
+    fontSize: '0.84rem',
+    color: '#24364d',
+    fontWeight: 600,
+  },
+  synopsisBox: {
+    borderTop: '1px dashed #d8e2f0',
+    marginTop: theme.spacing(1),
+    paddingTop: theme.spacing(1.2),
+  },
+  synopsisText: {
+    fontSize: '0.8rem',
+    color: '#41556f',
+    lineHeight: 1.45,
   },
   [theme.breakpoints.down('md')]: {
     movieInfos: { minHeight: '30vh', borderRadius: '10px' },
@@ -95,7 +123,34 @@ export default function MovieInfo(props) {
           }}
         />
         <Typography className={classes.title}>{movie.title}</Typography>
+        <div className={classes.metaRow}>
+          {!!movie.language && (
+            <span className={classes.metaChip}>{movie.language}</span>
+          )}
+          {!!movie.duration && (
+            <span className={classes.metaChip}>{movie.duration} mins</span>
+          )}
+          {!!movie.genre &&
+            movie.genre
+              .split(',')
+              .slice(0, 2)
+              .map((item, idx) => (
+                <span key={`${item}-${idx}`} className={classes.metaChip}>
+                  {item.trim()}
+                </span>
+              ))}
+        </div>
         <div className={classes.info}>
+          {!!movie.duration && (
+            <div className={classes.infoBox}>
+              <Typography className={classes.infoLabel}>
+                Duration
+              </Typography>
+              <Typography className={classes.infoValue}>
+                {movie.duration} mins
+              </Typography>
+            </div>
+          )}
           {movie.director && (
             <div className={classes.infoBox}>
               <Typography className={classes.infoLabel}>
@@ -123,6 +178,16 @@ export default function MovieInfo(props) {
               </Typography>
               <Typography className={classes.infoValue}>
                 {movie.genre}
+              </Typography>
+            </div>
+          )}
+          {movie.description && (
+            <div className={classes.synopsisBox}>
+              <Typography className={classes.infoLabel}>
+                Synopsis
+              </Typography>
+              <Typography className={classes.synopsisText}>
+                {movie.description}
               </Typography>
             </div>
           )}

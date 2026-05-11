@@ -15,3 +15,5 @@ export const genreData = [
 ];
 
 export const languageData = ['english', 'greek', 'german', 'french'];
+
+export const formatData = ['2D', '3D', 'IMAX 2D', 'IMAX 3D', '4DX'];

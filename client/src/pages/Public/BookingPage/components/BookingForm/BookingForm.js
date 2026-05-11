@@ -5,28 +5,70 @@ import { makeStyles } from '@material-ui/styles';
 const useStyles = makeStyles(theme => ({
   formWrapper: {
     paddingTop: theme.spacing(1),
-    paddingBottom: 0,
+    paddingBottom: theme.spacing(1),
+  },
+  bookingShell: {
+    background: '#ffffff',
+    border: '1px solid #d9e1ef',
+    borderRadius: 14,
+    overflow: 'hidden',
+    boxShadow: '0 8px 22px rgba(15, 23, 42, 0.08)',
+  },
+  headerStrip: {
+    background: 'linear-gradient(90deg, #0f2847 0%, #1f3f68 100%)',
+    color: '#fff',
+    padding: theme.spacing(1.5, 2),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: theme.spacing(1),
+  },
+  headerTitle: {
+    fontWeight: 700,
+  },
+  headerMeta: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: '0.78rem',
   },
   dateRow: {
     display: 'flex',
     gap: theme.spacing(1),
     flexWrap: 'wrap',
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1.5),
+    padding: theme.spacing(1.5, 2, 0),
   },
   dateChip: {
-    borderColor: 'rgba(15,23,42,0.2)',
-    color: '#334155',
-    fontWeight: 600,
+    borderColor: '#c7d3e9',
+    color: '#1d3557',
+    fontWeight: 700,
+    borderRadius: 8,
+    background: '#f8fbff',
   },
   activeDateChip: {
-    backgroundColor: '#b72429',
-    color: '#fff',
-    borderColor: '#b72429',
+    backgroundColor: '#f0b429',
+    color: '#1d2a44',
+    borderColor: '#f0b429',
+    boxShadow: '0 2px 8px rgba(240,180,41,0.4)',
+  },
+  body: {
+    padding: theme.spacing(1.5, 2, 2),
+  },
+  filterCard: {
+    border: '1px solid #dce6f6',
+    borderRadius: 10,
+    background: '#f8fbff',
+    padding: theme.spacing(1.5),
+    marginBottom: theme.spacing(1.5),
+  },
+  filterTitle: {
+    color: '#1f3f68',
+    fontWeight: 700,
+    marginBottom: theme.spacing(1.2),
   },
   topFilterBar: {
     display: 'flex',
     gap: theme.spacing(1.5),
-    marginBottom: theme.spacing(2),
     alignItems: 'center',
     flexWrap: 'wrap',
   },
@@ -47,20 +89,45 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: '#fff',
       color: '#0f172a',
       '& fieldset': { borderColor: 'rgba(15,23,42,0.15)' },
-      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
-      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+      '&:hover fieldset': { borderColor: 'rgba(31,63,104,0.4)' },
+      '&.Mui-focused fieldset': { borderColor: '#1f3f68' },
     },
     '& .MuiInputLabel-root': { color: '#64748b' },
     '& .MuiSelect-icon': { color: '#64748b' },
-    '& .MuiIconButton-root': { color: '#64748b' },
   },
   emptyMessage: {
     fontSize: '1.4rem',
     color: '#64748b',
     fontWeight: 600,
   },
+  hint: {
+    color: '#64748b',
+    marginBottom: theme.spacing(1),
+    fontWeight: 600,
+  },
+  legendRow: {
+    display: 'flex',
+    gap: theme.spacing(2),
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: theme.spacing(1.2),
+  },
+  legendItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.7),
+    color: '#475569',
+    fontSize: '0.78rem',
+    fontWeight: 600,
+  },
+  legendDot: {
+    width: 9,
+    height: 9,
+    borderRadius: '50%',
+    display: 'inline-block',
+  },
   cinemaCard: {
-    border: '1px solid #e5e7eb',
+    border: '1px solid #d6e1f2',
     borderRadius: 12,
     background: '#fff',
     padding: theme.spacing(2),
@@ -71,11 +138,21 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'space-between',
     alignItems: 'baseline',
     gap: theme.spacing(1),
-    marginBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
   },
   cinemaName: {
     fontWeight: 700,
-    color: '#0f172a',
+    color: '#152d4d',
+  },
+  cinemaSubtitle: {
+    color: '#64748b',
+    fontWeight: 600,
+  },
+  slotTag: {
+    color: '#64748b',
+    fontWeight: 700,
+    fontSize: '0.74rem',
+    marginBottom: theme.spacing(0.8),
   },
   slotWrap: {
     display: 'flex',
@@ -84,15 +161,16 @@ const useStyles = makeStyles(theme => ({
   },
   timeButton: {
     borderRadius: 8,
-    borderColor: '#9fdf9f',
-    color: '#15803d',
+    borderColor: '#86d89a',
+    color: '#136f2d',
     fontWeight: 700,
     minWidth: 96,
+    background: '#f3fff5',
   },
   activeTimeButton: {
-    borderColor: '#b72429',
-    color: '#b72429',
-    backgroundColor: 'rgba(183,36,41,0.06)',
+    borderColor: '#1f3f68',
+    color: '#1f3f68',
+    backgroundColor: 'rgba(31,63,104,0.1)',
   },
   noSlots: {
     color: '#94a3b8',
@@ -104,10 +182,6 @@ const useStyles = makeStyles(theme => ({
     whiteSpace: 'nowrap',
     height: 40,
     flexShrink: 0,
-  },
-  hint: {
-    color: '#64748b',
-    marginBottom: theme.spacing(1.5),
   },
   [theme.breakpoints.down('sm')]: {
     topFilterBar: {
@@ -227,111 +301,150 @@ export default function BookingForm(props) {
 
   return (
     <div className={classes.formWrapper}>
-      <div className={classes.dateRow}>
-        {dateOptions.map(date => {
-          const label = new Date(date).toLocaleDateString('en-IN', {
-            day: 'numeric',
-            month: 'short',
-            weekday: 'short'
-          });
-          const active = selectedDateKey === date;
-          return (
-            <Chip
-              key={date}
-              label={label}
-              clickable
-              variant="outlined"
-              className={`${classes.dateChip} ${active ? classes.activeDateChip : ''}`}
-              onClick={() => onChangeDate(new Date(date))}
-            />
-          );
-        })}
-      </div>
+      <div className={classes.bookingShell}>
+        <div className={classes.headerStrip}>
+          <Typography variant="subtitle1" className={classes.headerTitle}>
+            Select Showtime
+          </Typography>
+          <Typography className={classes.headerMeta}>
+            Choose date, cinema and showtime
+          </Typography>
+        </div>
 
-      <div className={classes.topFilterBar}>
-        <TextField
-          variant="outlined"
-          placeholder="Search for cinema"
-          value={search}
-          onChange={event => setSearch(event.target.value)}
-          className={classes.searchField}
-        />
-        <TextField
-          select
-          value={selectedCinema || ''}
-          label="Select Cinema"
-          variant="outlined"
-          onChange={onChangeCinema}
-          className={classes.field}
-        >
-          <MenuItem value="">All Cinemas</MenuItem>
-          {cinemas.map(cinema => (
-            <MenuItem key={cinema._id} value={cinema._id}>
-              {cinema.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        <Button
-          variant="outlined"
-          className={classes.resetButton}
-          onClick={() => {
-            setSearch('');
-            onChangeCinema({ target: { value: '' } });
-            onChangeTime({ target: { value: '' } });
-          }}
-        >
-          Reset
-        </Button>
-      </div>
+        <div className={classes.dateRow}>
+          {dateOptions.map(date => {
+            const label = new Date(date).toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              weekday: 'short'
+            });
+            const active = selectedDateKey === date;
+            return (
+              <Chip
+                key={date}
+                label={label}
+                clickable
+                variant="outlined"
+                className={`${classes.dateChip} ${active ? classes.activeDateChip : ''}`}
+                onClick={() => onChangeDate(new Date(date))}
+              />
+            );
+          })}
+        </div>
 
-      <Typography variant="body2" className={classes.hint}>
-        Select a showtime to continue booking seats.
-      </Typography>
+        <div className={classes.body}>
+          <div className={classes.filterCard}>
+            <Typography variant="body2" className={classes.filterTitle}>
+              Filters
+            </Typography>
+            <div className={classes.topFilterBar}>
+              <TextField
+                variant="outlined"
+                placeholder="Search for cinema"
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                className={classes.searchField}
+              />
+              <TextField
+                select
+                value={selectedCinema || ''}
+                label="Select Cinema"
+                variant="outlined"
+                onChange={onChangeCinema}
+                className={classes.field}
+              >
+                <MenuItem value="">All Cinemas</MenuItem>
+                {cinemas.map(cinema => (
+                  <MenuItem key={cinema._id} value={cinema._id}>
+                    {cinema.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Button
+                variant="outlined"
+                className={classes.resetButton}
+                onClick={() => {
+                  setSearch('');
+                  onChangeCinema({ target: { value: '' } });
+                  onChangeTime({ target: { value: '' } });
+                }}
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
 
-      <Grid container spacing={1}>
-        {cinemasWithSlots
-          .filter(item => (selectedCinema ? item.cinema._id === selectedCinema : true))
-          .map(item => (
-            <Grid item xs={12} key={item.cinema._id}>
-              <div className={classes.cinemaCard}>
-                <div className={classes.cinemaHeader}>
-                  <Typography variant="h6" className={classes.cinemaName}>
-                    {item.cinema.name}
-                  </Typography>
-                </div>
-                {item.slots.length ? (
-                  <div className={classes.slotWrap}>
-                    {item.slots.map(time => {
-                      const active =
-                        selectedCinema === item.cinema._id && selectedTime === time;
-                      return (
-                        <Button
-                          key={`${item.cinema._id}-${time}`}
-                          variant="outlined"
-                          size="small"
-                          className={`${classes.timeButton} ${active ? classes.activeTimeButton : ''}`}
-                          onClick={() => {
-                            onChangeCinema({ target: { value: item.cinema._id } });
-                            onChangeTime({ target: { value: time } });
-                            if (onProceedToSeats) {
-                              onProceedToSeats(item.cinema._id, time);
-                            }
-                          }}
-                        >
-                          {time}
-                        </Button>
-                      );
-                    })}
+          <Typography variant="body2" className={classes.hint}>
+            Select a showtime to continue booking seats.
+          </Typography>
+
+          <div className={classes.legendRow}>
+            <div className={classes.legendItem}>
+              <span className={classes.legendDot} style={{ background: '#16a34a' }} />
+              Available
+            </div>
+            <div className={classes.legendItem}>
+              <span className={classes.legendDot} style={{ background: '#f59e0b' }} />
+              Filling Fast
+            </div>
+            <div className={classes.legendItem}>
+              <span className={classes.legendDot} style={{ background: '#ef4444' }} />
+              Sold Out
+            </div>
+          </div>
+
+          <Grid container spacing={1}>
+            {cinemasWithSlots
+              .filter(item => (selectedCinema ? item.cinema._id === selectedCinema : true))
+              .map(item => (
+                <Grid item xs={12} key={item.cinema._id}>
+                  <div className={classes.cinemaCard}>
+                    <div className={classes.cinemaHeader}>
+                      <Typography variant="h6" className={classes.cinemaName}>
+                        {item.cinema.name}
+                      </Typography>
+                      <Typography variant="caption" className={classes.cinemaSubtitle}>
+                        {item.cinema.city || 'City N/A'}
+                      </Typography>
+                    </div>
+                    {item.slots.length ? (
+                      <>
+                        <Typography className={classes.slotTag}>Digital 2D</Typography>
+                        <div className={classes.slotWrap}>
+                          {item.slots.map(time => {
+                            const active =
+                              selectedCinema === item.cinema._id && selectedTime === time;
+                            return (
+                              <Button
+                                key={`${item.cinema._id}-${time}`}
+                                variant="outlined"
+                                size="small"
+                                className={`${classes.timeButton} ${active ? classes.activeTimeButton : ''}`}
+                                onClick={() => {
+                                  onChangeCinema({ target: { value: item.cinema._id } });
+                                  onChangeTime({ target: { value: time } });
+                                  if (onProceedToSeats) {
+                                    onProceedToSeats(item.cinema._id, time);
+                                  }
+                                }}
+                              >
+                                {time}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <Typography variant="body2" className={classes.noSlots}>
+                        No shows available for selected date.
+                      </Typography>
+                    )}
                   </div>
-                ) : (
-                  <Typography variant="body2" className={classes.noSlots}>
-                    No shows available for selected date.
-                  </Typography>
-                )}
-              </div>
-            </Grid>
-          ))}
-      </Grid>
+                </Grid>
+              ))}
+          </Grid>
+        </div>
+      </div>
     </div>
   );
 }

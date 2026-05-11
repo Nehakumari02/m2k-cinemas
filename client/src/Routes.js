@@ -244,6 +244,12 @@ const Routes = () => {
             layout={PublicLayout}
             component={BookingPage}
           />
+          <WithLayoutRoute
+            exact
+            path="/movie/booking/:id/payment"
+            layout={PublicLayout}
+            component={BookingPage}
+          />
           <ProtectedRoute
             exact
             path="/admin/dashboard"

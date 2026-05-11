@@ -20,5 +20,20 @@ export default theme => ({
     color: theme.palette.common.black,
     padding: '15px',
     whiteSpace: 'normal'
+  },
+  formatBadge: {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    background: 'rgba(0, 0, 0, 0.75)',
+    color: '#fff',
+    fontSize: '0.7rem',
+    fontWeight: 800,
+    padding: '3px 10px',
+    borderRadius: '4px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    zIndex: 3,
+    border: '1px solid rgba(255,255,255,0.2)',
   }
 });

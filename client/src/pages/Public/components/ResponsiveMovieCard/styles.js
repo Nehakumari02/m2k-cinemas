@@ -111,5 +111,21 @@ export default theme => ({
       zIndex: 2,
       borderRadius: 10
     }
+  },
+  formatBadge: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+    background: 'rgba(0, 0, 0, 0.75)',
+    color: '#fff',
+    fontSize: '0.75rem',
+    fontWeight: 800,
+    padding: '4px 12px',
+    borderRadius: '4px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    zIndex: 10,
+    border: '1px solid rgba(255,255,255,0.2)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
   }
 });

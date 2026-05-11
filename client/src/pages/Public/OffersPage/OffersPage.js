@@ -72,26 +72,50 @@ function OffersPage({ offers: storeOffers, getOffers }) {
 
       <div className={classes.grid}>
         {offers.map(offer => (
-          <div 
-            key={offer.id} 
-            className={classes.card}
-            onClick={() => handleOfferClick(offer)}
-          >
-            <img
-              className={classes.cardImage}
-              src={normalizeImage(offer.image)}
-              alt={offer.title}
-            />
-            <div className={classes.cardBody}>
-              <span className={classes.codeBadge}>{offer.code}</span>
-              <Typography className={classes.cardTitle}>{offer.title}</Typography>
-              <Typography className={classes.cardDesc}>{offer.description}</Typography>
-              <div className={classes.cardFooter}>
-                <span className={classes.validTill}>
-                  Valid till: <span>{offer.validTill}</span>
-                </span>
-                <Button className={classes.viewBtn} size="small">
-                  View Offer
+          <div key={offer.id} className={classes.cardContainer}>
+            <div className={classes.cardInner}>
+              {/* Front Face */}
+              <div className={classes.cardFront}>
+                <img
+                  className={classes.cardImage}
+                  src={normalizeImage(offer.image)}
+                  alt={offer.title}
+                />
+                <div className={classes.cardBody}>
+                  <span className={classes.codeBadge}>{offer.code}</span>
+                  <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                  <div className={classes.cardFooter}>
+                    <span className={classes.validTill}>
+                      Valid till: <span>{offer.validTill}</span>
+                    </span>
+                    <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700 }}>
+                      Hover to Reveal
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+
+              {/* Back Face */}
+              <div className={classes.cardBack} onClick={() => handleOfferClick(offer)}>
+                <div className={classes.dialogCodeBox} style={{
+                  width: '100%',
+                  marginBottom: '16px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px dashed rgba(255,255,255,0.2)'
+                }}>
+                  <Typography className={classes.dialogCodeLabel} style={{ color: 'rgba(255,255,255,0.5)' }}>Promo Code</Typography>
+                  <Typography className={classes.dialogCodeValue} style={{ fontSize: '1.2rem', color: '#fff' }}>
+                    {offer.code}
+                  </Typography>
+                </div>
+                <Typography variant="h6" style={{ fontWeight: 800, color: '#fff', marginBottom: '8px' }}>
+                  {offer.title}
+                </Typography>
+                <Typography variant="body2" style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '16px' }}>
+                  {offer.description}
+                </Typography>
+                <Button className={classes.viewBtn} fullWidth style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
+                  View Full Details
                 </Button>
               </div>
             </div>
@@ -117,7 +141,7 @@ function OffersPage({ offers: storeOffers, getOffers }) {
             <DialogContent className={classes.dialogContent}>
               <Typography className={classes.dialogTitle}>{selectedOffer.title}</Typography>
               <Typography className={classes.dialogDesc}>{selectedOffer.description}</Typography>
-              
+
               <div className={classes.dialogCodeBox}>
                 <Typography className={classes.dialogCodeLabel}>Use Promo Code</Typography>
                 <Typography className={classes.dialogCodeValue}>{selectedOffer.code}</Typography>

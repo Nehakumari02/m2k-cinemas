@@ -48,6 +48,9 @@ const MovieCard = props => {
               {isWishlisted ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </IconButton>
           </div>
+          {movie.format && (
+            <span className={classes.formatBadge}>{movie.format}</span>
+          )}
           <Typography className={classes.h4} variant="h4" color="inherit">
             {movie.genre}
           </Typography>

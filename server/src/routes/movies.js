@@ -176,7 +176,6 @@ router.get('/movies/:id', async (req, res) => {
 // Update movie by id
 router.put('/movies/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;
-  const updates = Object.keys(req.body);
   const allowedUpdates = [
     'title',
     'image',
@@ -188,23 +187,32 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'cast',
     'description',
     'synopsis',
+    'contentWarning',
     'duration',
     'rating',
     'releaseDate',
     'endDate',
     'isPublished',
+    'format',
   ];
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+  const sanitizedBody = Object.keys(req.body || {}).reduce((acc, key) => {
+    if (allowedUpdates.includes(key)) {
+      acc[key] = req.body[key];
+    }
+    return acc;
+  }, {});
+  const updates = Object.keys(sanitizedBody);
 
-  if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
+  if (!updates.length) return res.status(400).send({ error: 'Invalid updates!' });
 
   try {
     const movie = await Movie.findById(_id);
-    updates.forEach((update) => (movie[update] = req.body[update]));
+    if (!movie) return res.sendStatus(404);
+    updates.forEach((update) => (movie[update] = sanitizedBody[update]));
     if (updates.includes('backdropImages')) movie.markModified('backdropImages');
     if (updates.includes('castCrew')) movie.markModified('castCrew');
     await movie.save();
-    return !movie ? res.sendStatus(404) : res.send(movie);
+    return res.send(movie);
   } catch (e) {
     return res.status(400).send(e);
   }

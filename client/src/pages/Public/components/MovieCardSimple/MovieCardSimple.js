@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import IconButton from '@material-ui/core/IconButton';
+import StarIcon from '@material-ui/icons/Star';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
 import { normalizeImage } from '../../../../utils/imageUrl';
+import { ContentWarningModal } from '../../../../components';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -31,10 +33,6 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       transform: 'translateY(-6px)',
       boxShadow: '0 20px 40px rgba(15,23,42,0.2)',
-    },
-    '&:hover $bookOverlay': {
-      opacity: 1,
-      transform: 'translateY(0)',
     },
   },
   mediaWrapper: {
@@ -67,6 +65,22 @@ const useStyles = makeStyles(theme => ({
     letterSpacing: '0.05em',
     zIndex: 3,
   },
+  formatBadge: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'rgba(0, 0, 0, 0.75)',
+    color: '#fff',
+    fontSize: '0.65rem',
+    fontWeight: 800,
+    padding: '2px 8px',
+    borderRadius: '4px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    zIndex: 3,
+    border: '1px solid rgba(255,255,255,0.2)',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+  },
   wishlistBtn: {
     position: 'absolute',
     top: '5px',
@@ -79,20 +93,10 @@ const useStyles = makeStyles(theme => ({
     zIndex: 5,
   },
   bookOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    background: 'linear-gradient(to top, rgba(0,0,0,0.92) 60%, transparent)',
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
-    padding: '20px 12px 14px',
-    opacity: 0,
-    transform: 'translateY(8px)',
-    transition: 'opacity 0.25s ease, transform 0.25s ease',
-    zIndex: 4,
-    pointerEvents: 'none',
+    marginTop: '10px',
   },
   bookBtn: {
     background: 'linear-gradient(90deg, #b72429, #8b1c20)',
@@ -126,15 +130,64 @@ const useStyles = makeStyles(theme => ({
   cardContent: {
     padding: '10px 12px 12px',
     backgroundColor: '#ffffff',
+  },
+  detailsRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    marginBottom: '6px',
+  },
+  detailsLeft: {
+    color: '#475569',
+    fontSize: '0.73rem',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+  },
+  ratingPill: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '3px',
+    background: '#fef3c7',
+    color: '#92400e',
+    borderRadius: 999,
+    padding: '2px 7px',
+    fontSize: '0.7rem',
+    fontWeight: 800,
+  },
+  [theme.breakpoints.down('sm')]: {
+    card: {
+      width: 168,
+    },
+    cardContent: {
+      padding: '8px 9px 10px',
+    },
+    detailsLeft: {
+      fontSize: '0.62rem',
+    },
+    ratingPill: {
+      fontSize: '0.62rem',
+      padding: '1px 6px',
+    },
+    h5: {
+      fontSize: '0.82rem',
+    },
+    bookBtn: {
+      fontSize: '0.68rem',
+      padding: '7px 0',
+    },
   }
 }));
 
 const MovieCardSimple = props => {
   const classes = useStyles();
+  const history = useHistory();
   const dispatch = useDispatch();
   const wishlist = useSelector(state => state.wishlistState?.wishlist || []);
   const user = useSelector(state => state.authState?.user);
   const { movie } = props;
+  const [showWarning, setShowWarning] = useState(false);
   
   const isWishlisted = wishlist.some(w => (w._id || w) === movie._id);
 
@@ -154,26 +207,53 @@ const MovieCardSimple = props => {
   };
 
   const imageUrl = normalizeImage(movie.image);
+  const onBookTickets = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (movie.contentWarning) {
+      setShowWarning(true);
+    } else {
+      history.push(`/movie/booking/${movie._id}`);
+    }
+  };
+
+  const onCardClick = () => {
+    history.push(`/movie/${movie._id}`);
+  };
+
+  const handleContinue = () => {
+    setShowWarning(false);
+    history.push(`/movie/booking/${movie._id}`);
+  };
 
   return (
-    <Link to={`/movie/${movie._id}`} className={classes.link} style={{ textDecoration: 'none' }}>
+    <div className={classes.link}>
       <Card className={classes.card}>
-        <CardActionArea component="div">
+        <CardActionArea component="div" onClick={onCardClick}>
           <div className={classes.mediaWrapper}>
             <img className={classes.mediaImage} src={imageUrl} alt={movie.title} />
             {movie.language && (
               <span className={classes.langBadge}>{movie.language}</span>
             )}
-            <IconButton className={classes.wishlistBtn} onClick={handleWishlistToggle} size="small">
+            {movie.format && (
+              <span className={classes.formatBadge}>{movie.format}</span>
+            )}
+            <IconButton className={classes.wishlistBtn} onClick={handleWishlistToggle} size="small" style={{ top: '38px' }}>
               {isWishlisted ? <FavoriteIcon style={{ color: '#ff4d4d' }} /> : <FavoriteBorderIcon />}
             </IconButton>
-            <div className={classes.bookOverlay}>
-              <button className={classes.bookBtn}>Book Tickets</button>
-            </div>
           </div>
           <CardContent className={classes.cardContent}>
+            <div className={classes.detailsRow}>
+              <Typography className={classes.detailsLeft} variant="caption" color="inherit">
+                {(movie.language || 'LANG').toUpperCase()} • {movie.duration || '--'} MIN
+              </Typography>
+              <span className={classes.ratingPill}>
+                <StarIcon style={{ fontSize: '0.8rem' }} />
+                {movie.rating || '4.0'}
+              </span>
+            </div>
             <Typography className={classes.meta} variant="caption" color="inherit">
-              {movie.duration} min{movie.genre ? ` • ${movie.genre.split(',')[0].trim()}` : ''}
+              {movie.genre ? movie.genre.split(',').slice(0, 2).join(' • ') : 'Drama • Action'}
             </Typography>
             <Typography
               className={classes.h5}
@@ -183,10 +263,21 @@ const MovieCardSimple = props => {
               color="inherit">
               {movie.title}
             </Typography>
+            <div className={classes.bookOverlay}>
+              <button className={classes.bookBtn} onClick={onBookTickets}>
+                Book Tickets
+              </button>
+            </div>
           </CardContent>
         </CardActionArea>
       </Card>
-    </Link>
+      <ContentWarningModal
+        open={showWarning}
+        handleClose={() => setShowWarning(false)}
+        handleContinue={handleContinue}
+        movie={movie}
+      />
+    </div>
   );
 };
 

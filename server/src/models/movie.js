@@ -69,6 +69,11 @@ const movieSchema = new Schema({
     trim: true,
     lowercase: true,
   },
+  contentWarning: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   duration: {
     type: Number,
     required: true,
@@ -89,6 +94,12 @@ const movieSchema = new Schema({
   isPublished: {
     type: Boolean,
     default: true,
+  },
+  format: {
+    type: String,
+    required: false,
+    trim: true,
+    default: '2D',
   },
 });
 

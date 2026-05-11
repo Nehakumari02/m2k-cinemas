@@ -8,6 +8,11 @@ import { getOffers } from '../../../../store/actions';
 import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
+  '@keyframes pulse': {
+    '0%': { boxShadow: '0 0 0 0 rgba(183,36,41,0.4)' },
+    '70%': { boxShadow: '0 0 0 10px rgba(183,36,41,0)' },
+    '100%': { boxShadow: '0 0 0 0 rgba(183,36,41,0)' },
+  },
   section: {
     padding: theme.spacing(6, 0, 8),
     background: '#f8fafc',
@@ -79,21 +84,59 @@ const useStyles = makeStyles(theme => ({
     transition: 'transform 0.4s cubic-bezier(0.25,0.8,0.25,1)',
     willChange: 'transform',
   },
-  card: {
+  cardInner: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+    transformStyle: 'preserve-3d',
+    cursor: 'pointer',
+  },
+  cardContainer: {
     minWidth: '320px',
     maxWidth: '320px',
+    height: '340px',
+    perspective: '1000px',
+    flexShrink: 0,
+    '&:hover $cardInner': {
+      transform: 'rotateY(180deg)',
+    },
+  },
+  cardFront: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backfaceVisibility: 'hidden',
     borderRadius: '14px',
     overflow: 'hidden',
     background: '#ffffff',
     border: '1px solid rgba(15,23,42,0.08)',
-    flexShrink: 0,
-    transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
-    cursor: 'pointer',
-    '&:hover': {
-      transform: 'translateY(-4px)',
-      borderColor: 'rgba(183,36,41,0.25)',
-      boxShadow: '0 12px 30px rgba(15,23,42,0.12)',
-    },
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 4px 12px rgba(15,23,42,0.05)',
+    animation: '$pulse 3s infinite',
+  },
+  cardBack: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backfaceVisibility: 'hidden',
+    borderRadius: '14px',
+    overflow: 'hidden',
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    border: '1px solid #d9e2ef',
+    borderTop: '4px solid #b72429',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing(3),
+    transform: 'rotateY(180deg)',
+    boxShadow: '0 12px 30px rgba(15,23,42,0.14)',
+    textAlign: 'center',
+  },
+  card: {
+    display: 'none', // deprecated by new structure but kept to avoid breakage if referenced elsewhere
   },
   cardImage: {
     width: '100%',
@@ -325,26 +368,52 @@ function OffersSection({ offers: storeOffers, getOffers }) {
             className={classes.track}
             style={{ transform: `translateX(-${scrollPos}px)` }}>
             {offers.map(offer => (
-              <div
-                key={offer._id}
-                className={classes.card}
-                onClick={() => setSelectedOffer(offer)}
-              >
-                <img
-                  className={classes.cardImage}
-                  src={getOfferImage(offer)}
-                  alt={offer.title}
-                />
-                <div className={classes.cardBody}>
-                  <span className={classes.codeBadge}>{offer.code}</span>
-                  <Typography className={classes.cardTitle}>{offer.title}</Typography>
-                  <Typography className={classes.cardDesc}>{offer.description}</Typography>
-                  <div className={classes.cardFooter}>
-                    <span className={classes.validTill}>
-                      Valid till: <span>{new Date(offer.validTill).toLocaleDateString()}</span>
-                    </span>
-                    <Button className={classes.viewBtn} size="small">
-                      View
+              <div key={offer._id} className={classes.cardContainer}>
+                <div className={classes.cardInner}>
+                  {/* Front Face */}
+                  <div className={classes.cardFront}>
+                    <img
+                      className={classes.cardImage}
+                      src={getOfferImage(offer)}
+                      alt={offer.title}
+                    />
+                    <div className={classes.cardBody}>
+                      <span className={classes.codeBadge}>{offer.code}</span>
+                      <Typography className={classes.cardTitle}>{offer.title}</Typography>
+                      <div className={classes.cardFooter}>
+                        <span className={classes.validTill}>
+                          Valid till: <span>{new Date(offer.validTill).toLocaleDateString()}</span>
+                        </span>
+                        <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700 }}>
+                          Hover to Reveal
+                        </Typography>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Back Face */}
+                  <div
+                    className={classes.cardBack}
+                    onClick={() => setSelectedOffer(offer)}>
+                    <div className={classes.dialogCodeBox} style={{
+                      width: '100%',
+                      marginBottom: '16px',
+                      background: 'rgba(183,36,41,0.06)',
+                      border: '1px dashed rgba(183,36,41,0.35)'
+                    }}>
+                      <Typography className={classes.dialogCodeLabel} style={{ color: '#64748b' }}>Promo Code</Typography>
+                      <Typography className={classes.dialogCodeValue} style={{ fontSize: '1.2rem', color: '#b72429' }}>
+                        {offer.code}
+                      </Typography>
+                    </div>
+                    <Typography variant="h6" style={{ fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
+                      {offer.title}
+                    </Typography>
+                    <Typography variant="body2" style={{ color: '#475569', marginBottom: '16px' }}>
+                      {offer.description}
+                    </Typography>
+                    <Button className={classes.viewBtn} fullWidth style={{ color: '#b72429', borderColor: 'rgba(183,36,41,0.4)' }}>
+                      View Full Details
                     </Button>
                   </div>
                 </div>
@@ -372,7 +441,7 @@ function OffersSection({ offers: storeOffers, getOffers }) {
             <DialogContent className={classes.dialogContent}>
               <Typography className={classes.dialogTitle}>{selectedOffer.title}</Typography>
               <Typography className={classes.dialogDesc}>{selectedOffer.description}</Typography>
-              
+
               <div className={classes.dialogCodeBox}>
                 <Typography className={classes.dialogCodeLabel}>Use Promo Code</Typography>
                 <Typography className={classes.dialogCodeValue}>{selectedOffer.code}</Typography>

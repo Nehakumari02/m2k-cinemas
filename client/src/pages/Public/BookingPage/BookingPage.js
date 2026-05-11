@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Grid, Container, Typography } from '@material-ui/core';
+import {
+  withStyles,
+  Grid,
+  Container,
+  Typography,
+  Button,
+  Paper,
+  Chip,
+  Box
+} from '@material-ui/core';
+import { Rating } from '@material-ui/lab';
+import { Star as StarIcon } from '@material-ui/icons';
 import {
   getMovie,
   getCinemasUserModeling,
@@ -46,6 +57,8 @@ class BookingPage extends Component {
   isValidObjectId = value => /^[a-f\d]{24}$/i.test(String(value || ''));
   state = {
     showFoodStep: false,
+    reviews: [],
+    loadingReviews: true,
     paymentMethod: '',
     paymentDetails: {
       cardNumber: '',
@@ -76,6 +89,7 @@ class BookingPage extends Component {
       getWalletData
     } = this.props;
     getMovie(match.params.id);
+    this.fetchReviews(match.params.id);
     user ? getCinemasUserModeling(user.username) : getCinemas();
     getShowtimes();
     getReservations();
@@ -85,6 +99,20 @@ class BookingPage extends Component {
       getWalletData();
     }
   }
+
+  fetchReviews = async movieId => {
+    try {
+      const response = await fetch(`/movies/${movieId}/reviews`);
+      if (response.ok) {
+        const data = await response.json();
+        this.setState({ reviews: data || [], loadingReviews: false });
+      } else {
+        this.setState({ reviews: [], loadingReviews: false });
+      }
+    } catch (e) {
+      this.setState({ reviews: [], loadingReviews: false });
+    }
+  };
 
   componentDidUpdate(prevProps) {
     const {
@@ -96,12 +124,20 @@ class BookingPage extends Component {
       setSelectedTime
     } = this.props;
     const hasValidCinemaId = this.isValidObjectId(selectedCinema);
-    const wasSeatsStep = prevProps.location.pathname.endsWith('/seats');
-    const isSeatsStep = location.pathname.endsWith('/seats');
+    const prevMovieId = prevProps.movie && prevProps.movie._id;
+    const movieId = this.props.movie && this.props.movie._id;
+    const warningText = this.props.movie && this.props.movie.contentWarning;
+
+    const wasDetailStep =
+      prevProps.location.pathname.endsWith('/seats') ||
+      prevProps.location.pathname.endsWith('/payment');
+    const isDetailStep =
+      location.pathname.endsWith('/seats') ||
+      location.pathname.endsWith('/payment');
 
     // When user returns from seats to listing, clear sticky cinema/time filters
     // so all available cinemas are visible again by default.
-    if (wasSeatsStep && !isSeatsStep) {
+    if (wasDetailStep && !isDetailStep) {
       setSelectedCinema('');
       setSelectedTime('');
       return;
@@ -473,8 +509,7 @@ class BookingPage extends Component {
 
   onToggleFoodStep = async () => {
     const { 
-      showFoodStep, 
-      timeLeft 
+      showFoodStep
     } = this.state;
     const { 
       selectedSeats, 
@@ -491,7 +526,9 @@ class BookingPage extends Component {
       cancelPendingReservation
     } = this.props;
 
-    if (!showFoodStep) {
+    const isPaymentStep = this.props.location.pathname.endsWith('/payment');
+
+    if (!showFoodStep && !isPaymentStep) {
       // Moving TO payment step
       if (selectedSeats.length === 0) return;
       if (!isAuth) return toggleLoginPopup();
@@ -514,6 +551,7 @@ class BookingPage extends Component {
         setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
         this.startTimer();
         this.setState({ showFoodStep: true });
+        this.props.history.push(`/movie/booking/${this.props.match.params.id}/payment`);
       }
     } else {
       // Moving BACK to seats
@@ -523,6 +561,7 @@ class BookingPage extends Component {
       }
       this.stopTimer();
       this.setState({ showFoodStep: false });
+      this.props.history.push(`/movie/booking/${this.props.match.params.id}/seats`);
     }
   };
 
@@ -787,12 +826,17 @@ class BookingPage extends Component {
       resetCheckout,
       suggestedSeats,
       suggestedSeat,
-      match,
       location,
-      walletBalance
     } = this.props;
     const isSeatsStep = location.pathname.endsWith('/seats');
-    const { paymentMethod, paymentDetails } = this.state;
+    const isPaymentStep = location.pathname.endsWith('/payment');
+    const {
+      paymentMethod,
+      paymentDetails,
+      reviews,
+      loadingReviews,
+      contentWarningOpen
+    } = this.state;
     const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
     const castMembers = castCrew.filter(
       member => String(member.role || '').toLowerCase() === 'cast'
@@ -815,10 +859,47 @@ class BookingPage extends Component {
 
     return (
       <Container maxWidth="xl" className={classes.container}>
+        <div className={classes.pageHeader}>
+          <div>
+            <Typography variant="overline" className={classes.pageEyebrow}>
+              M-TICKET BOOKING
+            </Typography>
+            <Typography variant="h4" className={classes.pageTitle}>
+              {movie && movie.title ? movie.title : 'Book Movie Tickets'}
+            </Typography>
+            <Typography variant="body2" className={classes.pageSubtitle}>
+              {isSeatsStep
+                ? 'Choose your preferred seats.'
+                : isPaymentStep
+                ? 'Add food combos and complete payment.'
+                : 'Select your preferred cinema and showtime.'}
+            </Typography>
+          </div>
+          <div className={classes.stepPills}>
+            <span
+              className={`${classes.stepPill} ${
+                !isSeatsStep && !isPaymentStep ? classes.stepPillActive : ''
+              }`}>
+              1. Showtime
+            </span>
+            <span
+              className={`${classes.stepPill} ${
+                isSeatsStep ? classes.stepPillActive : ''
+              }`}>
+              2. Seats
+            </span>
+            <span
+              className={`${classes.stepPill} ${
+                isPaymentStep ? classes.stepPillActive : ''
+              }`}>
+              3. Food & Pay
+            </span>
+          </div>
+        </div>
         <Grid container spacing={2} style={{ height: '100%' }}>
           <MovieInfo movie={movie} />
           <Grid item lg={9} xs={12} md={12}>
-            {!isSeatsStep && (
+            {!isSeatsStep && !isPaymentStep && (
               <BookingForm
                 cinemas={uniqueCinemas}
                 times={uniqueTimes}
@@ -834,6 +915,7 @@ class BookingPage extends Component {
             )}
 
             {!isSeatsStep &&
+              !isPaymentStep &&
               (selectedCinema || selectedDate || selectedTime) &&
               (castMembers.length || crewMembers.length || backdropImages.length) && (
                 <div className={classes.mediaSection}>
@@ -923,6 +1005,74 @@ class BookingPage extends Component {
                   )}
                 </div>
               )}
+            {!isSeatsStep && !isPaymentStep && (
+              <div className={classes.mediaSection}>
+                <Typography variant="h5" className={classes.sectionTitle}>
+                  User Reviews ({reviews.length})
+                </Typography>
+                {loadingReviews ? (
+                  <Typography variant="body2" style={{ color: '#64748b' }}>
+                    Loading reviews...
+                  </Typography>
+                ) : reviews.length ? (
+                  reviews
+                    .sort((a, b) => (b.isHighlighted ? 1 : 0) - (a.isHighlighted ? 1 : 0))
+                    .slice(0, 6)
+                    .map((rev, idx) => (
+                      <Paper
+                        key={`${rev._id || idx}`}
+                        elevation={0}
+                        style={{
+                          padding: '18px',
+                          borderRadius: 12,
+                          border: rev.isHighlighted
+                            ? '2px solid #fbbf24'
+                            : '1px solid #e2e8f0',
+                          marginBottom: 12,
+                          background: rev.isHighlighted ? '#fffef0' : '#fff'
+                        }}>
+                        {rev.isHighlighted && (
+                          <Chip
+                            size="small"
+                            icon={<StarIcon style={{ color: '#fff', fontSize: '0.8rem' }} />}
+                            label="Featured"
+                            style={{
+                              marginBottom: 8,
+                              background: '#fbbf24',
+                              color: '#fff',
+                              fontWeight: 800
+                            }}
+                          />
+                        )}
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="subtitle2" style={{ fontWeight: 700 }}>
+                            {rev.userName || 'User'}
+                          </Typography>
+                          <Rating value={Number(rev.rating) || 0} readOnly size="small" />
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          style={{ color: '#94a3b8', display: 'block', marginBottom: 8 }}>
+                          {rev.createdAt
+                            ? new Date(rev.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })
+                            : ''}
+                        </Typography>
+                        <Typography variant="body2" style={{ color: '#475569', lineHeight: 1.6 }}>
+                          {rev.comment}
+                        </Typography>
+                      </Paper>
+                    ))
+                ) : (
+                  <Typography variant="body2" style={{ color: '#64748b' }}>
+                    No reviews yet.
+                  </Typography>
+                )}
+              </div>
+            )}
             {showInvitation && !!selectedSeats.length && (
               <BookingInvitation
                 selectedSeats={selectedSeats}
@@ -936,16 +1086,26 @@ class BookingPage extends Component {
 
             {isSeatsStep && cinema && selectedCinema && selectedTime && !showInvitation && (
               <>
-                {!this.state.showFoodStep ? (
-                  <BookingSeats
-                    seats={seats}
-                    onSelectSeat={(indexRow, index) =>
-                      this.onSelectSeat(indexRow, index)
-                    }
-                  />
-                ) : (
-                  <BookingFood />
-                )}
+                <BookingSeats
+                  seats={seats}
+                  onSelectSeat={(indexRow, index) =>
+                    this.onSelectSeat(indexRow, index)
+                  }
+                />
+                <div className={classes.proceedBar}>
+                  <Button
+                    className={classes.proceedButton}
+                    disabled={!selectedSeats.length}
+                    onClick={this.onToggleFoodStep}>
+                    Continue to Food & Payment
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {isPaymentStep && cinema && selectedCinema && selectedTime && !showInvitation && (
+              <>
+                <BookingFood />
                 <BookingCheckout
                   user={user}
                   ticketPrice={cinema.ticketPrice}
@@ -954,7 +1114,7 @@ class BookingPage extends Component {
                   selectedFood={this.props.selectedFood}
                   paymentMethod={paymentMethod}
                   paymentDetails={paymentDetails}
-                  showFoodStep={this.state.showFoodStep}
+                  showFoodStep
                   onToggleFoodStep={this.onToggleFoodStep}
                   onChangePaymentMethod={this.onChangePaymentMethod}
                   onPaymentFieldChange={this.onPaymentFieldChange}

@@ -18,7 +18,7 @@ export default theme => ({
     backgroundPosition: 'center center',
     width: '100%',
     pointerEvents: 'none',
-    filter: 'brightness(0.35) saturate(1.2)',
+    filter: 'brightness(0.92) saturate(1.03)',
     '&::after': {
       content: '""',
       position: 'absolute',
@@ -26,7 +26,7 @@ export default theme => ({
       left: 0,
       right: 0,
       height: '40%',
-      background: 'linear-gradient(transparent, rgb(14,14,20))',
+      background: 'linear-gradient(transparent, rgba(14,14,20,0.25))',
     },
   },
   infoSection: {
@@ -37,7 +37,8 @@ export default theme => ({
     width: '100%',
     height: '100%',
     zIndex: 2,
-    background: 'linear-gradient(to right, rgba(14,14,20,0.95) 0%, rgba(14,14,20,0.6) 50%, transparent 100%)',
+    background:
+      'linear-gradient(to right, rgba(14,14,20,0.36) 0%, rgba(14,14,20,0.18) 45%, transparent 100%)',
   },
   posterWrapper: {
     position: 'absolute',
@@ -67,6 +68,9 @@ export default theme => ({
     position: 'relative',
     padding: theme.spacing(0, 4, 10, 6),
     maxWidth: '55%',
+    background: 'rgba(9,16,28,0.22)',
+    borderRadius: 14,
+    backdropFilter: 'blur(2px)',
   },
   tag: {
     padding: '4px 16px',
@@ -87,10 +91,10 @@ export default theme => ({
     textTransform: 'capitalize',
     letterSpacing: '-0.01em',
     marginBottom: theme.spacing(1),
-    textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+    textShadow: '0 4px 24px rgba(0,0,0,0.72)',
   },
   director: {
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.78)',
     fontWeight: 500,
     fontSize: '0.9rem',
     marginTop: theme.spacing(0.5),
@@ -106,21 +110,21 @@ export default theme => ({
     marginTop: theme.spacing(1.5),
     padding: '6px 16px',
     borderRadius: '8px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    background: 'rgba(9,16,28,0.42)',
     fontSize: '0.82rem',
     fontWeight: 600,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.95)',
   },
   genre: {
     display: 'inline-flex',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.9)',
     marginLeft: theme.spacing(1.5),
     fontSize: '0.82rem',
     fontWeight: 500,
   },
   descriptionText: {
-    color: 'rgba(255,255,255,0.6)',
+    color: 'rgba(255,255,255,0.9)',
     padding: theme.spacing(1.5, 0),
     fontSize: '0.92rem',
     lineHeight: 1.7,
@@ -185,7 +189,7 @@ export default theme => ({
 
   [theme.breakpoints.down('sm')]: {
     infoSection: {
-      background: 'linear-gradient(to top, rgba(14,14,20,1) 30%, rgba(14,14,20,0.5) 100%)',
+      background: 'linear-gradient(to top, rgba(14,14,20,0.58) 30%, rgba(14,14,20,0.34) 100%)',
       width: '100%',
       alignItems: 'flex-end',
     },

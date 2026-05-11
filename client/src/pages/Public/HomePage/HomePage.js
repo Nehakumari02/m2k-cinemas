@@ -123,42 +123,50 @@ class HomePage extends Component {
         </div>
 
         {/* ── Now Showing ── */}
-        <div id="nowShowing" className={classes.sectionWrapper}>
-          <MovieCarousel
-            carouselClass={classes.carousel}
-            title="Now Showing"
-            to="/movie/category/nowShowing"
-            movies={nowShowing}
-          />
-        </div>
+        {!!(nowShowing && nowShowing.length) && (
+          <div id="nowShowing" className={classes.sectionWrapper}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="Now Showing"
+              to="/movie/category/nowShowing"
+              movies={nowShowing}
+            />
+          </div>
+        )}
 
         {/* ── Coming Soon ── */}
-        <div id="comingSoon" className={classes.sectionWrapper}>
-          <MovieCarousel
-            carouselClass={classes.carousel}
-            title="Coming Soon"
-            to="/movie/category/comingSoon"
-            movies={comingSoon}
-          />
-        </div>
+        {!!(comingSoon && comingSoon.length) && (
+          <div id="comingSoon" className={classes.sectionWrapper}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="Coming Soon"
+              to="/movie/category/comingSoon"
+              movies={comingSoon}
+            />
+          </div>
+        )}
 
         {/* ── Suggested ── */}
-        <div id="suggested" className={classes.sectionWrapper}>
-          <MovieCarousel
-            carouselClass={classes.carousel}
-            title="Suggested for You"
-            movies={suggested}
-          />
-        </div>
+        {!!(suggested && suggested.length) && (
+          <div id="suggested" className={classes.sectionWrapper}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="Suggested for You"
+              movies={suggested}
+            />
+          </div>
+        )}
 
         {/* ── All Movies ── */}
-        <div id="allMovies" className={classes.sectionWrapper}>
-          <MovieCarousel
-            carouselClass={classes.carousel}
-            title="All Movies"
-            movies={movies}
-          />
-        </div>
+        {!!(movies && movies.length) && (
+          <div id="allMovies" className={classes.sectionWrapper}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="All Movies"
+              movies={movies}
+            />
+          </div>
+        )}
 
         {/* ── PVR Experiences ── */}
         <ExperiencesSection />

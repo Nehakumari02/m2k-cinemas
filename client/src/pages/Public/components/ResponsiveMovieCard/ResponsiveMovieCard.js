@@ -39,6 +39,9 @@ const MovieCard = props => {
     <Link to={`/movie/${movie._id}`} style={{ textDecoration: 'none' }}>
       <Paper className={classes.movieCard} elevation={20}>
         <div className={classes.infoSection}>
+          {movie.format && (
+            <span className={classes.formatBadge}>{movie.format}</span>
+          )}
           <header className={classes.movieHeader}>
             <Typography
               className={classes.movieTitle}

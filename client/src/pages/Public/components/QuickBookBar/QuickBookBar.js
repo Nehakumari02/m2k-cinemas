@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
+import { ContentWarningModal } from '../../../../components';
 
 const useStyles = makeStyles(theme => ({
   bar: {
@@ -102,6 +103,7 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedRating, setSelectedRating] = useState('');
+  const [warningMovie, setWarningMovie] = useState(null);
 
   const today = new Date();
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -131,13 +133,27 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
   });
 
   const handleBook = () => {
-    if (selectedMovie) {
-      history.push(`/movie/${selectedMovie}`);
-    } else if (filteredMovies.length === 1) {
-      history.push(`/movie/${filteredMovies[0]._id}`);
+    const movieToBook = selectedMovie 
+      ? movies.find(m => m._id === selectedMovie)
+      : filteredMovies.length === 1 
+        ? filteredMovies[0] 
+        : null;
+
+    if (movieToBook) {
+      if (movieToBook.contentWarning) {
+        setWarningMovie(movieToBook);
+      } else {
+        history.push(`/movie/booking/${movieToBook._id}`);
+      }
     } else {
       history.push('/movie/category/nowShowing');
     }
+  };
+
+  const handleContinue = () => {
+    const id = warningMovie._id;
+    setWarningMovie(null);
+    history.push(`/movie/booking/${id}`);
   };
 
   return (
@@ -219,6 +235,12 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
       <button className={classes.bookBtn} onClick={handleBook}>
         Search
       </button>
+      <ContentWarningModal
+        open={!!warningMovie}
+        handleClose={() => setWarningMovie(null)}
+        handleContinue={handleContinue}
+        movie={warningMovie}
+      />
     </div>
   );
 }

@@ -59,8 +59,8 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
       {
         breakpoint: 750,
         settings: {
-          slidesToShow: 1,
-          infinite: movies.length > 1
+          slidesToShow: Math.min(2, movies.length),
+          infinite: movies.length > 2
         }
       }
     ]
