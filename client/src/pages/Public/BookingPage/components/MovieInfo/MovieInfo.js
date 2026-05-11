@@ -3,6 +3,65 @@ import { makeStyles } from '@material-ui/styles';
 import { Grid, Typography } from '@material-ui/core';
 import { normalizeImage } from '../../../../../utils/imageUrl';
 
+function ordinalSuffix(day) {
+  if (day >= 11 && day <= 13) return 'th';
+  switch (day % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+
+/** e.g. 150 -> "2h 30m" */
+function formatRuntimeMinutes(totalMins) {
+  if (totalMins == null || totalMins === '') return '';
+  const n = Number(totalMins);
+  if (!Number.isFinite(n) || n <= 0) return '';
+  const h = Math.floor(n / 60);
+  const m = Math.round(n % 60);
+  const parts = [];
+  if (h) parts.push(`${h}h`);
+  if (m) parts.push(`${m}m`);
+  return parts.join(' ') || `${n}m`;
+}
+
+/** e.g. 8th May 2026 */
+function formatReleaseDateLong(dateVal) {
+  if (!dateVal) return '';
+  const d = new Date(dateVal);
+  if (Number.isNaN(d.getTime())) return '';
+  const day = d.getDate();
+  const month = d.toLocaleString('en-GB', { month: 'long' });
+  const year = d.getFullYear();
+  return `${day}${ordinalSuffix(day)} ${month} ${year}`;
+}
+
+function titleCaseGenre(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .split(',')
+    .map(s =>
+      s
+        .trim()
+        .split(/\s+/)
+        .map(w => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''))
+        .join(' ')
+    )
+    .filter(Boolean)
+    .join(', ');
+}
+
+function displayLanguages(movie) {
+  if (movie.languages && String(movie.languages).trim()) return String(movie.languages).trim();
+  if (movie.language && String(movie.language).trim()) return titleCaseGenre(movie.language.replace(/,/g, ', '));
+  return '';
+}
+
 const useStyles = makeStyles(theme => ({
   movieInfos: {
     background: '#ffffff',
@@ -112,6 +171,14 @@ export default function MovieInfo(props) {
     );
 
   const imageUrl = normalizeImage(movie.image);
+  const runtimeStr = formatRuntimeMinutes(movie.duration);
+  const runtimeWithCert = [runtimeStr, movie.certificate && String(movie.certificate).trim()]
+    .filter(Boolean)
+    .join(' ');
+  const genreDisplay = titleCaseGenre(movie.genre);
+  const releaseDisplay = formatReleaseDateLong(movie.releaseDate);
+  const languagesDisplay = displayLanguages(movie);
+  const formatDisplay = (movie.format && String(movie.format).trim()) || '2D';
 
   return (
     <Grid item xs={12} md={12} lg={3}>
@@ -124,16 +191,16 @@ export default function MovieInfo(props) {
         />
         <Typography className={classes.title}>{movie.title}</Typography>
         <div className={classes.metaRow}>
-          {!!movie.language && (
-            <span className={classes.metaChip}>{movie.language}</span>
+          {!!languagesDisplay && (
+            <span className={classes.metaChip}>{languagesDisplay}</span>
           )}
-          {!!movie.duration && (
-            <span className={classes.metaChip}>{movie.duration} mins</span>
+          {!!runtimeWithCert && (
+            <span className={classes.metaChip}>{runtimeWithCert}</span>
           )}
-          {!!movie.genre &&
-            movie.genre
+          {!!genreDisplay &&
+            genreDisplay
               .split(',')
-              .slice(0, 2)
+              .slice(0, 3)
               .map((item, idx) => (
                 <span key={`${item}-${idx}`} className={classes.metaChip}>
                   {item.trim()}
@@ -141,16 +208,54 @@ export default function MovieInfo(props) {
               ))}
         </div>
         <div className={classes.info}>
-          {!!movie.duration && (
+          {!!runtimeWithCert && (
             <div className={classes.infoBox}>
               <Typography className={classes.infoLabel}>
                 Duration
               </Typography>
               <Typography className={classes.infoValue}>
-                {movie.duration} mins
+                {runtimeWithCert}
               </Typography>
             </div>
           )}
+          {!!genreDisplay && (
+            <div className={classes.infoBox}>
+              <Typography className={classes.infoLabel}>
+                Genre
+              </Typography>
+              <Typography className={classes.infoValue}>
+                {genreDisplay}
+              </Typography>
+            </div>
+          )}
+          {!!releaseDisplay && (
+            <div className={classes.infoBox}>
+              <Typography className={classes.infoLabel}>
+                Release Date
+              </Typography>
+              <Typography className={classes.infoValue}>
+                {releaseDisplay}
+              </Typography>
+            </div>
+          )}
+          {!!languagesDisplay && (
+            <div className={classes.infoBox}>
+              <Typography className={classes.infoLabel}>
+                Languages
+              </Typography>
+              <Typography className={classes.infoValue}>
+                {languagesDisplay}
+              </Typography>
+            </div>
+          )}
+          <div className={classes.infoBox}>
+            <Typography className={classes.infoLabel}>
+              Formats
+            </Typography>
+            <Typography className={classes.infoValue}>
+              {formatDisplay}
+            </Typography>
+          </div>
           {movie.director && (
             <div className={classes.infoBox}>
               <Typography className={classes.infoLabel}>
@@ -168,16 +273,6 @@ export default function MovieInfo(props) {
               </Typography>
               <Typography className={classes.infoValue}>
                 {movie.cast}
-              </Typography>
-            </div>
-          )}
-          {movie.genre && (
-            <div className={classes.infoBox}>
-              <Typography className={classes.infoLabel}>
-                Genre
-              </Typography>
-              <Typography className={classes.infoValue}>
-                {movie.genre}
               </Typography>
             </div>
           )}

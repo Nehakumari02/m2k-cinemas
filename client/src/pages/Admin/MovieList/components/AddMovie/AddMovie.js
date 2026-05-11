@@ -43,7 +43,9 @@ class AddMovie extends Component {
     releaseDate: new Date(),
     endDate: new Date(),
     isPublished: true,
-    format: '2D'
+    format: '2D',
+    certificate: '',
+    languages: ''
   };
 
   componentDidMount() {
@@ -63,7 +65,9 @@ class AddMovie extends Component {
         releaseDate,
         endDate,
         isPublished,
-        format
+        format,
+        certificate,
+        languages
       } = this.props.edit;
       const castMembers = Array.isArray(castCrew)
         ? castCrew.filter(item => String(item.role || '').toLowerCase() === 'cast')
@@ -87,6 +91,9 @@ class AddMovie extends Component {
         endDate,
         isPublished: isPublished !== undefined ? isPublished : true,
         format: format || '2D',
+        certificate: certificate || '',
+        languages: languages || '',
+        releaseDate: releaseDate || new Date(),
         backdropImages: Array.isArray(this.props.edit.backdropImages)
           ? this.props.edit.backdropImages
           : []
@@ -134,6 +141,8 @@ class AddMovie extends Component {
       endDate,
       isPublished,
       format,
+      certificate,
+      languages,
       image
     } = this.state;
     const castCrew = [
@@ -157,7 +166,9 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
-      format
+      format,
+      certificate,
+      languages
     };
     this.props.addMovie(image, movie, backdropFiles, [...castFiles, ...crewFiles]);
   };
@@ -183,6 +194,8 @@ class AddMovie extends Component {
       endDate,
       isPublished,
       format,
+      certificate,
+      languages,
       backdropImages,
       image
     } = this.state;
@@ -215,7 +228,9 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
-      format
+      format,
+      certificate,
+      languages
     };
     this.props.updateMovie(
       this.props.edit._id,
@@ -302,7 +317,9 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
-      format
+      format,
+      certificate,
+      languages
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
@@ -710,6 +727,33 @@ class AddMovie extends Component {
                 </MenuItem>
               ))}
             </TextField>
+            <TextField
+              className={classes.textField}
+              label="Certificate (optional)"
+              margin="dense"
+              placeholder="U, UA, A…"
+              variant="outlined"
+              value={certificate}
+              helperText="Shown after runtime (e.g. 2h 30m U)"
+              onChange={event =>
+                this.handleFieldChange('certificate', event.target.value)
+              }
+            />
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              className={classes.textField}
+              label="Languages line (optional)"
+              margin="dense"
+              variant="outlined"
+              placeholder="e.g. HindiOriginal + Hindi, Tamil"
+              value={languages}
+              helperText="Overrides the single Language field on the booking sidebar when set"
+              onChange={event =>
+                this.handleFieldChange('languages', event.target.value)
+              }
+            />
           </div>
           {/* The redundant fields were moved to the top for better organization */}
           <div className={classes.field}>

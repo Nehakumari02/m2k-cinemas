@@ -35,11 +35,13 @@ export default theme => ({
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: theme.spacing(4),
+    // Fixed 320px tracks — same card width as home OffersSection carousel
+    gridTemplateColumns: 'repeat(auto-fill, 320px)',
+    gap: theme.spacing(3),
     padding: theme.spacing(0, 4),
     maxWidth: '1400px',
     margin: '0 auto',
+    justifyContent: 'center',
   },
   cardInner: {
     position: 'relative',
@@ -51,6 +53,9 @@ export default theme => ({
     transition: 'transform 0.75s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   cardContainer: {
+    width: '320px',
+    minWidth: '320px',
+    maxWidth: '320px',
     height: '340px',
     isolation: 'isolate',
     perspective: '1100px',

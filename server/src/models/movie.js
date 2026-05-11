@@ -101,6 +101,20 @@ const movieSchema = new Schema({
     trim: true,
     default: '2D',
   },
+  /** Censor / certificate badge shown next to runtime (e.g. U, UA, A) */
+  certificate: {
+    type: String,
+    required: false,
+    trim: true,
+    default: '',
+  },
+  /** Full languages line for booking UI (e.g. "HindiOriginal + Hindi, Tamil") */
+  languages: {
+    type: String,
+    required: false,
+    trim: true,
+    default: '',
+  },
 });
 
 const Movie = mongoose.model('Movie', movieSchema);
