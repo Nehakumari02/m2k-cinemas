@@ -333,46 +333,7 @@ export default function BookingForm(props) {
         </div>
 
         <div className={classes.body}>
-          <div className={classes.filterCard}>
-            <Typography variant="body2" className={classes.filterTitle}>
-              Filters
-            </Typography>
-            <div className={classes.topFilterBar}>
-              <TextField
-                variant="outlined"
-                placeholder="Search for cinema"
-                value={search}
-                onChange={event => setSearch(event.target.value)}
-                className={classes.searchField}
-              />
-              <TextField
-                select
-                value={selectedCinema || ''}
-                label="Select Cinema"
-                variant="outlined"
-                onChange={onChangeCinema}
-                className={classes.field}
-              >
-                <MenuItem value="">All Cinemas</MenuItem>
-                {cinemas.map(cinema => (
-                  <MenuItem key={cinema._id} value={cinema._id}>
-                    {cinema.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Button
-                variant="outlined"
-                className={classes.resetButton}
-                onClick={() => {
-                  setSearch('');
-                  onChangeCinema({ target: { value: '' } });
-                  onChangeTime({ target: { value: '' } });
-                }}
-              >
-                Reset
-              </Button>
-            </div>
-          </div>
+
 
           <Typography variant="body2" className={classes.hint}>
             Select a showtime to continue booking seats.

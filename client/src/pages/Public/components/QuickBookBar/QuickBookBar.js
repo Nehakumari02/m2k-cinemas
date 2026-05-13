@@ -98,11 +98,10 @@ const useStyles = makeStyles(theme => ({
 function QuickBookBar({ movies = [], cinemas = [] }) {
   const classes = useStyles();
   const history = useHistory();
+  const [selectedCinema, setSelectedCinema] = useState('');
   const [selectedMovie, setSelectedMovie] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [selectedRating, setSelectedRating] = useState('');
   const [warningMovie, setWarningMovie] = useState(null);
 
   const today = new Date();
@@ -119,18 +118,8 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
     };
   });
 
-  // Extract unique genres and languages from movies
-  const genres = [...new Set(movies.flatMap(m => m.genre ? m.genre.split(',').map(g => g.trim()) : []))].sort();
-  const languages = [...new Set(movies.map(m => m.language).filter(Boolean))].sort();
-
-  // Filter movies based on selections
-  const filteredMovies = movies.filter(m => {
-    const genreMatch = !selectedGenre || (m.genre && m.genre.toLowerCase().includes(selectedGenre.toLowerCase()));
-    const langMatch = !selectedLanguage || (m.language && m.language.toLowerCase() === selectedLanguage.toLowerCase());
-    const ratingMatch = !selectedRating || (m.rating >= parseFloat(selectedRating));
-    // Showtime filter is simplified for this demo as we don't have full showtime integration here
-    return genreMatch && langMatch && ratingMatch;
-  });
+  // Filter movies based on selections (Cinema/Date/Time could filter movies in a real app)
+  const filteredMovies = movies;
 
   const handleBook = () => {
     const movieToBook = selectedMovie 
@@ -163,12 +152,12 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
       <div className={classes.selectWrapper}>
         <select
           className={classes.select}
-          value={selectedGenre}
-          onChange={e => setSelectedGenre(e.target.value)}
+          value={selectedCinema}
+          onChange={e => setSelectedCinema(e.target.value)}
         >
-          <option value="">Select Genre</option>
-          {genres.map(g => (
-            <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
+          <option value="">Select Cinema</option>
+          {cinemas.map(c => (
+            <option key={c._id} value={c._id}>{c.name}</option>
           ))}
         </select>
         <span className={classes.selectArrow}>▼</span>
@@ -177,12 +166,12 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
       <div className={classes.selectWrapper}>
         <select
           className={classes.select}
-          value={selectedLanguage}
-          onChange={e => setSelectedLanguage(e.target.value)}
+          value={selectedMovie}
+          onChange={e => setSelectedMovie(e.target.value)}
         >
-          <option value="">Select Language</option>
-          {languages.map(l => (
-            <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>
+          <option value="">Select Movie</option>
+          {filteredMovies.map(m => (
+            <option key={m._id} value={m._id}>{m.title}</option>
           ))}
         </select>
         <span className={classes.selectArrow}>▼</span>
@@ -191,14 +180,13 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
       <div className={classes.selectWrapper}>
         <select
           className={classes.select}
-          value={selectedRating}
-          onChange={e => setSelectedRating(e.target.value)}
+          value={selectedDate}
+          onChange={e => setSelectedDate(e.target.value)}
         >
-          <option value="">Select Rating</option>
-          <option value="9">9+ Rated</option>
-          <option value="8">8+ Rated</option>
-          <option value="7">7+ Rated</option>
-          <option value="5">5+ Rated</option>
+          <option value="">Select Date</option>
+          {dates.map(d => (
+            <option key={d.value} value={d.value}>{d.label}</option>
+          ))}
         </select>
         <span className={classes.selectArrow}>▼</span>
       </div>
@@ -214,20 +202,6 @@ function QuickBookBar({ movies = [], cinemas = [] }) {
           <option value="afternoon">Afternoon (12pm - 4pm)</option>
           <option value="evening">Evening (4pm - 8pm)</option>
           <option value="night">Night (8pm - 12am)</option>
-        </select>
-        <span className={classes.selectArrow}>▼</span>
-      </div>
-
-      <div className={classes.selectWrapper}>
-        <select
-          className={classes.select}
-          value={selectedMovie}
-          onChange={e => setSelectedMovie(e.target.value)}
-        >
-          <option value="">{filteredMovies.length ? 'Select Movie' : 'No Movies Found'}</option>
-          {filteredMovies.map(m => (
-            <option key={m._id} value={m._id}>{m.title}</option>
-          ))}
         </select>
         <span className={classes.selectArrow}>▼</span>
       </div>
