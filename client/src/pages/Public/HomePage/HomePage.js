@@ -8,10 +8,12 @@ import {
   getMovies,
   getCinemas,
   getShowtimes,
-  getMovieSuggestion
+  getMovieSuggestion,
+  getOffers
 } from '../../../store/actions';
 import MovieCarousel from '../components/MovieCarousel/MovieCarousel';
 import MovieBanner from '../components/MovieBanner/MovieBanner';
+import OfferBanner from '../components/OfferBanner/OfferBanner';
 import CinemaCard from '../components/CinemaCard/CinemaCard';
 import QuickBookBar from '../components/QuickBookBar/QuickBookBar';
 import ExperiencesSection from '../components/ExperiencesSection/ExperiencesSection';
@@ -34,11 +36,13 @@ class HomePage extends Component {
       getCinemas,
       getShowtimes,
       getMovieSuggestion,
+      getOffers,
       user
     } = this.props;
     if (!movies.length) getMovies();
     if (!cinemas.length) getCinemas();
     if (!showtimes.length) getShowtimes();
+    getOffers();
     if (user) {
       if (!suggested.length) getMovieSuggestion(user.username);
     }
@@ -65,19 +69,28 @@ class HomePage extends Component {
       randomMovie,
       comingSoon,
       nowShowing,
-      suggested
+      suggested,
+      offers
     } = this.props;
     const { activeTab } = this.state;
     const heroMovies = (nowShowing && nowShowing.length ? nowShowing : movies).slice(0, 3);
+
+    // Combine movies and top 2 offers for the banner
+    const topOffers = (offers || []).slice(0, 2);
+    const heroItems = [
+      ...heroMovies.map(movie => ({ type: 'movie', data: movie })),
+      ...topOffers.map(offer => ({ type: 'offer', data: offer }))
+    ];
+
     const heroSettings = {
       dots: true,
       arrows: false,
-      infinite: heroMovies.length > 1,
+      infinite: heroItems.length > 1,
       speed: 500,
       slidesToShow: 1,
       slidesToScroll: 1,
-      autoplay: heroMovies.length > 1,
-      autoplaySpeed: 4000,
+      autoplay: heroItems.length > 1,
+      autoplaySpeed: 5000,
       pauseOnHover: true
     };
 
@@ -93,11 +106,15 @@ class HomePage extends Component {
       <Fragment>
         {/* ── Hero Banner ── */}
         <div className={classes.heroCarousel}>
-          {heroMovies.length ? (
+          {heroItems.length ? (
             <Slider {...heroSettings}>
-              {heroMovies.map(movie => (
-                <div key={movie._id}>
-                  <MovieBanner movie={movie} height="68vh" />
+              {heroItems.map((item, idx) => (
+                <div key={item.data._id || idx}>
+                  {item.type === 'movie' ? (
+                    <MovieBanner movie={item.data} height="68vh" />
+                  ) : (
+                    <OfferBanner offer={item.data} height="68vh" />
+                  )}
                 </div>
               ))}
             </Slider>
@@ -208,7 +225,7 @@ HomePage.propTypes = {
   latestMovies: PropTypes.array.isRequired
 };
 
-const mapStateToProps = ({ movieState, cinemaState, showtimeState, authState }) => ({
+const mapStateToProps = ({ movieState, cinemaState, showtimeState, authState, offerState }) => ({
   movies: movieState.movies,
   cinemas: cinemaState.cinemas,
   randomMovie: movieState.randomMovie,
@@ -217,10 +234,11 @@ const mapStateToProps = ({ movieState, cinemaState, showtimeState, authState }) 
   nowShowing: movieState.nowShowing,
   showtimes: showtimeState.showtimes,
   suggested: movieState.suggested,
+  offers: offerState.offers,
   user: authState.user
 });
 
-const mapDispatchToProps = { getMovies, getCinemas, getShowtimes, getMovieSuggestion };
+const mapDispatchToProps = { getMovies, getCinemas, getShowtimes, getMovieSuggestion, getOffers };
 
 export default connect(
   mapStateToProps,
