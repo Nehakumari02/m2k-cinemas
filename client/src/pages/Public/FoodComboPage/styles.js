@@ -5,16 +5,39 @@ export default (theme) => ({
     paddingBottom: theme.spacing(10)
   },
   hero: {
-    background: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&q=80&w=1500")',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '400px',
+    position: 'relative',
+    height: '500px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     textAlign: 'center',
     color: '#fff',
-    marginBottom: theme.spacing(6)
+    marginBottom: theme.spacing(6),
+    overflow: 'hidden'
+  },
+  videoBackground: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 0
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    zIndex: 1
+  },
+  heroContent: {
+    position: 'relative',
+    zIndex: 2,
+    width: '100%'
   },
   heroTitle: {
     fontWeight: 900,

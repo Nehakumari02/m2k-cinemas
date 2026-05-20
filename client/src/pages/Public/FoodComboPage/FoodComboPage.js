@@ -43,14 +43,26 @@ const FoodComboPage = ({ setAlert, getFood, foodState }) => {
   return (
     <div className={classes.root}>
       <div className={classes.hero}>
-        <Container maxWidth="md">
-          <Typography variant="h1" className={classes.heroTitle}>
-            Deliciously <span>Unmissable</span>
-          </Typography>
-          <Typography variant="h5" className={classes.heroSubtitle}>
-            Grab your favorites and elevate your movie experience
-          </Typography>
-        </Container>
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className={classes.videoBackground}
+        >
+          <source src="/videos/food-banner.mp4" type="video/mp4" />
+        </video>
+        <div className={classes.heroOverlay} />
+        <div className={classes.heroContent}>
+          <Container maxWidth="md">
+            <Typography variant="h1" className={classes.heroTitle}>
+              Deliciously <span>Unmissable</span>
+            </Typography>
+            <Typography variant="h5" className={classes.heroSubtitle}>
+              Grab your favorites and elevate your movie experience
+            </Typography>
+          </Container>
+        </div>
       </div>
 
       <Container maxWidth="lg" className={classes.container}>
