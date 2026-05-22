@@ -33,6 +33,43 @@ export default theme => ({
     borderRadius: '2px',
     margin: '16px auto 0',
   },
+  schoolBanner: {
+    maxWidth: 900,
+    margin: '0 auto',
+    padding: theme.spacing(3, 4),
+    marginBottom: theme.spacing(5),
+    borderRadius: 16,
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+    color: '#fff',
+    textAlign: 'center',
+    boxShadow: '0 12px 40px rgba(15,23,42,0.15)',
+  },
+  schoolBannerTitle: {
+    fontWeight: 800,
+    fontSize: '1.35rem',
+    marginBottom: theme.spacing(1),
+  },
+  schoolBannerText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: '0.95rem',
+    lineHeight: 1.6,
+    marginBottom: theme.spacing(2),
+  },
+  schoolBannerBtn: {
+    backgroundColor: '#b72429',
+    color: '#fff',
+    fontWeight: 700,
+    borderRadius: 10,
+    padding: '10px 28px',
+    '&:hover': { backgroundColor: '#9a1e22' },
+  },
+  sectionHeading: {
+    fontWeight: 800,
+    fontSize: '1.25rem',
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: theme.spacing(3),
+  },
   grid: {
     display: 'grid',
     // Fixed 320px tracks — same card width as home OffersSection carousel

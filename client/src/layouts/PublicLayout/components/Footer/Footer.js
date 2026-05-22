@@ -103,6 +103,13 @@ export default function Footer() {
               <li style={{ marginBottom: '12px' }}>
                 <Link to="/offers" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem' }}>Offers</Link>
               </li>
+              <li style={{ marginBottom: '12px' }}>
+                <Link
+                  to="/school-group-booking"
+                  style={{ color: '#f8fafc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700 }}>
+                  School Booking
+                </Link>
+              </li>
             </ul>
           </Grid>
 
@@ -179,9 +186,22 @@ export default function Footer() {
           <Typography variant="caption" style={{ color: '#64748b' }}>
             &copy; {new Date().getFullYear()} M2K Cinemas. All rights reserved.
           </Typography>
-          <Typography variant="caption" style={{ color: '#64748b' }}>
-            Crafted for the ultimate movie experience.
-          </Typography>
+          <Box display="flex" flexWrap="wrap" alignItems="center" style={{ gap: 16 }}>
+            <Link
+              to="/school-group-booking"
+              style={{ color: '#b72429', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700 }}>
+              School Booking
+            </Link>
+            <Link to="/offers" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.8rem' }}>
+              Offers
+            </Link>
+            <Link to="/contact-us" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.8rem' }}>
+              Contact
+            </Link>
+            <Typography variant="caption" style={{ color: '#64748b' }}>
+              Crafted for the ultimate movie experience.
+            </Typography>
+          </Box>
         </Box>
       </Container>
     </div>

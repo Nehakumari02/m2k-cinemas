@@ -23,6 +23,9 @@ const ProductList = lazy(() => import('./pages/Admin/ProductList'));
 const OrderList = lazy(() => import('./pages/Admin/OrderList'));
 const LoyaltySettings = lazy(() => import('./pages/Admin/LoyaltySettings/LoyaltySettings'));
 const RefundManagement = lazy(() => import('./pages/Admin/RefundManagement/RefundManagement'));
+const SchoolGroupInquiryList = lazy(() =>
+  import('./pages/Admin/SchoolGroupInquiryList/SchoolGroupInquiryList')
+);
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -40,6 +43,7 @@ const CinemasPage = lazy(() => import('./pages/Public/CinemasPage'));
 const CinemaDetailPage = lazy(() => import('./pages/Public/CinemaDetailPage'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
 const OffersPage = lazy(() => import('./pages/Public/OffersPage'));
+const SchoolGroupBookingPage = lazy(() => import('./pages/Public/SchoolGroupBookingPage'));
 const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
 const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
 const FoodComboPage = lazy(() => import('./pages/Public/FoodComboPage'));
@@ -114,6 +118,12 @@ const Routes = () => {
             path="/offers"
             layout={PublicLayout}
             component={OffersPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/school-group-booking"
+            layout={PublicLayout}
+            component={SchoolGroupBookingPage}
           />
           <WithLayoutRoute
             exact
@@ -324,6 +334,12 @@ const Routes = () => {
             path="/admin/offers"
             layout={AdminLayout}
             component={OfferList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/school-bookings"
+            layout={AdminLayout}
+            component={SchoolGroupInquiryList}
           />
           <ProtectedRoute
             exact

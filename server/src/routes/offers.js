@@ -7,8 +7,7 @@ const router = new express.Router();
 
 // POST validate offer code
 router.post('/offers/validate', auth.simple, async (req, res) => {
-  const { code } = req.body;
-  console.log('Validating coupon code:', code);
+  const { code, ticketCount } = req.body;
   if (!code) {
     return res.status(400).send({ error: 'Coupon code is required' });
   }
@@ -28,7 +27,26 @@ router.post('/offers/validate', auth.simple, async (req, res) => {
       return res.status(400).send({ error: 'This coupon has expired' });
     }
 
-    res.send({ valid: true, discountPercentage: offer.discountPercentage });
+    if (offer.inquiryOnly) {
+      return res.status(400).send({
+        error:
+          'This offer is for school group enquiries only. Submit an enquiry on the School Group Booking page.',
+      });
+    }
+
+    const seats = Number(ticketCount) || 0;
+    if (offer.category === 'school_group' && offer.minTickets > 0 && seats < offer.minTickets) {
+      return res.status(400).send({
+        error: `This school group code requires at least ${offer.minTickets} tickets in your booking.`,
+      });
+    }
+
+    res.send({
+      valid: true,
+      discountPercentage: offer.discountPercentage,
+      category: offer.category,
+      minTickets: offer.minTickets,
+    });
   } catch (e) {
     res.status(500).send({ error: 'Server error validating coupon' });
   }
@@ -107,7 +125,18 @@ router.post(
 router.put('/offers/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['title', 'description', 'code', 'validTill', 'image', 'isActive', 'discountPercentage'];
+  const allowedUpdates = [
+    'title',
+    'description',
+    'code',
+    'validTill',
+    'image',
+    'isActive',
+    'discountPercentage',
+    'category',
+    'minTickets',
+    'inquiryOnly',
+  ];
   const isValidOperation = updates.every(u => allowedUpdates.includes(u));
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
 

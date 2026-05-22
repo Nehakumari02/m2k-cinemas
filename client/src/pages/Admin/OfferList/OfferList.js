@@ -20,6 +20,10 @@ import {
   FormControlLabel,
   IconButton,
   Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 import { Add, Edit, Delete, LocalOffer, PhotoCamera } from '@material-ui/icons';
 import {
@@ -203,6 +207,10 @@ const EMPTY_FORM = {
   code: '',
   validTill: '',
   isActive: true,
+  category: 'standard',
+  discountPercentage: 10,
+  minTickets: 0,
+  inquiryOnly: false,
 };
 
 class OfferList extends Component {
@@ -240,6 +248,10 @@ class OfferList extends Component {
         code: offer.code || '',
         validTill: offer.validTill ? offer.validTill.split('T')[0] : '',
         isActive: offer.isActive !== false,
+        category: offer.category || 'standard',
+        discountPercentage: offer.discountPercentage ?? 10,
+        minTickets: offer.minTickets ?? 0,
+        inquiryOnly: Boolean(offer.inquiryOnly),
       },
       imageFile: null,
       imagePreview: offer.image || null,
@@ -272,7 +284,11 @@ class OfferList extends Component {
     if (!form.title || !form.code || !form.validTill) return;
     this.setState({ saving: true });
 
-    const payload = { ...form };
+    const payload = {
+      ...form,
+      discountPercentage: Number(form.discountPercentage) || 0,
+      minTickets: Number(form.minTickets) || 0,
+    };
     let result;
     if (isEditing) {
       result = await this.props.updateOffer(imageFile, payload, editId);
@@ -345,6 +361,19 @@ class OfferList extends Component {
                         variant="outlined"
                       />
                     </div>
+                    {offer.category === 'school_group' && (
+                      <Chip
+                        label="School group"
+                        size="small"
+                        style={{
+                          marginBottom: 8,
+                          color: '#60a5fa',
+                          borderColor: 'rgba(96,165,250,0.4)',
+                          backgroundColor: 'rgba(96,165,250,0.1)',
+                        }}
+                        variant="outlined"
+                      />
+                    )}
                     <Typography className={classes.cardTitle}>{offer.title}</Typography>
                     <Typography className={classes.cardDesc}>{offer.description}</Typography>
                     <Typography className={classes.validTill}>
@@ -429,6 +458,43 @@ class OfferList extends Component {
               inputProps={{ style: { textTransform: 'uppercase' } }}
               className={classes.input}
             />
+            <FormControl fullWidth variant="outlined" className={classes.input}>
+              <InputLabel style={{ color: 'rgba(255,255,255,0.5)' }}>Offer type</InputLabel>
+              <Select
+                name="category"
+                value={form.category}
+                onChange={this.handleChange}
+                label="Offer type">
+                <MenuItem value="standard">Standard (checkout coupon)</MenuItem>
+                <MenuItem value="school_group">School group booking</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Discount %"
+              name="discountPercentage"
+              type="number"
+              value={form.discountPercentage}
+              onChange={this.handleChange}
+              fullWidth
+              variant="outlined"
+              inputProps={{ min: 0, max: 100 }}
+              className={classes.input}
+            />
+            {form.category === 'school_group' && (
+              <TextField
+                label="Minimum tickets / students"
+                name="minTickets"
+                type="number"
+                value={form.minTickets}
+                onChange={this.handleChange}
+                fullWidth
+                variant="outlined"
+                inputProps={{ min: 0 }}
+                helperText="Required seat count when applying code at checkout (0 = no minimum)"
+                className={classes.input}
+                FormHelperTextProps={{ style: { color: 'rgba(255,255,255,0.4)' } }}
+              />
+            )}
             <TextField
               label="Valid Till *"
               name="validTill"
@@ -451,6 +517,23 @@ class OfferList extends Component {
               }
               label={<span className={classes.toggleLabel}>Active (visible on website)</span>}
             />
+            {form.category === 'school_group' && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={form.inquiryOnly}
+                    onChange={this.handleChange}
+                    name="inquiryOnly"
+                    color="primary"
+                  />
+                }
+                label={
+                  <span className={classes.toggleLabel}>
+                    Enquiry only (cannot apply at online checkout)
+                  </span>
+                }
+              />
+            )}
           </DialogContent>
           <DialogActions style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
             <Button onClick={this.closeDialog} className={classes.cancelBtn}>Cancel</Button>

@@ -36,6 +36,20 @@ const offerSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    category: {
+      type: String,
+      enum: ['standard', 'school_group'],
+      default: 'standard',
+    },
+    minTickets: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    inquiryOnly: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

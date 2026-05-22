@@ -144,7 +144,7 @@ export default function BookingCheckout(props) {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ code: couponInput })
+        body: JSON.stringify({ code: couponInput, ticketCount: selectedSeats })
       });
       const data = await response.json();
       if (response.ok && data.valid) {

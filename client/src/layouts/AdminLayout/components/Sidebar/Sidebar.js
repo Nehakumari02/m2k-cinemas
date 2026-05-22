@@ -23,6 +23,7 @@ import StoreIcon from '@material-ui/icons/StoreOutlined';
 import ShippingIcon from '@material-ui/icons/LocalShippingOutlined';
 import StarIcon from '@material-ui/icons/StarBorderOutlined';
 import RedeemIcon from '@material-ui/icons/Redeem';
+import SchoolIcon from '@material-ui/icons/School';
 // Component styles
 import styles from './styles';
 
@@ -108,6 +109,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Offers"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/school-bookings">
+            <ListItemIcon className={classes.listItemIcon}>
+              <SchoolIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="School Bookings"
             />
           </ListItem>
           <ListItem
