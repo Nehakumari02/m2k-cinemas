@@ -73,6 +73,24 @@ export default theme => ({
       opacity: 1
     }
   },
+  socialLinks: {
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: theme.spacing(2),
+    borderLeft: '1px solid rgba(183,36,41,0.15)',
+    paddingLeft: theme.spacing(2),
+  },
+  socialIcon: {
+    color: '#1f2937',
+    margin: '0 6px',
+    display: 'flex',
+    alignItems: 'center',
+    transition: 'color 200ms ease, transform 200ms ease',
+    '&:hover': {
+      color: '#b72429',
+      transform: 'scale(1.1)'
+    }
+  },
   navAccount: { 
     marginLeft: 'auto', 
     marginRight: theme.spacing(1),

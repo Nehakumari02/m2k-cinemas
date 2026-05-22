@@ -44,6 +44,7 @@ const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
 const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
 const FoodComboPage = lazy(() => import('./pages/Public/FoodComboPage'));
 const EventsPage = lazy(() => import('./pages/Public/EventsPage'));
+const EventGalleryPage = lazy(() => import('./pages/Public/EventGalleryPage/EventGalleryPage'));
 const AboutUsPage = lazy(() => import('./pages/Public/AboutUsPage'));
 const ContactUsPage = lazy(() => import('./pages/Public/ContactUsPage'));
 const CareersPage = lazy(() => import('./pages/Public/CareersPage'));
@@ -129,6 +130,12 @@ const Routes = () => {
             path="/events"
             layout={PublicLayout}
             component={EventsPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/events/gallery/:id"
+            layout={PublicLayout}
+            component={EventGalleryPage}
           />
           <WithLayoutRoute
             exact

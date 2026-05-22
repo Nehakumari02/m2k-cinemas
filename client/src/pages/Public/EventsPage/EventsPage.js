@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Typography, Container, Grid, Card, CardMedia, CardContent, Button, CircularProgress, Box } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { History, Event as EventIcon, Update } from '@material-ui/icons';
@@ -48,31 +49,47 @@ const EventsPage = ({ getEvents, eventState }) => {
 
   const { past, current, comingSoon } = categorizeEvents();
 
-  const EventCard = ({ event, isPast }) => (
-    <Grid item xs={12} sm={6} md={4}>
-      <Card className={`${classes.card} ${isPast ? classes.pastEvent : ''}`}>
-        <div className={classes.mediaWrapper}>
-          <div className={classes.dateOverlay}>{event.date}</div>
-          <CardMedia 
-            className={classes.media} 
-            image={normalizeImage(event.image)} 
-            title={event.title}
-          />
-        </div>
-        <CardContent className={classes.cardContent}>
-          <Typography className={classes.eventTitle} variant="h5">
-            {event.title}
-          </Typography>
-          <Typography className={classes.eventDescription} variant="body2">
-            {event.description}
-          </Typography>
-          <Button className={classes.button} fullWidth>
-            {isPast ? 'View Gallery' : 'Interested'}
-          </Button>
-        </CardContent>
-      </Card>
-    </Grid>
-  );
+  const EventCard = ({ event, isPast }) => {
+    const galleryCount = Array.isArray(event.gallery) ? event.gallery.length : 0;
+    const showGalleryLink = isPast || galleryCount > 0;
+
+    return (
+      <Grid item xs={12} sm={6} md={4}>
+        <Card className={`${classes.card} ${isPast ? classes.pastEvent : ''}`}>
+          <div className={classes.mediaWrapper}>
+            <div className={classes.dateOverlay}>{event.date}</div>
+            <CardMedia
+              className={classes.media}
+              image={normalizeImage(event.image)}
+              title={event.title}
+            />
+          </div>
+          <CardContent className={classes.cardContent}>
+            <Typography className={classes.eventTitle} variant="h5">
+              {event.title}
+            </Typography>
+            <Typography className={classes.eventDescription} variant="body2">
+              {event.description}
+            </Typography>
+            {showGalleryLink ? (
+              <Button
+                className={classes.button}
+                fullWidth
+                component={Link}
+                to={`/events/gallery/${event._id}`}
+              >
+                View Gallery
+              </Button>
+            ) : (
+              <Button className={classes.button} fullWidth>
+                Interested
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+    );
+  };
 
   const Section = ({ title, icon: Icon, data, isPast }) => {
     if (data.length === 0) return null;

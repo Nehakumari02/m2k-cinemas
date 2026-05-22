@@ -167,6 +167,23 @@ const useStyles = makeStyles((theme) => ({
     border: '1px dashed rgba(255, 255, 255, 0.1)',
     color: 'rgba(255, 255, 255, 0.4)',
   },
+  dialogPaper: {
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(2),
+    top: theme.spacing(2),
+    color: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    zIndex: 10,
+  },
 }));
 
 export default useStyles;

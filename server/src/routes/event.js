@@ -6,7 +6,7 @@ const upload = require('../utils/multer');
 const router = new express.Router();
 
 // Upload event image
-router.post('/events/upload', auth.enhance, upload('events').single('image'), async (req, res) => {
+router.post('/events/upload', auth.staff, upload('events').single('image'), async (req, res) => {
   try {
     const url = `/uploads/events/${req.file.filename}`;
 
@@ -17,7 +17,7 @@ router.post('/events/upload', auth.enhance, upload('events').single('image'), as
 });
 
 // Create event
-router.post('/events', auth.enhance, async (req, res) => {
+router.post('/events', auth.staff, async (req, res) => {
   const event = new Event(req.body);
   try {
     await event.save();
@@ -50,10 +50,10 @@ router.get('/events/:id', async (req, res) => {
 });
 
 // Update event
-router.patch('/events/:id', auth.enhance, async (req, res) => {
+router.patch('/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['title', 'date', 'description', 'image'];
+  const allowedUpdates = ['title', 'date', 'description', 'image', 'gallery'];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
@@ -70,7 +70,7 @@ router.patch('/events/:id', auth.enhance, async (req, res) => {
 });
 
 // Delete event
-router.delete('/events/:id', auth.enhance, async (req, res) => {
+router.delete('/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   try {
     const event = await Event.findByIdAndDelete(_id);

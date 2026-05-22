@@ -4,7 +4,13 @@ import { connect } from 'react-redux';
 import { logout } from '../../../../store/actions';
 import classnames from 'classnames';
 import { withStyles, Typography, List, ListItem, Badge, IconButton } from '@material-ui/core';
-import { ShoppingCart as ShoppingCartIcon } from '@material-ui/icons';
+import { 
+  ShoppingCart as ShoppingCartIcon,
+  Facebook as FacebookIcon,
+  Twitter as TwitterIcon,
+  Instagram as InstagramIcon,
+  YouTube as YouTubeIcon
+} from '@material-ui/icons';
 
 // Component styles
 import styles from './styles';
@@ -78,6 +84,20 @@ class Navbar extends Component {
                 <ShoppingCartIcon />
               </Badge>
             </Link>
+            <div className={classes.socialLinks}>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
+                <FacebookIcon fontSize="small" />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
+                <TwitterIcon fontSize="small" />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
+                <InstagramIcon fontSize="small" />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
+                <YouTubeIcon fontSize="small" />
+              </a>
+            </div>
           </div>
 
           <div className={classes.navAccount}>

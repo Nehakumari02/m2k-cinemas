@@ -153,7 +153,8 @@ const EMPTY_FORM = {
   title: '',
   date: '',
   description: '',
-  image: ''
+  image: '',
+  gallery: []
 };
 
 class EventList extends Component {
@@ -182,7 +183,8 @@ class EventList extends Component {
         title: item.title,
         date: item.date,
         description: item.description,
-        image: item.image
+        image: item.image,
+        gallery: item.gallery || []
       },
       isEdit: true,
       selectedId: item._id
@@ -214,6 +216,36 @@ class EventList extends Component {
     } else {
       this.setState({ uploading: false });
     }
+  };
+
+  handleGalleryUpload = async e => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    this.setState({ uploading: true });
+    
+    // Process each file sequentially or in parallel
+    const uploadPromises = files.map(file => this.props.uploadEventImage(file));
+    const results = await Promise.all(uploadPromises);
+    
+    const newUrls = results.filter(r => r && r.status === 'success').map(r => r.url);
+    
+    if (newUrls.length > 0) {
+      this.setState(prev => ({
+        form: { ...prev.form, gallery: [...(prev.form.gallery || []), ...newUrls] },
+        uploading: false
+      }));
+    } else {
+      this.setState({ uploading: false });
+    }
+  };
+
+  removeGalleryImage = (index) => {
+    this.setState(prev => {
+      const newGallery = [...(prev.form.gallery || [])];
+      newGallery.splice(index, 1);
+      return { form: { ...prev.form, gallery: newGallery } };
+    });
   };
 
   handleSave = async () => {
@@ -316,10 +348,53 @@ class EventList extends Component {
                 />
               </div>
             </div>
+
+            <div className={classes.fileInput} style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 16 }}>
+              <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>
+                Gallery Images (Upload multiple)
+              </Typography>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+                <Button variant="outlined" component="label" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.15)' }} disabled={uploading}>
+                  {uploading ? <CircularProgress size={20} color="inherit" /> : 'Upload Images'}
+                  <input type="file" hidden accept="image/*" multiple onChange={this.handleGalleryUpload} />
+                </Button>
+              </div>
+              
+              {form.gallery && form.gallery.length > 0 && (
+                <Grid container spacing={1}>
+                  {form.gallery.map((url, idx) => (
+                    <Grid item key={idx}>
+                      <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden' }}>
+                        <img src={url} alt={`Gallery ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <IconButton 
+                          size="small" 
+                          style={{ position: 'absolute', top: 2, right: 2, backgroundColor: 'rgba(0,0,0,0.6)', color: '#fff', padding: 2 }}
+                          onClick={() => this.removeGalleryImage(idx)}
+                        >
+                          <Delete style={{ fontSize: 16 }} />
+                        </IconButton>
+                      </div>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </div>
           </DialogContent>
           <DialogActions style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
             <Button onClick={this.closeDialog} className={classes.cancelBtn}>Cancel</Button>
-            <Button onClick={this.handleSave} className={classes.saveBtn} disabled={saving || uploading || !form.title || !form.date} variant="contained">
+            <Button
+              onClick={this.handleSave}
+              className={classes.saveBtn}
+              disabled={
+                saving ||
+                uploading ||
+                !(form.title && String(form.title).trim()) ||
+                !(form.date && String(form.date).trim()) ||
+                !(form.description && String(form.description).trim()) ||
+                !(form.image && String(form.image).trim())
+              }
+              variant="contained"
+            >
               {saving ? <CircularProgress size={20} color="inherit" /> : (isEdit ? 'Update Event' : 'Create Event')}
             </Button>
           </DialogActions>

@@ -20,7 +20,10 @@ const eventSchema = new Schema({
   image: {
     type: String,
     required: true
-  }
+  },
+  gallery: [{
+    type: String
+  }]
 });
 
 const Event = mongoose.model('Event', eventSchema);
