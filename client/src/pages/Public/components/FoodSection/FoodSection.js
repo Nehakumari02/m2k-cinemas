@@ -13,7 +13,7 @@ import {
   Box
 } from '@material-ui/core';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
-import { getFood, addToCart } from '../../../../store/actions';
+import { getFood, addToFoodCart } from '../../../../store/actions';
 import { normalizeImage } from '../../../../utils/imageUrl';
 
 const useStyles = makeStyles(theme => ({
@@ -104,7 +104,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FoodSection = ({ food, getFood, addToCart }) => {
+const FoodSection = ({ food, getFood, addToFoodCart }) => {
   const classes = useStyles();
 
   useEffect(() => {
@@ -154,9 +154,9 @@ const FoodSection = ({ food, getFood, addToCart }) => {
                     variant="contained" 
                     className={classes.orderBtn}
                     startIcon={<FastfoodIcon />}
-                    onClick={() => addToCart(item, 1)}
+                    onClick={() => addToFoodCart(item, 1)}
                   >
-                    Add to Cart
+                    Add to Food Cart
                   </Button>
                 </div>
               </Card>
@@ -183,4 +183,4 @@ const mapStateToProps = state => ({
   food: state.foodState.food
 });
 
-export default connect(mapStateToProps, { getFood, addToCart })(FoodSection);
+export default connect(mapStateToProps, { getFood, addToFoodCart })(FoodSection);

@@ -22,6 +22,7 @@ const eventRouter = require('./routes/event');
 const walletRouter = require('./routes/wallet');
 const productRouter = require('./routes/products');
 const orderRouter = require('./routes/orders');
+const foodOrderRouter = require('./routes/foodOrders');
 const settingsRouter = require('./routes/settings');
 const refundRouter = require('./routes/refunds');
 
@@ -66,6 +67,7 @@ app.use(eventRouter);
 app.use(walletRouter);
 app.use(productRouter);
 app.use(orderRouter);
+app.use(foodOrderRouter);
 app.use(settingsRouter);
 app.use(refundRouter);
 

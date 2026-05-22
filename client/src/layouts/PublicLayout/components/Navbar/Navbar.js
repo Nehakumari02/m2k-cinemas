@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { withStyles, Typography, List, ListItem, Badge, IconButton } from '@material-ui/core';
 import { 
   ShoppingCart as ShoppingCartIcon,
+  Fastfood as FoodCartIcon,
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
   Instagram as InstagramIcon,
@@ -35,8 +36,9 @@ class Navbar extends Component {
 
   render() {
     const { showMenu, scrollPos } = this.state;
-    const { classes, isAuth, user, logout, cartItems } = this.props;
+    const { classes, isAuth, user, logout, cartItems, foodCartItems } = this.props;
     const cartCount = (cartItems || []).reduce((acc, item) => acc + item.quantity, 0);
+    const foodCartCount = (foodCartItems || []).reduce((acc, item) => acc + item.quantity, 0);
     return (
       <Fragment>
         <nav
@@ -79,7 +81,12 @@ class Navbar extends Component {
             <Link className={classes.navLink} to="/shop">
               Shop
             </Link>
-            <Link className={classes.navLink} to="/cart">
+            <Link className={classes.navLink} to="/food-cart" title="Food cart">
+              <Badge badgeContent={foodCartCount} color="secondary">
+                <FoodCartIcon />
+              </Badge>
+            </Link>
+            <Link className={classes.navLink} to="/cart" title="Shop cart">
               <Badge badgeContent={cartCount} color="secondary">
                 <ShoppingCartIcon />
               </Badge>
@@ -233,8 +240,13 @@ class Navbar extends Component {
                 </Link>
               </li>
               <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/food-cart">
+                  Food cart ({foodCartCount})
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
                 <Link className={classes.innerNavLink} to="/cart">
-                  Cart ({cartCount})
+                  Shop cart ({cartCount})
                 </Link>
               </li>
               {user && (
@@ -298,7 +310,8 @@ class Navbar extends Component {
 const mapStateToProps = state => ({
   isAuth: state.authState.isAuthenticated,
   user: state.authState.user,
-  cartItems: state.cartState.cartItems
+  cartItems: state.cartState.cartItems,
+  foodCartItems: state.foodCartState.cartItems
 });
 
 const mapDispatchToProps = {

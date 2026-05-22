@@ -220,6 +220,29 @@ export default (theme) => ({
       backgroundColor: '#9a1e22'
     }
   },
+  quantityControls: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+  btn: {
+    minWidth: 32,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    padding: 0,
+    background: '#f1f5f9',
+    color: '#0f172a',
+    '&:hover': {
+      background: '#e2e8f0',
+    },
+  },
+  quantity: {
+    fontWeight: 800,
+    color: '#0f172a',
+    minWidth: 20,
+    textAlign: 'center',
+  },
   addedBtn: {
     backgroundColor: '#2e7d32',
     color: '#fff',

@@ -14,6 +14,7 @@ import events from './events';
 import wallet from './wallet';
 import products from './products';
 import cart from './cart';
+import foodCart from './foodCart';
 import wishlist from './wishlist';
 import reviews from './reviews';
 
@@ -33,6 +34,7 @@ export default combineReducers({
   walletState: wallet,
   productState: products,
   cartState: cart,
+  foodCartState: foodCart,
   wishlistState: wishlist,
   reviewState: reviews
 });

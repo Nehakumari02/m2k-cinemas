@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Box, Grid, Typography, Button, TextField, MenuItem } from '@material-ui/core';
+import { Box, Typography, Button, TextField, MenuItem } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   checkoutBar: {

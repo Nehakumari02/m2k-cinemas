@@ -49,6 +49,7 @@ import BookingSeats from './components/BookingSeats/BookingSeats';
 import BookingCheckout from './components/BookingCheckout/BookingCheckout';
 import BookingInvitation from './components/BookingInvitation/BookingInvitation';
 import BookingFood from './components/BookingFood/BookingFood';
+import BookingFoodLastChance from './components/BookingFoodLastChance/BookingFoodLastChance';
 
 import jsPDF from 'jspdf';
 
@@ -72,7 +73,10 @@ class BookingPage extends Component {
     pointsUsed: 0,
     appliedCoupon: null,
     discountPercentage: 0,
-    timeLeft: 420 // 7 minutes
+    timeLeft: 420, // 7 minutes
+    showPaymentSection: false,
+    loginResumePayment: false,
+    completedWithoutFood: false
   };
   timer = null;
 
@@ -150,6 +154,10 @@ class BookingPage extends Component {
     ) {
       getCinema(selectedCinema);
     }
+
+    if (!prevProps.isAuth && this.props.isAuth && this.state.loginResumePayment) {
+      this.setState({ loginResumePayment: false }, () => this.onContinueToPayment());
+    }
   }
 
   componentWillUnmount() {
@@ -171,7 +179,7 @@ class BookingPage extends Component {
           this.props.setAlert('Session expired. Seats have been released.', 'warning', 5000);
           this.props.cancelPendingReservation(this.props.pendingReservationId);
           this.props.resetCheckout();
-          this.setState({ showFoodStep: false });
+          this.setState({ showFoodStep: false, showPaymentSection: false });
           return { timeLeft: 0 };
         }
         return { timeLeft: prevState.timeLeft - 1 };
@@ -503,24 +511,15 @@ class BookingPage extends Component {
       const { data } = response;
       setQRCode(data.QRCode || (data.reservation && data.reservation.QRCode));
       getReservations();
+      this.setState({ completedWithoutFood: foodItems.length === 0 });
       showInvitationForm();
     }
   }
 
-  onToggleFoodStep = async () => {
-    const { 
-      showFoodStep
-    } = this.state;
-    const { 
-      selectedSeats, 
-      isAuth, 
-      toggleLoginPopup, 
-      addReservation,
-      selectedDate,
-      selectedTime,
-      cinema,
-      movie,
-      user,
+  onToggleFoodStep = () => {
+    const { showFoodStep } = this.state;
+    const {
+      selectedSeats,
       setPendingReservation,
       pendingReservationId,
       cancelPendingReservation
@@ -529,39 +528,63 @@ class BookingPage extends Component {
     const isPaymentStep = this.props.location.pathname.endsWith('/payment');
 
     if (!showFoodStep && !isPaymentStep) {
-      // Moving TO payment step
+      // Seats → food (no login yet)
       if (selectedSeats.length === 0) return;
-      if (!isAuth) return toggleLoginPopup();
+      this.setState({ showFoodStep: true, showPaymentSection: false });
+      this.props.history.push(`/movie/booking/${this.props.match.params.id}/payment`);
+      return;
+    }
 
-      const res = await addReservation({
-        date: selectedDate,
-        startAt: selectedTime,
-        seats: this.bookSeats(),
-        ticketPrice: Number(cinema.ticketPrice || 0),
-        total: Number(selectedSeats.length * (cinema.ticketPrice || 0)),
-        foodItems: [],
-        movieId: movie._id,
-        cinemaId: cinema._id,
-        username: user.username,
-        phone: user.phone,
-        status: 'Pending'
-      });
+    // Payment → back to seats
+    if (pendingReservationId) {
+      cancelPendingReservation(pendingReservationId);
+      setPendingReservation(null, null);
+    }
+    this.stopTimer();
+    this.setState({ showFoodStep: false, showPaymentSection: false });
+    this.props.history.push(`/movie/booking/${this.props.match.params.id}/seats`);
+  };
 
-      if (res.status === 'success') {
-        setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
-        this.startTimer();
-        this.setState({ showFoodStep: true });
-        this.props.history.push(`/movie/booking/${this.props.match.params.id}/payment`);
-      }
-    } else {
-      // Moving BACK to seats
-      if (pendingReservationId) {
-        cancelPendingReservation(pendingReservationId);
-        setPendingReservation(null, null);
-      }
-      this.stopTimer();
-      this.setState({ showFoodStep: false });
-      this.props.history.push(`/movie/booking/${this.props.match.params.id}/seats`);
+  onContinueToPayment = async () => {
+    const {
+      selectedSeats,
+      isAuth,
+      toggleLoginPopup,
+      addReservation,
+      selectedDate,
+      selectedTime,
+      cinema,
+      movie,
+      user,
+      setPendingReservation
+    } = this.props;
+
+    if (selectedSeats.length === 0) return;
+
+    if (!isAuth) {
+      this.setState({ loginResumePayment: true });
+      return toggleLoginPopup();
+    }
+
+    const res = await addReservation({
+      date: selectedDate,
+      startAt: selectedTime,
+      seats: this.bookSeats(),
+      ticketPrice: Number(cinema.ticketPrice || 0),
+      total: Number(selectedSeats.length * (cinema.ticketPrice || 0)),
+      foodItems: [],
+      movieId: movie._id,
+      cinemaId: cinema._id,
+      username: user.username,
+      phone: user.phone,
+      status: 'Pending'
+    });
+
+    if (res.status === 'success') {
+      setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
+      this.startTimer();
+      this.setState({ showPaymentSection: true });
+      if (user) this.props.getWalletData();
     }
   };
 
@@ -871,7 +894,9 @@ class BookingPage extends Component {
               {isSeatsStep
                 ? 'Choose your preferred seats.'
                 : isPaymentStep
-                ? 'Add food combos and complete payment.'
+                ? this.state.showPaymentSection
+                  ? 'Complete payment to confirm your booking.'
+                  : 'Add food combos, then continue to payment.'
                 : 'Select your preferred cinema and showtime.'}
             </Typography>
           </div>
@@ -1074,14 +1099,26 @@ class BookingPage extends Component {
               </div>
             )}
             {showInvitation && !!selectedSeats.length && (
-              <BookingInvitation
-                selectedSeats={selectedSeats}
-                sendInvitations={this.sendInvitations}
-                ignore={resetCheckout}
-                invitations={invitations}
-                onSetInvitation={setInvitation}
-                onDownloadPDF={this.jsPdfGenerator}
-              />
+              <>
+                <BookingInvitation
+                  selectedSeats={selectedSeats}
+                  sendInvitations={this.sendInvitations}
+                  ignore={() => {
+                    this.setState({ completedWithoutFood: false });
+                    resetCheckout();
+                  }}
+                  invitations={invitations}
+                  onSetInvitation={setInvitation}
+                  onDownloadPDF={this.jsPdfGenerator}
+                />
+                {this.state.completedWithoutFood && (
+                  <BookingFoodLastChance
+                    variant="postPayment"
+                    offers={this.props.offers}
+                    onOrderFood={() => this.props.history.push('/food-cart')}
+                  />
+                )}
+              </>
             )}
 
             {isSeatsStep && cinema && selectedCinema && selectedTime && !showInvitation && (
@@ -1097,7 +1134,7 @@ class BookingPage extends Component {
                     className={classes.proceedButton}
                     disabled={!selectedSeats.length}
                     onClick={this.onToggleFoodStep}>
-                    Continue to Food & Payment
+                    Continue to Food & Combos
                   </Button>
                 </div>
               </>
@@ -1106,35 +1143,52 @@ class BookingPage extends Component {
             {isPaymentStep && cinema && selectedCinema && selectedTime && !showInvitation && (
               <>
                 <BookingFood />
-                <BookingCheckout
-                  user={user}
-                  ticketPrice={cinema.ticketPrice}
-                  seatsAvailable={cinema.seatsAvailable}
-                  selectedSeats={selectedSeats.length}
-                  selectedFood={this.props.selectedFood}
-                  paymentMethod={paymentMethod}
-                  paymentDetails={paymentDetails}
-                  showFoodStep
-                  onToggleFoodStep={this.onToggleFoodStep}
-                  onChangePaymentMethod={this.onChangePaymentMethod}
-                  onPaymentFieldChange={this.onPaymentFieldChange}
-                  onBookSeats={() => this.checkout()}
-                  walletBalance={this.props.walletBalance}
-                  loyaltyPoints={this.props.loyaltyPoints}
-                  pointsUsed={this.state.pointsUsed}
-                  onChangePointsUsed={this.onChangePointsUsed}
-                  appliedCoupon={this.state.appliedCoupon}
-                  discountPercentage={this.state.discountPercentage}
-                  onApplyCoupon={this.onApplyCoupon}
-                  onRemoveCoupon={this.onRemoveCoupon}
-                  offers={this.props.offers}
-                  timeLeft={this.state.timeLeft}
-                  totalTicketsPrice={selectedSeats.reduce((acc, [row, col]) => {
-                    const seatVal = Number(cinema.seats[row][col]);
-                    const isSpecial = seatVal === 6 || seatVal === 5;
-                    return acc + (isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0 ? Number(cinema.specialPrice) : Number(cinema.ticketPrice));
-                  }, 0)}
-                />
+                {!this.state.showPaymentSection ? (
+                  <div className={classes.proceedBar}>
+                    <Button
+                      variant="outlined"
+                      style={{ marginRight: 12, background: '#fff', color: '#64748b', borderRadius: 8 }}
+                      onClick={this.onToggleFoodStep}>
+                      Back to Seats
+                    </Button>
+                    <Button
+                      className={classes.proceedButton}
+                      disabled={!selectedSeats.length}
+                      onClick={this.onContinueToPayment}>
+                      Continue to Payment
+                    </Button>
+                  </div>
+                ) : (
+                  <BookingCheckout
+                    user={user}
+                    ticketPrice={cinema.ticketPrice}
+                    seatsAvailable={cinema.seatsAvailable}
+                    selectedSeats={selectedSeats.length}
+                    selectedFood={this.props.selectedFood}
+                    paymentMethod={paymentMethod}
+                    paymentDetails={paymentDetails}
+                    showFoodStep
+                    onToggleFoodStep={this.onToggleFoodStep}
+                    onChangePaymentMethod={this.onChangePaymentMethod}
+                    onPaymentFieldChange={this.onPaymentFieldChange}
+                    onBookSeats={() => this.checkout()}
+                    walletBalance={this.props.walletBalance}
+                    loyaltyPoints={this.props.loyaltyPoints}
+                    pointsUsed={this.state.pointsUsed}
+                    onChangePointsUsed={this.onChangePointsUsed}
+                    appliedCoupon={this.state.appliedCoupon}
+                    discountPercentage={this.state.discountPercentage}
+                    onApplyCoupon={this.onApplyCoupon}
+                    onRemoveCoupon={this.onRemoveCoupon}
+                    offers={this.props.offers}
+                    timeLeft={this.state.timeLeft}
+                    totalTicketsPrice={selectedSeats.reduce((acc, [row, col]) => {
+                      const seatVal = Number(cinema.seats[row][col]);
+                      const isSpecial = seatVal === 6 || seatVal === 5;
+                      return acc + (isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0 ? Number(cinema.specialPrice) : Number(cinema.ticketPrice));
+                    }, 0)}
+                  />
+                )}
               </>
             )}
           </Grid>
@@ -1142,9 +1196,12 @@ class BookingPage extends Component {
         <ResponsiveDialog
           id="Edit-cinema"
           open={showLoginPopup}
-          handleClose={() => toggleLoginPopup()}
+          handleClose={() => {
+            this.setState({ loginResumePayment: false });
+            toggleLoginPopup();
+          }}
           maxWidth="sm">
-          <LoginForm />
+          <LoginForm redirect={false} />
         </ResponsiveDialog>
       </Container>
     );

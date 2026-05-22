@@ -43,6 +43,8 @@ const OffersPage = lazy(() => import('./pages/Public/OffersPage'));
 const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
 const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
 const FoodComboPage = lazy(() => import('./pages/Public/FoodComboPage'));
+const FoodCartPage = lazy(() => import('./pages/Public/FoodCartPage'));
+const FoodCheckoutPage = lazy(() => import('./pages/Public/FoodCheckoutPage'));
 const EventsPage = lazy(() => import('./pages/Public/EventsPage'));
 const EventGalleryPage = lazy(() => import('./pages/Public/EventGalleryPage/EventGalleryPage'));
 const AboutUsPage = lazy(() => import('./pages/Public/AboutUsPage'));
@@ -124,6 +126,18 @@ const Routes = () => {
             path="/food-combos"
             layout={PublicLayout}
             component={FoodComboPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/food-cart"
+            layout={PublicLayout}
+            component={FoodCartPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/food-checkout"
+            layout={PublicLayout}
+            component={FoodCheckoutPage}
           />
           <WithLayoutRoute
             exact

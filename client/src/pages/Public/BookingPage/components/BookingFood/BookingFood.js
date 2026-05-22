@@ -23,7 +23,7 @@ const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood }) => {
   };
 
   return (
-    <div className={classes.root}>
+    <div id="booking-food-section" className={classes.root}>
       <Typography variant="h5" className={classes.title}>
         Add some <span>Snacks & Combos</span>?
       </Typography>

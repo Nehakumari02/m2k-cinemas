@@ -16,14 +16,38 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 import useStyles from './styles';
 
+const fieldInputProps = {
+  style: { color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }
+};
+
 export default function Footer() {
   const classes = useStyles();
   const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
 
   const handleNewsletter = (e) => {
     e.preventDefault();
+    const trimmedEmail = email.trim();
+    const trimmedMobile = mobile.replace(/\D/g, '');
+    const hasEmail = trimmedEmail.length > 0;
+    const hasMobile = trimmedMobile.length >= 10;
+
+    if (!hasEmail && !hasMobile) {
+      alert('Please enter your email or mobile number.');
+      return;
+    }
+    if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    if (trimmedMobile.length > 0 && trimmedMobile.length < 10) {
+      alert('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
     alert('Thank you for subscribing to our newsletter!');
     setEmail('');
+    setMobile('');
   };
 
   return (
@@ -109,27 +133,44 @@ export default function Footer() {
               Newsletter
             </Typography>
             <Typography variant="body2" style={{ color: '#94a3b8', marginBottom: '20px' }}>
-              Subscribe to get the latest movie updates and exclusive offers delivered to your inbox.
+              Subscribe with your email or mobile number for movie updates and exclusive offers.
             </Typography>
-            <form onSubmit={handleNewsletter} style={{ display: 'flex', gap: '8px' }}>
-              <TextField
-                variant="outlined"
-                placeholder="Email Address"
-                size="small"
-                fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                InputProps={{
-                  style: { color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }
-                }}
-              />
-              <Button 
-                variant="contained" 
-                type="submit"
-                style={{ backgroundColor: '#b72429', color: 'white', fontWeight: 700, textTransform: 'none' }}
-              >
-                Join
-              </Button>
+            <form onSubmit={handleNewsletter}>
+              <div>
+                <div style={{ marginBottom: 20 }}>
+                  <TextField
+                    variant="outlined"
+                    placeholder="Email Address"
+                    size="small"
+                    fullWidth
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    InputProps={fieldInputProps}
+                  />
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <TextField
+                    variant="outlined"
+                    placeholder="Mobile Number"
+                    size="small"
+                    fullWidth
+                    type="tel"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    inputProps={{ maxLength: 15 }}
+                    InputProps={fieldInputProps}
+                  />
+                </div>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  fullWidth
+                  style={{ backgroundColor: '#b72429', color: 'white', fontWeight: 700, textTransform: 'none' }}
+                >
+                  Join
+                </Button>
+              </div>
             </form>
           </Grid>
         </Grid>
