@@ -19,6 +19,10 @@ const membershipSchema = new Schema({
     type: Number,
     default: 0,
   },
+  shopDiscount: {
+    type: Number,
+    default: 0,
+  },
   /** GST % shown on movie tickets (default 18%) */
   ticketGstPercent: {
     type: Number,

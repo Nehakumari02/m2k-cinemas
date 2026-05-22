@@ -9,6 +9,7 @@ const memberships = [
     price: 499,
     ticketDiscount: 10,
     foodDiscount: 5,
+    shopDiscount: 5,
     ticketGstPercent: 18,
     firstBookingGstBenefitPercent: 5,
     benefits: [
@@ -24,6 +25,7 @@ const memberships = [
     price: 999,
     ticketDiscount: 20,
     foodDiscount: 15,
+    shopDiscount: 10,
     ticketGstPercent: 18,
     firstBookingGstBenefitPercent: 5,
     benefits: [
@@ -40,6 +42,7 @@ const memberships = [
     price: 1999,
     ticketDiscount: 35,
     foodDiscount: 25,
+    shopDiscount: 15,
     ticketGstPercent: 18,
     firstBookingGstBenefitPercent: 5,
     benefits: [

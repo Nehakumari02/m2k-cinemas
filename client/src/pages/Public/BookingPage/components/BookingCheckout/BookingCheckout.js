@@ -121,6 +121,7 @@ export default function BookingCheckout(props) {
   const classes = useStyles(props);
   const {
     user,
+    membershipPlans = [],
     ticketPrice,
     selectedSeats,
     seatsAvailable,
@@ -191,14 +192,16 @@ export default function BookingCheckout(props) {
         discountPercentage,
         pointsUsed,
         user,
+        membershipPlans,
       }),
-    [ticketsTotal, foodTotal, discountPercentage, pointsUsed, user]
+    [ticketsTotal, foodTotal, discountPercentage, pointsUsed, user, membershipPlans]
   );
 
   const {
     ticketGst,
     ticketGstRate,
     membershipTicketDiscount,
+    membershipFoodDiscount,
     firstBookingBenefit,
     firstBookingBenefitEligible,
     membershipName,
@@ -244,11 +247,15 @@ export default function BookingCheckout(props) {
           <Typography className={classes.priceHighlight}>
             ₹{finalPrice}
           </Typography>
-          {membershipName && (
+          {membershipName ? (
             <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700 }}>
-              {membershipName} member
+              {membershipName} member — discounts applied below
             </Typography>
-          )}
+          ) : user?.membership && !membershipName ? (
+            <Typography variant="caption" style={{ color: '#b45309', fontWeight: 700 }}>
+              Loading member benefits…
+            </Typography>
+          ) : null}
           {discountValue > 0 && (
             <Typography variant="caption" style={{ color: '#22c55e', fontWeight: 'bold' }}>
               (-₹{discountValue} coupon)
@@ -284,6 +291,12 @@ export default function BookingCheckout(props) {
               <div className={`${classes.breakdownLine} ${classes.savingsLine}`}>
                 <span>First booking benefit ({firstBookingBenefitEligible ? '5%' : ''})</span>
                 <span>-₹{firstBookingBenefit}</span>
+              </div>
+            )}
+            {membershipFoodDiscount > 0 && (
+              <div className={`${classes.breakdownLine} ${classes.savingsLine}`}>
+                <span>Member food discount</span>
+                <span>-₹{membershipFoodDiscount}</span>
               </div>
             )}
             {foodTotal > 0 && (

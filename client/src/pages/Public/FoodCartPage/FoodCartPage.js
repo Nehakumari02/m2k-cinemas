@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import {
@@ -25,8 +25,9 @@ import {
   Fastfood as FoodIcon,
   ArrowBack as BackIcon
 } from '@material-ui/icons';
-import { removeFromFoodCart, updateFoodCartQuantity } from '../../../store/actions';
+import { removeFromFoodCart, updateFoodCartQuantity, getMemberships, loadUser } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import { calculateCartTotals } from '../../../utils/cartPricing';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -59,6 +60,10 @@ const useStyles = makeStyles(theme => ({
     fontSize: '1.5rem',
     color: '#b72429',
   },
+  savingsLine: {
+    color: '#16a34a',
+    fontWeight: 700,
+  },
   checkoutBtn: {
     marginTop: theme.spacing(3),
     borderRadius: '12px',
@@ -73,10 +78,35 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const FoodCartPage = ({ cartItems, removeFromFoodCart, updateFoodCartQuantity }) => {
+const FoodCartPage = ({
+  cartItems,
+  user,
+  isAuth,
+  membershipPlans,
+  removeFromFoodCart,
+  updateFoodCartQuantity,
+  getMemberships,
+  loadUser,
+}) => {
   const classes = useStyles();
   const history = useHistory();
+
+  useEffect(() => {
+    getMemberships();
+    if (isAuth) loadUser();
+  }, [getMemberships, loadUser, isAuth]);
+
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const pricing = useMemo(
+    () =>
+      calculateCartTotals({
+        subtotal,
+        user: isAuth ? user : null,
+        membershipPlans,
+        cartType: 'food',
+      }),
+    [subtotal, user, membershipPlans, isAuth]
+  );
 
   const handleUpdateQty = (id, currentQty, delta) => {
     const newQty = currentQty + delta;
@@ -178,10 +208,21 @@ const FoodCartPage = ({ cartItems, removeFromFoodCart, updateFoodCartQuantity })
             <Typography variant="h5" style={{ fontWeight: 800, marginBottom: 24 }}>
               Order Summary
             </Typography>
+            {pricing.membershipName && (
+              <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700, display: 'block', marginBottom: 12 }}>
+                {pricing.membershipName} member — {pricing.membershipDiscountPercent}% off food
+              </Typography>
+            )}
             <Box display="flex" justifyContent="space-between" mb={2}>
               <Typography color="textSecondary">Subtotal</Typography>
               <Typography style={{ fontWeight: 600 }}>₹{subtotal}</Typography>
             </Box>
+            {pricing.membershipDiscount > 0 && (
+              <Box display="flex" justifyContent="space-between" mb={2}>
+                <Typography className={classes.savingsLine}>Member discount</Typography>
+                <Typography className={classes.savingsLine}>-₹{pricing.membershipDiscount}</Typography>
+              </Box>
+            )}
             <Box display="flex" justifyContent="space-between" mb={2}>
               <Typography color="textSecondary">Pickup</Typography>
               <Typography style={{ fontWeight: 600, color: '#22c55e' }}>At counter</Typography>
@@ -191,7 +232,7 @@ const FoodCartPage = ({ cartItems, removeFromFoodCart, updateFoodCartQuantity })
               <Typography variant="h6" style={{ fontWeight: 800 }}>
                 Total
               </Typography>
-              <Typography className={classes.totalPrice}>₹{subtotal}</Typography>
+              <Typography className={classes.totalPrice}>₹{pricing.finalTotal}</Typography>
             </Box>
             <Button
               fullWidth
@@ -211,7 +252,15 @@ const FoodCartPage = ({ cartItems, removeFromFoodCart, updateFoodCartQuantity })
 };
 
 const mapStateToProps = state => ({
-  cartItems: state.foodCartState.cartItems
+  cartItems: state.foodCartState.cartItems,
+  user: state.authState.user,
+  isAuth: state.authState.isAuthenticated,
+  membershipPlans: state.membershipState.memberships || [],
 });
 
-export default connect(mapStateToProps, { removeFromFoodCart, updateFoodCartQuantity })(FoodCartPage);
+export default connect(mapStateToProps, {
+  removeFromFoodCart,
+  updateFoodCartQuantity,
+  getMemberships,
+  loadUser,
+})(FoodCartPage);

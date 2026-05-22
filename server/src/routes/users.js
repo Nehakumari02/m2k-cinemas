@@ -2,6 +2,7 @@ const express = require('express');
 const upload = require('../utils/multer');
 const User = require('../models/user');
 const auth = require('../middlewares/auth');
+const { normalizeMembershipPlan } = require('../utils/membershipDefaults');
 
 const router = new express.Router();
 
@@ -48,6 +49,9 @@ router.post('/users/login', async (req, res) => {
     const user = await User.findByCredentials(loginIdentifier, password);
     const token = await user.generateAuthToken();
     const populated = await User.findById(user._id).populate('membership');
+    if (populated.membership) {
+      populated.membership = normalizeMembershipPlan(populated.membership);
+    }
     res.send({ user: populated, token });
   } catch (e) {
     res.status(400).send({
@@ -148,6 +152,9 @@ router.get('/users', auth.enhance, async (req, res) => {
 router.get('/users/me', auth.simple, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate('membership');
+    if (user.membership) {
+      user.membership = normalizeMembershipPlan(user.membership);
+    }
     res.send(user);
   } catch (e) {
     res.status(400).send(e);

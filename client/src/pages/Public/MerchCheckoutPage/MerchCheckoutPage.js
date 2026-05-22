@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
 import { makeStyles, Container, Grid, Typography, TextField, Button, Paper, Box, Divider, MenuItem, CircularProgress } from '@material-ui/core';
-import { createOrder, saveShippingAddress, getWalletData } from '../../../store/actions';
+import { createOrder, saveShippingAddress, getWalletData, getMemberships, loadUser } from '../../../store/actions';
+import { calculateCartTotals } from '../../../utils/cartPricing';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -42,7 +43,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveShippingAddress, getWalletData }) => {
+const MerchCheckoutPage = ({
+  cartState,
+  user,
+  isAuth,
+  membershipPlans,
+  walletBalance,
+  createOrder,
+  saveShippingAddress,
+  getWalletData,
+  getMemberships,
+  loadUser,
+}) => {
   const { cartItems = [], shippingAddress = {} } = cartState || {};
   const classes = useStyles();
   const history = useHistory();
@@ -51,7 +63,9 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
 
   useEffect(() => {
     getWalletData();
-  }, [getWalletData]);
+    getMemberships();
+    if (isAuth) loadUser();
+  }, [getWalletData, getMemberships, loadUser, isAuth]);
 
   const [address, setAddress] = useState({
     fullName: shippingAddress.fullName || user?.name || '',
@@ -65,8 +79,20 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
   const [paymentMethod, setPaymentMethod] = useState('Card');
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const pricing = useMemo(
+    () =>
+      calculateCartTotals({
+        subtotal,
+        pointsUsed,
+        user: isAuth ? user : null,
+        membershipPlans,
+        cartType: 'shop',
+      }),
+    [subtotal, pointsUsed, user, membershipPlans, isAuth]
+  );
+  const { membershipDiscount, membershipName, membershipDiscountPercent, afterCoupon, finalTotal } =
+    pricing;
   const loyaltyPoints = user?.loyaltyPoints || 0;
-  const finalTotal = Math.max(0, subtotal - pointsUsed);
 
   const handleInputChange = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
@@ -222,10 +248,21 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
                 ))}
               </Box>
               <Divider />
+              {membershipName && (
+                <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700, display: 'block', marginBottom: 8 }}>
+                  {membershipName} member — {membershipDiscountPercent}% off shop
+                </Typography>
+              )}
               <Box mt={3} mb={1} display="flex" justifyContent="space-between">
                 <Typography color="textSecondary">Subtotal</Typography>
                 <Typography style={{ fontWeight: 600 }}>₹{subtotal}</Typography>
               </Box>
+              {membershipDiscount > 0 && (
+                <Box mb={2} display="flex" justifyContent="space-between">
+                  <Typography color="textSecondary">Member discount</Typography>
+                  <Typography style={{ fontWeight: 600, color: '#22c55e' }}>-₹{membershipDiscount}</Typography>
+                </Box>
+              )}
               <Box mb={3} display="flex" justifyContent="space-between">
                 <Typography color="textSecondary">Shipping</Typography>
                 <Typography style={{ fontWeight: 600, color: '#22c55e' }}>FREE</Typography>
@@ -246,7 +283,7 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
                     value={pointsUsed || ''}
                     onChange={(e) => {
                       const val = parseInt(e.target.value, 10) || 0;
-                      setPointsUsed(Math.min(val, loyaltyPoints, subtotal));
+                      setPointsUsed(Math.min(val, loyaltyPoints, afterCoupon));
                     }}
                     helperText={`1 Point = ₹1 Discount`}
                   />
@@ -284,7 +321,15 @@ const MerchCheckoutPage = ({ cartState, user, walletBalance, createOrder, saveSh
 const mapStateToProps = state => ({
   cartState: state.cartState,
   user: state.authState.user,
-  walletBalance: state.walletState.balance
+  isAuth: state.authState.isAuthenticated,
+  membershipPlans: state.membershipState.memberships || [],
+  walletBalance: state.walletState.balance,
 });
 
-export default connect(mapStateToProps, { createOrder, saveShippingAddress, getWalletData })(MerchCheckoutPage);
+export default connect(mapStateToProps, {
+  createOrder,
+  saveShippingAddress,
+  getWalletData,
+  getMemberships,
+  loadUser,
+})(MerchCheckoutPage);

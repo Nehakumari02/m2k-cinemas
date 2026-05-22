@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { useHistory, Link, Redirect } from 'react-router-dom';
 import {
@@ -15,7 +15,8 @@ import {
   CircularProgress,
   Chip
 } from '@material-ui/core';
-import { createFoodOrder, getWalletData, getOffers } from '../../../store/actions';
+import { createFoodOrder, getWalletData, getOffers, getMemberships, loadUser } from '../../../store/actions';
+import { calculateCartTotals } from '../../../utils/cartPricing';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -68,7 +69,19 @@ const PICKUP_TIMES = [
   'After show ends',
 ];
 
-const FoodCheckoutPage = ({ cartItems, user, isAuth, walletBalance, createFoodOrder, getWalletData, getOffers, offers }) => {
+const FoodCheckoutPage = ({
+  cartItems,
+  user,
+  isAuth,
+  walletBalance,
+  membershipPlans,
+  createFoodOrder,
+  getWalletData,
+  getOffers,
+  getMemberships,
+  loadUser,
+  offers,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
@@ -89,8 +102,35 @@ const FoodCheckoutPage = ({ cartItems, user, isAuth, walletBalance, createFoodOr
 
   useEffect(() => {
     getOffers();
-    if (isAuth) getWalletData();
-  }, [getWalletData, getOffers, isAuth]);
+    getMemberships();
+    if (isAuth) {
+      getWalletData();
+      loadUser();
+    }
+  }, [getWalletData, getOffers, getMemberships, loadUser, isAuth]);
+
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const pricing = useMemo(
+    () =>
+      calculateCartTotals({
+        subtotal,
+        discountPercentage,
+        pointsUsed,
+        user: isAuth ? user : null,
+        membershipPlans,
+        cartType: 'food',
+      }),
+    [subtotal, discountPercentage, pointsUsed, user, membershipPlans, isAuth]
+  );
+  const {
+    membershipDiscount,
+    membershipName,
+    membershipDiscountPercent,
+    couponDiscount,
+    afterCoupon,
+    finalTotal,
+  } = pricing;
+  const loyaltyPoints = user?.loyaltyPoints || 0;
 
   if (!isAuth) {
     return <Redirect to="/login" />;
@@ -100,12 +140,6 @@ const FoodCheckoutPage = ({ cartItems, user, isAuth, walletBalance, createFoodOr
     history.replace('/food-cart');
     return null;
   }
-
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const discountValue = Math.floor((subtotal * discountPercentage) / 100);
-  const afterDiscount = subtotal - discountValue;
-  const loyaltyPoints = user?.loyaltyPoints || 0;
-  const finalTotal = Math.max(0, afterDiscount - pointsUsed);
 
   const activeOffers = (offers || []).filter(
     o => o.isActive && new Date(o.validTill) > new Date()
@@ -155,7 +189,8 @@ const FoodCheckoutPage = ({ cartItems, user, isAuth, walletBalance, createFoodOr
         price: item.price,
       })),
       totalAmount: finalTotal,
-      discountAmount: discountValue,
+      discountAmount: membershipDiscount + couponDiscount,
+      membershipDiscount,
       couponCode: appliedCoupon || '',
       pointsUsed,
       pickupDetails: {
@@ -362,27 +397,38 @@ const FoodCheckoutPage = ({ cartItems, user, isAuth, walletBalance, createFoodOr
                 </Box>
               ))}
               <Divider style={{ margin: '16px 0' }} />
+              {membershipName && (
+                <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700, display: 'block', marginBottom: 8 }}>
+                  {membershipName} member — {membershipDiscountPercent}% off food
+                </Typography>
+              )}
               <Box display="flex" justifyContent="space-between" mb={1}>
                 <Typography color="textSecondary">Subtotal</Typography>
                 <Typography>₹{subtotal}</Typography>
               </Box>
-              {discountValue > 0 && (
+              {membershipDiscount > 0 && (
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography color="textSecondary">Member discount</Typography>
+                  <Typography style={{ color: '#22c55e' }}>-₹{membershipDiscount}</Typography>
+                </Box>
+              )}
+              {couponDiscount > 0 && (
                 <Box display="flex" justifyContent="space-between" mb={1}>
                   <Typography color="textSecondary">Coupon</Typography>
-                  <Typography style={{ color: '#22c55e' }}>-₹{discountValue}</Typography>
+                  <Typography style={{ color: '#22c55e' }}>-₹{couponDiscount}</Typography>
                 </Box>
               )}
               {loyaltyPoints > 0 && (
                 <TextField
                   fullWidth
-                  label={`Loyalty points (max ${Math.min(loyaltyPoints, afterDiscount)})`}
+                  label={`Loyalty points (max ${Math.min(loyaltyPoints, afterCoupon)})`}
                   type="number"
                   variant="outlined"
                   size="small"
                   value={pointsUsed || ''}
                   onChange={e => {
                     const val = parseInt(e.target.value, 10) || 0;
-                    setPointsUsed(Math.min(val, loyaltyPoints, afterDiscount));
+                    setPointsUsed(Math.min(val, loyaltyPoints, afterCoupon));
                   }}
                   style={{ marginTop: 12, marginBottom: 12 }}
                 />
@@ -423,6 +469,13 @@ const mapStateToProps = state => ({
   isAuth: state.authState.isAuthenticated,
   walletBalance: state.walletState.balance,
   offers: state.offerState.offers,
+  membershipPlans: state.membershipState.memberships || [],
 });
 
-export default connect(mapStateToProps, { createFoodOrder, getWalletData, getOffers })(FoodCheckoutPage);
+export default connect(mapStateToProps, {
+  createFoodOrder,
+  getWalletData,
+  getOffers,
+  getMemberships,
+  loadUser,
+})(FoodCheckoutPage);

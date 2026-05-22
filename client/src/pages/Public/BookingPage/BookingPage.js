@@ -39,6 +39,7 @@ import {
   cancelPendingReservation,
   setPendingReservation,
   loadUser,
+  getMemberships,
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { calculateBookingTotals } from '../../../utils/bookingPricing';
@@ -100,9 +101,11 @@ class BookingPage extends Component {
     getShowtimes();
     getReservations();
     this.props.getOffers();
+    this.props.getMemberships();
     if (user) {
       getSuggestedReservationSeats(user.username);
       getWalletData();
+      this.props.loadUser();
     }
   }
 
@@ -451,6 +454,7 @@ class BookingPage extends Component {
       discountPercentage: this.state.discountPercentage,
       pointsUsed,
       user,
+      membershipPlans: this.props.membershipPlans,
     });
     const { afterDiscountTotal, finalPrice: finalAmount, appliedFirstGstBenefit } = pricing;
 
@@ -1167,6 +1171,7 @@ class BookingPage extends Component {
                 ) : (
                   <BookingCheckout
                     user={user}
+                    membershipPlans={this.props.membershipPlans}
                     ticketPrice={cinema.ticketPrice}
                     seatsAvailable={cinema.seatsAvailable}
                     selectedSeats={selectedSeats.length}
@@ -1229,7 +1234,8 @@ const mapStateToProps = (
     reservationState,
     checkoutState,
     walletState,
-    offerState
+    offerState,
+    membershipState,
   },
   ownProps
 ) => ({
@@ -1257,7 +1263,8 @@ const mapStateToProps = (
   suggestedSeats: reservationState.suggestedSeats,
   walletBalance: walletState.balance,
   loyaltyPoints: walletState.loyaltyPoints,
-  offers: offerState.offers
+  offers: offerState.offers,
+  membershipPlans: membershipState.memberships || [],
 });
 
 const mapDispatchToProps = {
@@ -1286,6 +1293,7 @@ const mapDispatchToProps = {
   cancelPendingReservation,
   setPendingReservation,
   loadUser,
+  getMemberships,
 };
 
 export default connect(
