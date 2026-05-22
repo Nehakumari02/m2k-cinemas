@@ -1,12 +1,12 @@
-import { GET_MEMBERSHIPS, MEMBERSHIP_ERROR } from '../types';
+import { GET_MEMBERSHIPS, PURCHASE_MEMBERSHIP, MEMBERSHIP_ERROR } from '../types';
 
 const initialState = {
   memberships: [],
-  loading: true,
-  error: {}
+  loading: false,
+  error: {},
 };
 
-export default function(state = initialState, action) {
+export default function membershipReducer(state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
@@ -14,13 +14,18 @@ export default function(state = initialState, action) {
       return {
         ...state,
         memberships: payload,
-        loading: false
+        loading: false,
+      };
+    case PURCHASE_MEMBERSHIP:
+      return {
+        ...state,
+        loading: false,
       };
     case MEMBERSHIP_ERROR:
       return {
         ...state,
         error: payload,
-        loading: false
+        loading: false,
       };
     default:
       return state;

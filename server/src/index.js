@@ -28,6 +28,7 @@ const foodOrderRouter = require('./routes/foodOrders');
 const settingsRouter = require('./routes/settings');
 const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
+const membershipRouter = require('./routes/membership');
 
 const app = express();
 app.disable('x-powered-by');
@@ -64,6 +65,7 @@ app.use(foodOrderRouter);
 app.use(settingsRouter);
 app.use(refundRouter);
 app.use(schoolGroupInquiryRouter);
+app.use(membershipRouter);
 
 app.get('/health', (req, res) => {
   res.send({

@@ -44,6 +44,7 @@ const CinemaDetailPage = lazy(() => import('./pages/Public/CinemaDetailPage'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
 const OffersPage = lazy(() => import('./pages/Public/OffersPage'));
 const SchoolGroupBookingPage = lazy(() => import('./pages/Public/SchoolGroupBookingPage'));
+const MembershipPage = lazy(() => import('./pages/Public/MembershipPage'));
 const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
 const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
 const FoodComboPage = lazy(() => import('./pages/Public/FoodComboPage'));
@@ -124,6 +125,12 @@ const Routes = () => {
             path="/school-group-booking"
             layout={PublicLayout}
             component={SchoolGroupBookingPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/membership"
+            layout={PublicLayout}
+            component={MembershipPage}
           />
           <WithLayoutRoute
             exact

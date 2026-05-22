@@ -17,6 +17,7 @@ import cart from './cart';
 import foodCart from './foodCart';
 import wishlist from './wishlist';
 import reviews from './reviews';
+import membership from './membership';
 
 export default combineReducers({
   alertState: alert,
@@ -36,5 +37,6 @@ export default combineReducers({
   cartState: cart,
   foodCartState: foodCart,
   wishlistState: wishlist,
-  reviewState: reviews
+  reviewState: reviews,
+  membershipState: membership,
 });

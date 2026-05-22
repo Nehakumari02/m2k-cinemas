@@ -47,7 +47,8 @@ router.post('/users/login', async (req, res) => {
     const loginIdentifier = identifier || id || username || email;
     const user = await User.findByCredentials(loginIdentifier, password);
     const token = await user.generateAuthToken();
-    res.send({ user, token });
+    const populated = await User.findById(user._id).populate('membership');
+    res.send({ user: populated, token });
   } catch (e) {
     res.status(400).send({
       error: { message: 'You have entered an invalid username or password' },
@@ -146,7 +147,8 @@ router.get('/users', auth.enhance, async (req, res) => {
 // User infos
 router.get('/users/me', auth.simple, async (req, res) => {
   try {
-    res.send(req.user);
+    const user = await User.findById(req.user._id).populate('membership');
+    res.send(user);
   } catch (e) {
     res.status(400).send(e);
   }

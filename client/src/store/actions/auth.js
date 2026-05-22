@@ -161,7 +161,7 @@ export const loadUser = () => async dispatch => {
     if (response.ok) {
       const { user } = responseData;
       user && setUser(user);
-      dispatch({ type: USER_LOADED, payload: responseData });
+      dispatch({ type: USER_LOADED, payload: { user: responseData.user || responseData } });
     }
     if (!response.ok) dispatch({ type: AUTH_ERROR });
   } catch (error) {

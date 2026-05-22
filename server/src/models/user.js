@@ -78,6 +78,18 @@ const userSchema = Schema(
       type: Number,
       default: 0,
     },
+    membership: {
+      type: Schema.Types.ObjectId,
+      ref: 'Membership',
+    },
+    membershipExpiresAt: {
+      type: Date,
+    },
+    /** Set true after member uses the one-time first-booking GST benefit */
+    membershipGstBenefitUsed: {
+      type: Boolean,
+      default: false,
+    },
     wishlist: [{
       type: Schema.Types.ObjectId,
       ref: 'Movie'

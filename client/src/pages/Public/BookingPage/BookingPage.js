@@ -37,9 +37,11 @@ import {
   getOffers,
   confirmReservation,
   cancelPendingReservation,
-  setPendingReservation
+  setPendingReservation,
+  loadUser,
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import { calculateBookingTotals } from '../../../utils/bookingPricing';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
 import styles from './styles';
@@ -429,7 +431,6 @@ class BookingPage extends Component {
 
     const ticketsAmount = selectedSeats.reduce((acc, [row, col]) => {
       const seatVal = Number(cinema.seats[row][col]);
-      // 6 = selected special seat, 5 = special seat (unselected)
       const isSpecial = seatVal === 6 || seatVal === 5;
       const price = isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0
         ? Number(cinema.specialPrice)
@@ -443,14 +444,15 @@ class BookingPage extends Component {
       quantity: item.quantity
     }));
     const foodAmount = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const subTotal = ticketsAmount + foodAmount;
 
-    // Apply coupon discount
-    const discountValue = Math.floor((subTotal * this.state.discountPercentage) / 100);
-    const afterDiscountTotal = subTotal - discountValue;
-
-    // Apply points discount
-    const finalAmount = Math.max(0, afterDiscountTotal - pointsUsed);
+    const pricing = calculateBookingTotals({
+      ticketsTotal: ticketsAmount,
+      foodTotal: foodAmount,
+      discountPercentage: this.state.discountPercentage,
+      pointsUsed,
+      user,
+    });
+    const { afterDiscountTotal, finalPrice: finalAmount, appliedFirstGstBenefit } = pricing;
 
     let paymentSuccess = false;
     if (finalAmount === 0) {
@@ -490,7 +492,8 @@ class BookingPage extends Component {
       ? await this.props.confirmReservation(pendingReservationId, {
           total: afterDiscountTotal,
           pointsUsed: pointsUsed,
-          foodItems
+          foodItems,
+          appliedFirstGstBenefit,
         })
       : await addReservation({
           date: selectedDate,
@@ -511,6 +514,9 @@ class BookingPage extends Component {
       const { data } = response;
       setQRCode(data.QRCode || (data.reservation && data.reservation.QRCode));
       getReservations();
+      if (appliedFirstGstBenefit) {
+        this.props.loadUser();
+      }
       this.setState({ completedWithoutFood: foodItems.length === 0 });
       showInvitationForm();
     }
@@ -1278,7 +1284,8 @@ const mapDispatchToProps = {
   getOffers,
   confirmReservation,
   cancelPendingReservation,
-  setPendingReservation
+  setPendingReservation,
+  loadUser,
 };
 
 export default connect(

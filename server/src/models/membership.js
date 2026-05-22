@@ -19,6 +19,16 @@ const membershipSchema = new Schema({
     type: Number,
     default: 0,
   },
+  /** GST % shown on movie tickets (default 18%) */
+  ticketGstPercent: {
+    type: Number,
+    default: 18,
+  },
+  /** One-time extra % off ticket value on member's first booking */
+  firstBookingGstBenefitPercent: {
+    type: Number,
+    default: 5,
+  },
   benefits: [String],
 }, { timestamps: true });
 

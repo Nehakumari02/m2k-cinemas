@@ -5,9 +5,10 @@ import {
   Grid, 
   Typography, 
   Button, 
-  Card, 
-  CardContent, 
+  Card,
+  CardContent,
   CardActions,
+  Paper,
   Box,
   makeStyles,
   List,
@@ -16,6 +17,7 @@ import {
   ListItemText
 } from '@material-ui/core';
 import { CheckCircle } from '@material-ui/icons';
+import { useHistory } from 'react-router-dom';
 import { getMemberships, purchaseMembership } from '../../../store/actions';
 
 const useStyles = makeStyles((theme) => ({
@@ -72,27 +74,41 @@ const useStyles = makeStyles((theme) => ({
   },
   currentPlan: {
     backgroundColor: '#b72429',
-    color: '#white',
+    color: '#fff',
     pointerEvents: 'none',
-  }
+  },
+  gstBanner: {
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+    color: '#fff',
+    borderRadius: 16,
+    padding: theme.spacing(3, 4),
+    marginBottom: theme.spacing(4),
+    textAlign: 'center',
+  },
+  gstHighlight: {
+    color: '#fbbf24',
+    fontWeight: 800,
+  },
 }));
 
-const MembershipPage = ({ 
-  getMemberships, 
-  purchaseMembership, 
-  memberships, 
+const MembershipPage = ({
+  getMemberships,
+  purchaseMembership,
+  memberships,
   user,
-  isAuthenticated 
+  isAuthenticated,
 }) => {
   const classes = useStyles();
+  const history = useHistory();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getMemberships();
   }, [getMemberships]);
 
-  const handlePurchase = (planId) => {
+  const handlePurchase = planId => {
     if (!isAuthenticated) {
-      // Show login or alert
+      history.push('/login');
       return;
     }
     purchaseMembership(planId);
@@ -118,6 +134,18 @@ const MembershipPage = ({
             Unlock premium benefits and save more on every visit to M2K Cinemas
           </Typography>
         </div>
+
+        <Paper className={classes.gstBanner} elevation={0}>
+          <Typography variant="h6" style={{ fontWeight: 800, marginBottom: 8 }}>
+            Membership GST benefits
+          </Typography>
+          <Typography variant="body1" style={{ lineHeight: 1.7, opacity: 0.95 }}>
+            <span className={classes.gstHighlight}>18% GST</span> on movie tickets is shown clearly
+            at checkout. Members get a{' '}
+            <span className={classes.gstHighlight}>first booking 5% benefit</span> on ticket value
+            (one-time), plus tier discounts on tickets and food.
+          </Typography>
+        </Paper>
 
         <Grid container spacing={4} alignItems="center">
           {memberships.map((plan) => (
@@ -162,8 +190,8 @@ const MembershipPage = ({
   );
 };
 
-const mapStateToProps = (state) => ({
-  memberships: state.membership.memberships,
+const mapStateToProps = state => ({
+  memberships: state.membershipState.memberships,
   user: state.authState.user,
   isAuthenticated: state.authState.isAuthenticated,
 });

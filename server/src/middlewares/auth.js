@@ -7,7 +7,7 @@ const loadUserFromToken = async req => {
   const user = await User.findOne({
     _id: decoded._id,
     'tokens.token': token,
-  });
+  }).populate('membership');
   return { token, user };
 };
 

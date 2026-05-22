@@ -40,10 +40,15 @@ router.post('/memberships/purchase', auth.simple, async (req, res) => {
     expiry.setFullYear(expiry.getFullYear() + 1);
     user.membershipExpiresAt = expiry;
 
+    user.membershipGstBenefitUsed = false;
     await user.save();
-    res.send({ user, message: `Successfully upgraded to ${plan.name} membership!` });
+    const populated = await User.findById(user._id).populate('membership');
+    res.send({
+      user: populated,
+      message: `Successfully upgraded to ${plan.name} membership!`,
+    });
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message || 'Purchase failed' });
   }
 });
 

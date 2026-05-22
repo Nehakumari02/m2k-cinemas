@@ -104,6 +104,9 @@ export default function Footer() {
                 <Link to="/offers" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem' }}>Offers</Link>
               </li>
               <li style={{ marginBottom: '12px' }}>
+                <Link to="/membership" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem' }}>Membership</Link>
+              </li>
+              <li style={{ marginBottom: '12px' }}>
                 <Link
                   to="/school-group-booking"
                   style={{ color: '#f8fafc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700 }}>

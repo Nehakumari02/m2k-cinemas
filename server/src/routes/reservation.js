@@ -174,7 +174,7 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     if (reservation.status !== 'Pending') return res.status(400).send({ error: 'Reservation is already confirmed or cancelled' });
 
     // Update reservation data with final details from payment step
-    const { total, pointsUsed, foodItems } = req.body;
+    const { total, pointsUsed, foodItems, appliedFirstGstBenefit } = req.body;
     if (total !== undefined) reservation.total = total;
     if (foodItems !== undefined) reservation.foodItems = foodItems;
 
@@ -202,6 +202,9 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     }
     
     user.loyaltyPoints += pointsEarned;
+    if (appliedFirstGstBenefit) {
+      user.membershipGstBenefitUsed = true;
+    }
     await user.save();
     
     reservation.status = 'Paid';

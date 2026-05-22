@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Box, Typography, Button, TextField, MenuItem } from '@material-ui/core';
+import { calculateBookingTotals } from '../../../../../utils/bookingPricing';
 
 const useStyles = makeStyles(theme => ({
   checkoutBar: {
@@ -71,6 +72,22 @@ const useStyles = makeStyles(theme => ({
       '&.Mui-focused fieldset': { borderColor: '#b72429' },
     },
     '& .MuiInputLabel-root': { color: '#64748b' },
+  },
+  priceBreakdown: {
+    padding: '12px 24px',
+    borderTop: '1px solid rgba(15,23,42,0.06)',
+    backgroundColor: '#f8fafc',
+  },
+  breakdownLine: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontSize: '0.85rem',
+    color: '#475569',
+    marginBottom: 4,
+  },
+  savingsLine: {
+    color: '#16a34a',
+    fontWeight: 700,
   },
   bookButton: {
     marginLeft: 'auto',
@@ -163,11 +180,32 @@ export default function BookingCheckout(props) {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const ticketsTotal = totalTicketsPrice !== undefined ? totalTicketsPrice : (ticketPrice * selectedSeats);
-  const subTotal = ticketsTotal + foodTotal;
-  const discountValue = Math.floor((subTotal * (discountPercentage || 0)) / 100);
-  const afterDiscountTotal = subTotal - discountValue;
-  const finalPrice = Math.max(0, afterDiscountTotal - (pointsUsed || 0));
+  const ticketsTotal =
+    totalTicketsPrice !== undefined ? totalTicketsPrice : ticketPrice * selectedSeats;
+
+  const pricing = useMemo(
+    () =>
+      calculateBookingTotals({
+        ticketsTotal,
+        foodTotal,
+        discountPercentage,
+        pointsUsed,
+        user,
+      }),
+    [ticketsTotal, foodTotal, discountPercentage, pointsUsed, user]
+  );
+
+  const {
+    ticketGst,
+    ticketGstRate,
+    membershipTicketDiscount,
+    firstBookingBenefit,
+    firstBookingBenefitEligible,
+    membershipName,
+    discountValue,
+    afterDiscountTotal,
+    finalPrice,
+  } = pricing;
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -206,6 +244,11 @@ export default function BookingCheckout(props) {
           <Typography className={classes.priceHighlight}>
             ₹{finalPrice}
           </Typography>
+          {membershipName && (
+            <Typography variant="caption" style={{ color: '#b72429', fontWeight: 700 }}>
+              {membershipName} member
+            </Typography>
+          )}
           {discountValue > 0 && (
             <Typography variant="caption" style={{ color: '#22c55e', fontWeight: 'bold' }}>
               (-₹{discountValue} coupon)
@@ -217,6 +260,40 @@ export default function BookingCheckout(props) {
             </Typography>
           )}
         </div>
+
+        {ticketsTotal > 0 && (
+          <div className={classes.priceBreakdown}>
+            <Typography variant="caption" style={{ fontWeight: 800, color: '#64748b', display: 'block', marginBottom: 8 }}>
+              Price breakdown
+            </Typography>
+            <div className={classes.breakdownLine}>
+              <span>Tickets</span>
+              <span>₹{ticketsTotal}</span>
+            </div>
+            <div className={classes.breakdownLine}>
+              <span>GST on tickets ({ticketGstRate}%)</span>
+              <span>₹{ticketGst}</span>
+            </div>
+            {membershipTicketDiscount > 0 && (
+              <div className={`${classes.breakdownLine} ${classes.savingsLine}`}>
+                <span>Member ticket discount</span>
+                <span>-₹{membershipTicketDiscount}</span>
+              </div>
+            )}
+            {firstBookingBenefit > 0 && (
+              <div className={`${classes.breakdownLine} ${classes.savingsLine}`}>
+                <span>First booking benefit ({firstBookingBenefitEligible ? '5%' : ''})</span>
+                <span>-₹{firstBookingBenefit}</span>
+              </div>
+            )}
+            {foodTotal > 0 && (
+              <div className={classes.breakdownLine}>
+                <span>Food &amp; combos</span>
+                <span>₹{foodTotal}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {timeLeft !== undefined && showFoodStep && (
           <div className={classes.infoBlock} style={{ marginLeft: 'auto' }}>
