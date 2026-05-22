@@ -126,6 +126,8 @@ const FoodCheckoutPage = ({
     membershipDiscount,
     membershipName,
     membershipDiscountPercent,
+    foodGst,
+    foodGstRate,
     couponDiscount,
     afterCoupon,
     finalTotal,
@@ -406,6 +408,12 @@ const FoodCheckoutPage = ({
                 <Typography color="textSecondary">Subtotal</Typography>
                 <Typography>₹{subtotal}</Typography>
               </Box>
+              {foodGst > 0 && (
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography color="textSecondary">GST on food ({foodGstRate}%)</Typography>
+                  <Typography>₹{foodGst}</Typography>
+                </Box>
+              )}
               {membershipDiscount > 0 && (
                 <Box display="flex" justifyContent="space-between" mb={1}>
                   <Typography color="textSecondary">Member discount</Typography>

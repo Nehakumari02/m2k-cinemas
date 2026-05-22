@@ -10,6 +10,7 @@ import {
   SET_SUGGESTED_SEATS,
   SET_QR_CODE,
   SET_SELECTED_FOOD,
+  CLEAR_SELECTED_FOOD,
   SET_PENDING_RESERVATION
 } from '../types';
 
@@ -17,6 +18,8 @@ export const setSelectedFood = (item, quantity) => ({
   type: SET_SELECTED_FOOD,
   payload: { item, quantity }
 });
+
+export const clearSelectedFood = () => ({ type: CLEAR_SELECTED_FOOD });
 
 export const setSelectedSeats = seats => ({
   type: SET_SELECTED_SEATS,

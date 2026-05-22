@@ -10,6 +10,7 @@ import {
   SET_SUGGESTED_SEATS,
   SET_QR_CODE,
   SET_SELECTED_FOOD,
+  CLEAR_SELECTED_FOOD,
   SET_PENDING_RESERVATION
 } from '../types';
 
@@ -136,6 +137,8 @@ export default function(state = initialState, action) {
       return setQRCode(state, payload);
     case SET_SELECTED_FOOD:
       return setSelectedFood(state, payload);
+    case CLEAR_SELECTED_FOOD:
+      return { ...state, selectedFood: {} };
     case SET_PENDING_RESERVATION:
       return setPendingReservation(state, payload);
     case RESET_CHECKOUT:

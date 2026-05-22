@@ -40,6 +40,7 @@ import {
   setPendingReservation,
   loadUser,
   getMemberships,
+  clearSelectedFood,
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { calculateBookingTotals } from '../../../utils/bookingPricing';
@@ -553,6 +554,21 @@ class BookingPage extends Component {
     this.stopTimer();
     this.setState({ showFoodStep: false, showPaymentSection: false });
     this.props.history.push(`/movie/booking/${this.props.match.params.id}/seats`);
+  };
+
+  onSkipFoodSelection = async () => {
+    const { clearSelectedFood: clearFood } = this.props;
+    clearFood();
+    await this.onContinueToPayment();
+  };
+
+  onSkipFoodFromSeats = async () => {
+    const { selectedSeats, match, clearSelectedFood: clearFood } = this.props;
+    if (selectedSeats.length === 0) return;
+    clearFood();
+    this.props.history.push(`/movie/booking/${match.params.id}/payment`);
+    this.setState({ showFoodStep: true, showPaymentSection: false });
+    await this.onContinueToPayment();
   };
 
   onContinueToPayment = async () => {
@@ -1141,6 +1157,13 @@ class BookingPage extends Component {
                 />
                 <div className={classes.proceedBar}>
                   <Button
+                    variant="outlined"
+                    className={classes.skipFoodButton}
+                    disabled={!selectedSeats.length}
+                    onClick={this.onSkipFoodFromSeats}>
+                    Skip food selection
+                  </Button>
+                  <Button
                     className={classes.proceedButton}
                     disabled={!selectedSeats.length}
                     onClick={this.onToggleFoodStep}>
@@ -1152,12 +1175,20 @@ class BookingPage extends Component {
 
             {isPaymentStep && cinema && selectedCinema && selectedTime && !showInvitation && (
               <>
-                <BookingFood />
+                <BookingFood onSkip={this.onSkipFoodSelection} />
                 {!this.state.showPaymentSection ? (
                   <div className={classes.proceedBar}>
                     <Button
                       variant="outlined"
-                      style={{ marginRight: 12, background: '#fff', color: '#64748b', borderRadius: 8 }}
+                      className={classes.skipFoodButton}
+                      style={{ background: '#fff' }}
+                      disabled={!selectedSeats.length}
+                      onClick={this.onSkipFoodSelection}>
+                      Skip snacks &amp; combos
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      style={{ background: '#fff', color: '#64748b', borderRadius: 8 }}
                       onClick={this.onToggleFoodStep}>
                       Back to Seats
                     </Button>
@@ -1294,6 +1325,7 @@ const mapDispatchToProps = {
   setPendingReservation,
   loadUser,
   getMemberships,
+  clearSelectedFood,
 };
 
 export default connect(

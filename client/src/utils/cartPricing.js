@@ -1,4 +1,4 @@
-import { getActiveMembership } from './bookingPricing';
+import { getActiveMembership, FOOD_GST_RATE } from './bookingPricing';
 
 /**
  * Cart totals with membership discount, optional coupon, and loyalty points.
@@ -23,13 +23,21 @@ export function calculateCartTotals({
       ? Math.floor((subtotal * discountPercent) / 100)
       : 0;
 
+  const foodGstRate = cartType === 'food' ? FOOD_GST_RATE : 0;
+  const foodGst =
+    cartType === 'food' && subtotal > 0 ? Math.round((subtotal * foodGstRate) / 100) : 0;
+
   const afterMembership = Math.max(0, subtotal - membershipDiscount);
-  const couponDiscount = Math.floor((afterMembership * (discountPercentage || 0)) / 100);
-  const afterCoupon = Math.max(0, afterMembership - couponDiscount);
+  const subtotalWithGst = afterMembership + foodGst;
+  const couponDiscount = Math.floor((subtotalWithGst * (discountPercentage || 0)) / 100);
+  const afterCoupon = Math.max(0, subtotalWithGst - couponDiscount);
   const finalTotal = Math.max(0, afterCoupon - (pointsUsed || 0));
 
   return {
     subtotal,
+    foodGstRate,
+    foodGst,
+    subtotalWithGst,
     membershipDiscount,
     membershipDiscountPercent: discountPercent,
     membershipName: membership?.name || null,

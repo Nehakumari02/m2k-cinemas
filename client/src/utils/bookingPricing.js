@@ -1,6 +1,9 @@
 /** Standard GST rate on movie tickets (India) */
 export const TICKET_GST_RATE = 18;
 
+/** GST on food & concessions (India) */
+export const FOOD_GST_RATE = 5;
+
 /** Fallback tier benefits when DB plan fields are missing (old seeds) */
 export const MEMBERSHIP_TIER_DEFAULTS = {
   Silver: { ticketDiscount: 10, foodDiscount: 5, shopDiscount: 5, ticketGstPercent: 18, firstBookingGstBenefitPercent: 5 },
@@ -60,7 +63,7 @@ export function getActiveMembership(user, membershipPlans = []) {
 }
 
 /**
- * Ticket + food pricing with 18% GST on tickets and membership savings.
+ * Ticket + food pricing with GST on tickets (18%) and food (5%), plus membership savings.
  */
 export function calculateBookingTotals({
   ticketsTotal = 0,
@@ -73,6 +76,9 @@ export function calculateBookingTotals({
   const membership = getActiveMembership(user, membershipPlans);
   const ticketGstRate = membership?.ticketGstPercent ?? TICKET_GST_RATE;
   const ticketGst = Math.round((ticketsTotal * ticketGstRate) / 100);
+  const foodGstRate = FOOD_GST_RATE;
+  const foodGst = foodTotal > 0 ? Math.round((foodTotal * foodGstRate) / 100) : 0;
+  const foodWithGst = foodTotal + foodGst;
 
   let membershipTicketDiscount = 0;
   let membershipFoodDiscount = 0;
@@ -98,7 +104,7 @@ export function calculateBookingTotals({
   const ticketsWithGst = ticketsTotal + ticketGst;
   const membershipSavings =
     membershipTicketDiscount + membershipFoodDiscount + firstBookingBenefit;
-  const preCouponTotal = Math.max(0, ticketsWithGst + foodTotal - membershipSavings);
+  const preCouponTotal = Math.max(0, ticketsWithGst + foodWithGst - membershipSavings);
   const discountValue = Math.floor((preCouponTotal * (discountPercentage || 0)) / 100);
   const afterDiscountTotal = Math.max(0, preCouponTotal - discountValue);
   const finalPrice = Math.max(0, afterDiscountTotal - (pointsUsed || 0));
@@ -108,6 +114,9 @@ export function calculateBookingTotals({
     ticketGstRate,
     ticketGst,
     ticketsWithGst,
+    foodGstRate,
+    foodGst,
+    foodWithGst,
     membershipTicketDiscount,
     membershipFoodDiscount,
     firstBookingBenefit,
@@ -115,7 +124,7 @@ export function calculateBookingTotals({
     membershipSavings,
     membershipName: membership?.name || null,
     foodTotal,
-    subTotal: ticketsWithGst + foodTotal,
+    subTotal: ticketsWithGst + foodWithGst,
     preCouponTotal,
     discountValue,
     afterDiscountTotal,

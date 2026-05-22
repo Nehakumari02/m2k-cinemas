@@ -200,6 +200,9 @@ export default function BookingCheckout(props) {
   const {
     ticketGst,
     ticketGstRate,
+    foodGst,
+    foodGstRate,
+    foodWithGst,
     membershipTicketDiscount,
     membershipFoodDiscount,
     firstBookingBenefit,
@@ -237,7 +240,7 @@ export default function BookingCheckout(props) {
           <div className={classes.infoBlock}>
             <Typography className={classes.bannerTitle}>Add-ons</Typography>
             <Typography className={classes.bannerContent}>
-              ₹{foodTotal}
+              ₹{foodWithGst}
             </Typography>
           </div>
         )}
@@ -293,16 +296,22 @@ export default function BookingCheckout(props) {
                 <span>-₹{firstBookingBenefit}</span>
               </div>
             )}
+            {foodTotal > 0 && (
+              <>
+                <div className={classes.breakdownLine}>
+                  <span>Food &amp; combos</span>
+                  <span>₹{foodTotal}</span>
+                </div>
+                <div className={classes.breakdownLine}>
+                  <span>GST on food ({foodGstRate}%)</span>
+                  <span>₹{foodGst}</span>
+                </div>
+              </>
+            )}
             {membershipFoodDiscount > 0 && (
               <div className={`${classes.breakdownLine} ${classes.savingsLine}`}>
                 <span>Member food discount</span>
                 <span>-₹{membershipFoodDiscount}</span>
-              </div>
-            )}
-            {foodTotal > 0 && (
-              <div className={classes.breakdownLine}>
-                <span>Food &amp; combos</span>
-                <span>₹{foodTotal}</span>
               </div>
             )}
           </div>

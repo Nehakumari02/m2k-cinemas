@@ -217,6 +217,12 @@ const FoodCartPage = ({
               <Typography color="textSecondary">Subtotal</Typography>
               <Typography style={{ fontWeight: 600 }}>₹{subtotal}</Typography>
             </Box>
+            {pricing.foodGst > 0 && (
+              <Box display="flex" justifyContent="space-between" mb={2}>
+                <Typography color="textSecondary">GST on food ({pricing.foodGstRate}%)</Typography>
+                <Typography style={{ fontWeight: 600 }}>₹{pricing.foodGst}</Typography>
+              </Box>
+            )}
             {pricing.membershipDiscount > 0 && (
               <Box display="flex" justifyContent="space-between" mb={2}>
                 <Typography className={classes.savingsLine}>Member discount</Typography>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Typography, Grid, Button, Card, CardMedia, CardContent, CircularProgress, IconButton } from '@material-ui/core';
+import { Typography, Grid, Button, Card, CardMedia, CardContent, CircularProgress, IconButton, Box } from '@material-ui/core';
 import { Add as AddIcon, Remove as RemoveIcon } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { getFood, setSelectedFood } from '../../../../../store/actions';
@@ -9,7 +9,7 @@ import styles from './styles';
 
 const useStyles = makeStyles(styles);
 
-const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood }) => {
+const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood, onSkip }) => {
   const classes = useStyles();
   const { food, loading } = foodState;
 
@@ -24,8 +24,21 @@ const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood }) => {
 
   return (
     <div id="booking-food-section" className={classes.root}>
-      <Typography variant="h5" className={classes.title}>
-        Add some <span>Snacks & Combos</span>?
+      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" style={{ gap: 12, marginBottom: 8 }}>
+        <Typography variant="h5" className={classes.title} style={{ marginBottom: 0 }}>
+          Add some <span>Snacks & Combos</span>?
+        </Typography>
+        {onSkip && (
+          <Button
+            variant="text"
+            onClick={onSkip}
+            style={{ color: '#64748b', fontWeight: 600, textTransform: 'none', whiteSpace: 'nowrap' }}>
+            Skip — tickets only
+          </Button>
+        )}
+      </Box>
+      <Typography variant="body2" color="textSecondary" style={{ marginBottom: 16 }}>
+        Optional. You can add food now or skip and pay for tickets only.
       </Typography>
 
       {loading ? (

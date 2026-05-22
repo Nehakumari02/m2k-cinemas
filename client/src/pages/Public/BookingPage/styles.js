@@ -125,6 +125,17 @@ export default theme => ({
     marginTop: theme.spacing(2),
     display: 'flex',
     justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: theme.spacing(1.5),
+  },
+  skipFoodButton: {
+    color: '#64748b',
+    fontWeight: 600,
+    textTransform: 'none',
+    borderColor: 'rgba(100, 116, 139, 0.4)',
+    borderRadius: 8,
+    padding: theme.spacing(1.2, 2.5),
   },
   proceedButton: {
     background: 'linear-gradient(90deg, #b72429, #8b1c20)',
