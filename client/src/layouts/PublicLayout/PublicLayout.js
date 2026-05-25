@@ -1,7 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 import { useLocation } from 'react-router-dom';
+import { logout } from '../../store/actions';
 import { Navbar, Footer, StickyFnBBar } from './components';
+import { SlideMenuShell } from './components/SlideMenu';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,17 +26,40 @@ function PublicLayout(props) {
       p => location.pathname === p || location.pathname.startsWith(`${p}/`)
     ) || location.pathname.includes('/movie/booking/');
   const classes = useStyles({ keepTopSpacing, showStickyFnB: !hideStickyFnB });
-  const { children, withFooter = true } = props;
+  const {
+    children,
+    withFooter = true,
+    isAuth,
+    user,
+    logout: doLogout,
+    cartItems,
+    foodCartItems,
+  } = props;
+  const cartCount = (cartItems || []).reduce((acc, item) => acc + item.quantity, 0);
+  const foodCartCount = (foodCartItems || []).reduce((acc, item) => acc + item.quantity, 0);
+
   return (
-    <div className={classes.root}>
-      <Navbar />
-      <div className={classes.content}>
-        {children}
+    <SlideMenuShell
+      isAuth={isAuth}
+      user={user}
+      onLogout={doLogout}
+      cartCount={cartCount}
+      foodCartCount={foodCartCount}>
+      <div className={classes.root}>
+        <Navbar />
+        <div className={classes.content}>{children}</div>
+        {withFooter && <Footer />}
+        {!hideStickyFnB && <StickyFnBBar />}
       </div>
-      {withFooter && <Footer />}
-      {!hideStickyFnB && <StickyFnBBar />}
-    </div>
+    </SlideMenuShell>
   );
 }
 
-export default PublicLayout;
+const mapStateToProps = state => ({
+  isAuth: state.authState.isAuthenticated,
+  user: state.authState.user,
+  cartItems: state.cartState.cartItems,
+  foodCartItems: state.foodCartState.cartItems,
+});
+
+export default connect(mapStateToProps, { logout })(PublicLayout);

@@ -3,22 +3,21 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logout } from '../../../../store/actions';
 import classnames from 'classnames';
-import { withStyles, Typography, List, ListItem, Badge, IconButton } from '@material-ui/core';
-import { 
+import { withStyles, List, ListItem, Badge } from '@material-ui/core';
+import {
   ShoppingCart as ShoppingCartIcon,
   Fastfood as FoodCartIcon,
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
   Instagram as InstagramIcon,
-  YouTube as YouTubeIcon
+  YouTube as YouTubeIcon,
 } from '@material-ui/icons';
 
-// Component styles
 import styles from './styles';
 import UserPopover from './components/UserPopover/UserPopover';
 
 class Navbar extends Component {
-  state = { showMenu: false, scrollPos: window.pageYOffset };
+  state = { scrollPos: window.pageYOffset };
 
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
@@ -35,7 +34,7 @@ class Navbar extends Component {
   };
 
   render() {
-    const { showMenu, scrollPos } = this.state;
+    const { scrollPos } = this.state;
     const { classes, isAuth, user, logout, cartItems, foodCartItems } = this.props;
     const cartCount = (cartItems || []).reduce((acc, item) => acc + item.quantity, 0);
     const foodCartCount = (foodCartItems || []).reduce((acc, item) => acc + item.quantity, 0);
@@ -169,153 +168,7 @@ class Navbar extends Component {
             </UserPopover>
           </div>
 
-          <div className={classes.navMobile}>
-            <div
-              className={classnames(classes.navIcon, {
-                [classes.navIconActive]: showMenu
-              })}
-              onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
-              <div
-                className={classnames(
-                  classes.navIconLine,
-                  classes.navIconLine__left
-                )}
-              />
-              <div className={classes.navIconLine} />
-              <div
-                className={classnames(
-                  classes.navIconLine,
-                  classes.navIconLine__right
-                )}
-              />
-            </div>
-          </div>
         </nav>
-        <div
-          className={classnames({
-            [classes.navActive]: showMenu,
-            [classes.nav]: true
-          })}>
-          <div className={classes.navContent}>
-            <div className={classes.currentPageShadow}>M2K</div>
-            <ul
-              className={classes.innerNav}
-              onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/movies">
-                  Movies
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/cinemas">
-                  Cinemas
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/food-combos">
-                  Food & Combos
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/offers">
-                  Offers
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/events">
-                  Events
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/showtimings">
-                  Showtimings
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/about-us">
-                  About Us
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/contact-us">
-                  Contact Us
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/shop">
-                  Shop
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/food-cart">
-                  Food cart ({foodCartCount})
-                </Link>
-              </li>
-              <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/cart">
-                  Shop cart ({cartCount})
-                </Link>
-              </li>
-              {user && (
-                <li className={classes.innerNavListItem}>
-                  {user.role !== 'guest' ? (
-                    <Link className={classes.innerNavLink} to="/admin/dashboard">
-                      Admin Dashboard
-                    </Link>
-                  ) : (
-                    <Link className={classes.innerNavLink} to="/mydashboard">
-                      My Bookings
-                    </Link>
-                  )}
-                </li>
-              )}
-              {user && (
-                <li className={classes.innerNavListItem}>
-                  <Link className={classes.innerNavLink} to="/mywallet">
-                    My Wallet
-                  </Link>
-                </li>
-              )}
-              {user && user.isSessionGuest && (
-                <li className={classes.innerNavListItem}>
-                  <Link className={classes.innerNavLink} to="/register" style={{ color: '#facc15' }}>
-                    Create full account
-                  </Link>
-                </li>
-              )}
-              {user && user.role === 'guest' && (
-                <>
-                  <li className={classes.innerNavListItem}>
-                    <Link className={classes.innerNavLink} to="/myorders">
-                      My Orders
-                    </Link>
-                  </li>
-                  <li className={classes.innerNavListItem}>
-                    <Link className={classes.innerNavLink} to="/wishlist">
-                      My Wishlist
-                    </Link>
-                  </li>
-                </>
-              )}
-              {isAuth ? (
-                <li className={classes.innerNavListItem}>
-                  <Link
-                    className={classes.innerNavLink}
-                    onClick={logout}
-                    to="/">
-                    Logout
-                  </Link>
-                </li>
-              ) : (
-                <li className={classes.innerNavListItem}>
-                  <Link className={classes.innerNavLink} to="/login">
-                    Login
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
-        </div>
       </Fragment>
     );
   }

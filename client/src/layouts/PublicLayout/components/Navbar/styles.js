@@ -27,7 +27,7 @@ export default theme => ({
     alignItems: 'center',
     paddingTop: '.15rem',
     paddingBottom: '.15rem',
-    marginRight: '20px',
+    marginRight: '12px',
     fontSize: '1.5rem',
     lineHeight: 'inherit',
     whiteSpace: 'nowrap',
