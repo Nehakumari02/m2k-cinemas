@@ -91,10 +91,25 @@ router.post('/reservations', auth.simple, async (req, res) => {
   }
 });
 
-// Get all reservations
+// Get all reservations (excludes expired Pending holds unless admin/staff)
 router.get('/reservations', auth.simple, async (req, res) => {
   try {
-    const reservations = await Reservation.find({});
+    await Reservation.deleteMany({
+      status: 'Pending',
+      expiresAt: { $lte: new Date() },
+    });
+
+    const isStaff = ['superadmin', 'admin'].includes(req.user.role);
+    const filter = isStaff
+      ? {}
+      : {
+          $or: [
+            { status: { $ne: 'Pending' } },
+            { status: 'Pending', expiresAt: { $gt: new Date() } },
+          ],
+        };
+
+    const reservations = await Reservation.find(filter);
     res.send(reservations);
   } catch (e) {
     res.status(400).send(e);

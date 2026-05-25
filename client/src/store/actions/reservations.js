@@ -186,6 +186,7 @@ export const confirmReservation = (id, finalData) => async dispatch => {
 };
 
 export const cancelPendingReservation = id => async dispatch => {
+  if (!id) return { status: 'skipped' };
   try {
     const token = localStorage.getItem('jwtToken');
     const url = '/reservations/pending/' + id;
@@ -196,9 +197,11 @@ export const cancelPendingReservation = id => async dispatch => {
       }
     });
     if (response.ok) {
+      await dispatch(getReservations());
       return { status: 'success' };
     }
   } catch (error) {
     console.error('Cancel pending reservation failed', error);
   }
+  return { status: 'error' };
 };

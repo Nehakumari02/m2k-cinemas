@@ -44,6 +44,7 @@ import {
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { calculateBookingTotals } from '../../../utils/bookingPricing';
+import { isReservationSeatHold } from '../../../utils/reservationSeats';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
 import styles from './styles';
@@ -101,6 +102,9 @@ class BookingPage extends Component {
     user ? getCinemasUserModeling(user.username) : getCinemas();
     getShowtimes();
     getReservations();
+    this.reservationsPoll = setInterval(() => {
+      if (this.props.isAuth) getReservations();
+    }, 30000);
     this.props.getOffers();
     this.props.getMemberships();
     if (user) {
@@ -168,6 +172,7 @@ class BookingPage extends Component {
 
   componentWillUnmount() {
     this.stopTimer();
+    if (this.reservationsPoll) clearInterval(this.reservationsPoll);
     const { pendingReservationId, cancelPendingReservation, resetCheckout } = this.props;
     if (pendingReservationId) {
       cancelPendingReservation(pendingReservationId);
@@ -175,21 +180,54 @@ class BookingPage extends Component {
     }
   }
 
+  handlePendingReservationExpired = async () => {
+    const {
+      pendingReservationId,
+      cancelPendingReservation,
+      setPendingReservation,
+      getReservations,
+      setAlert,
+      match,
+      history,
+    } = this.props;
+
+    this.stopTimer();
+    if (pendingReservationId) {
+      await cancelPendingReservation(pendingReservationId);
+      setPendingReservation(null, null);
+    }
+    await getReservations();
+    setAlert('Session expired. Seats have been released.', 'warning', 6000);
+    this.setState({ showFoodStep: false, showPaymentSection: false, timeLeft: 0 });
+    history.push(`/movie/booking/${match.params.id}/seats`);
+  };
+
   startTimer = () => {
     this.stopTimer();
-    this.setState({ timeLeft: 420 });
+    this.expiryHandled = false;
+    const expiresAt = this.props.reservationExpiresAt
+      ? new Date(this.props.reservationExpiresAt).getTime()
+      : Date.now() + 7 * 60 * 1000;
+    const initialLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+    this.setState({ timeLeft: initialLeft || 420 });
+
     this.timer = setInterval(() => {
-      this.setState(prevState => {
-        if (prevState.timeLeft <= 1) {
-          this.stopTimer();
-          this.props.setAlert('Session expired. Seats have been released.', 'warning', 5000);
-          this.props.cancelPendingReservation(this.props.pendingReservationId);
-          this.props.resetCheckout();
-          this.setState({ showFoodStep: false, showPaymentSection: false });
-          return { timeLeft: 0 };
-        }
-        return { timeLeft: prevState.timeLeft - 1 };
-      });
+      if (this.expiryHandled) return;
+
+      const expiry = this.props.reservationExpiresAt
+        ? new Date(this.props.reservationExpiresAt).getTime()
+        : null;
+      const nextLeft = expiry
+        ? Math.max(0, Math.floor((expiry - Date.now()) / 1000))
+        : Math.max(0, (this.state.timeLeft || 0) - 1);
+
+      if (nextLeft <= 0) {
+        this.expiryHandled = true;
+        this.setState({ timeLeft: 0 });
+        this.handlePendingReservationExpired();
+        return;
+      }
+      this.setState({ timeLeft: nextLeft });
     }, 1000);
   };
 
@@ -696,10 +734,11 @@ class BookingPage extends Component {
 
     const filteredReservations = reservations.filter(
       reservation =>
+        isReservationSeatHold(reservation) &&
         new Date(reservation.date).toLocaleDateString() ===
-        new Date(selectedDate).toLocaleDateString() &&
+          new Date(selectedDate).toLocaleDateString() &&
         reservation.startAt === selectedTime &&
-        reservation._id !== pendingReservationId // Don't mark current user's pending seats as reserved for them
+        reservation._id !== pendingReservationId
     );
     if (filteredReservations.length && selectedDate && selectedTime) {
       const reservedSeats = filteredReservations
