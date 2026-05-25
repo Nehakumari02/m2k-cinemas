@@ -55,8 +55,14 @@ import BookingCheckout from './components/BookingCheckout/BookingCheckout';
 import BookingInvitation from './components/BookingInvitation/BookingInvitation';
 import BookingFood from './components/BookingFood/BookingFood';
 import BookingFoodLastChance from './components/BookingFoodLastChance/BookingFoodLastChance';
-
 import jsPDF from 'jspdf';
+
+const REGISTRATION_REQUIRED_MSG =
+  'Registration required. Please create a full account with your phone number to book tickets.';
+
+function needsRegistration(user) {
+  return Boolean(user?.isSessionGuest || !(user?.phone || '').trim());
+}
 
 class BookingPage extends Component {
   didSetSuggestion = false;
@@ -165,9 +171,6 @@ class BookingPage extends Component {
       getCinema(selectedCinema);
     }
 
-    if (!prevProps.isAuth && this.props.isAuth && this.state.loginResumePayment) {
-      this.setState({ loginResumePayment: false }, () => this.onContinueToPayment());
-    }
   }
 
   componentWillUnmount() {
@@ -427,6 +430,9 @@ class BookingPage extends Component {
 
     if (selectedSeats.length === 0) return;
     if (!isAuth) return toggleLoginPopup();
+    if (needsRegistration(user)) {
+      return this.props.setAlert(REGISTRATION_REQUIRED_MSG, 'error', 6000);
+    }
     if (!paymentMethod)
       return this.props.setAlert('Please select a payment method', 'error', 5000);
 
@@ -628,6 +634,10 @@ class BookingPage extends Component {
     if (!isAuth) {
       this.setState({ loginResumePayment: true });
       return toggleLoginPopup();
+    }
+
+    if (needsRegistration(user)) {
+      return this.props.setAlert(REGISTRATION_REQUIRED_MSG, 'error', 6000);
     }
 
     const res = await addReservation({
@@ -1282,7 +1292,20 @@ class BookingPage extends Component {
             toggleLoginPopup();
           }}
           maxWidth="sm">
-          <LoginForm redirect={false} />
+          <LoginForm
+            redirect={false}
+            onAuthSuccess={() => {
+              const { toggleLoginPopup: closeLogin } = this.props;
+              if (this.state.loginResumePayment) {
+                this.setState({ loginResumePayment: false }, () => {
+                  closeLogin();
+                  this.onContinueToPayment();
+                });
+              } else {
+                closeLogin();
+              }
+            }}
+          />
         </ResponsiveDialog>
       </Container>
     );

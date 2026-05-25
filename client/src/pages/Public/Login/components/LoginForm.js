@@ -5,7 +5,7 @@ import { Button, TextField, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import FacebookLogin from 'react-facebook-login';
 import GoogleLogin from 'react-google-login';
-import { login, facebookLogin, googleLogin } from '../../../../store/actions';
+import { login, facebookLogin, googleLogin, guestLogin } from '../../../../store/actions';
 import { history } from '../../../../utils';
 
 const useStyles = makeStyles(theme => ({
@@ -16,77 +16,88 @@ const useStyles = makeStyles(theme => ({
     flexBasis: '700px',
     [theme.breakpoints.down('sm')]: {
       paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(2)
-    }
+      paddingRight: theme.spacing(2),
+    },
   },
   title: {
     color: theme.palette.common.contrastText,
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   socialLogin: {
-    margin: theme.spacing(4, 0)
+    margin: theme.spacing(4, 0),
   },
   fields: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   textField: {
     width: '100%',
     '& + & ': {
-      marginTop: theme.spacing(2)
-    }
-  },
-  progress: {
-    display: 'block',
-    marginTop: theme.spacing(2),
-    marginLeft: 'auto',
-    marginRight: 'auto'
+      marginTop: theme.spacing(2),
+    },
   },
   loginButton: {
     marginTop: theme.spacing(2),
-    width: '100%'
+    width: '100%',
   },
   register: {
     marginTop: theme.spacing(2),
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
   },
   registerUrl: {
     color: theme.palette.primary.main,
     fontWeight: 'bold',
     '&:hover': {
-      color: theme.palette.primary.main
-    }
+      color: theme.palette.primary.main,
+    },
   },
-  fieldError: {
-    color: theme.palette.danger.main,
-    marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(1)
+  guestLink: {
+    display: 'block',
+    marginTop: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    fontWeight: 600,
+    cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+    width: '100%',
+    fontSize: '0.95rem',
+    textDecoration: 'underline',
+    '&:hover': {
+      color: theme.palette.primary.main,
+    },
   },
-  submitError: {
-    color: theme.palette.danger.main,
-    alignText: 'center',
-    marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(2)
-  }
 }));
 
 function LoginForm(props) {
-  const { facebookLogin, googleLogin, isAuthenticated, user, redirect } = props;
+  const { facebookLogin, googleLogin, guestLogin, isAuthenticated, user, redirect, onAuthSuccess } =
+    props;
   const classes = useStyles();
   const [values, setValues] = useState({ username: '', password: '' });
+  const [guestLoading, setGuestLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && redirect) {
-      if (user && user.role === 'superadmin')
-        return history.push('/admin/dashboard');
+    if (!isAuthenticated) return;
+    if (onAuthSuccess) {
+      onAuthSuccess(user);
+      return;
+    }
+    if (redirect) {
+      if (user && user.role === 'superadmin') return history.push('/admin/dashboard');
       return history.push('/');
     }
-  }, [isAuthenticated, user, redirect]);
+  }, [isAuthenticated, user, redirect, onAuthSuccess]);
 
   const handleFieldChange = e =>
     setValues({
       ...values,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+
+  const handleGuestLogin = async () => {
+    setGuestLoading(true);
+    await guestLogin();
+    setGuestLoading(false);
+  };
 
   return (
     <form className={classes.form}>
@@ -113,7 +124,7 @@ function LoginForm(props) {
                 marginBottom: 10,
                 height: 60,
                 fontSize: 'calc(.27548vw + 12.71074px)',
-                fontWeight: 700
+                fontWeight: 700,
               }}>
               Login With Google
             </Button>
@@ -121,7 +132,7 @@ function LoginForm(props) {
         />
         <FacebookLogin
           buttonStyle={{ width: '100%', height: 60 }}
-          appId={process.env.REACT_APP_FACEBOOK_APP_ID} //APP ID NOT CREATED YET
+          appId={process.env.REACT_APP_FACEBOOK_APP_ID}
           fields="name,email,picture"
           callback={facebookLogin}
         />
@@ -156,20 +167,30 @@ function LoginForm(props) {
         variant="contained">
         Login now
       </Button>
+
       <Typography className={classes.register} variant="body1">
         Don't have an account?
         <Link className={classes.registerUrl} to="/register">
           register
         </Link>
       </Typography>
+
+      <button
+        type="button"
+        className={classes.guestLink}
+        disabled={guestLoading}
+        onClick={handleGuestLogin}>
+        {guestLoading ? 'Please wait…' : 'Continue as Guest'}
+      </button>
     </form>
   );
 }
 
 const mapStateToProps = state => ({
   isAuthenticated: state.authState.isAuthenticated,
-  user: state.authState.user
+  user: state.authState.user,
 });
-export default connect(mapStateToProps, { login, facebookLogin, googleLogin })(
+
+export default connect(mapStateToProps, { login, facebookLogin, googleLogin, guestLogin })(
   LoginForm
 );

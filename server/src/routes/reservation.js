@@ -5,14 +5,32 @@ const User = require('../models/user');
 const userModeling = require('../utils/userModeling');
 const generateQR = require('../utils/generateQRCode');
 const Setting = require('../models/setting');
+const {
+  REGISTRATION_REQUIRED_MESSAGE,
+  requiresRegistration,
+  formatReservationError,
+} = require('../utils/bookingAuth');
 
 const router = new express.Router();
 
 // Create a reservation
 router.post('/reservations', auth.simple, async (req, res) => {
-  const reservation = new Reservation(req.body);
-
   try {
+    const accountUser = await User.findById(req.user._id);
+    const bookingPhone = (req.body.phone || accountUser.phone || '').trim();
+
+    if (requiresRegistration(accountUser, bookingPhone)) {
+      return res.status(403).send({
+        error: REGISTRATION_REQUIRED_MESSAGE,
+        code: 'REGISTRATION_REQUIRED',
+      });
+    }
+
+    const reservation = new Reservation({
+      ...req.body,
+      phone: bookingPhone,
+      username: req.body.username || accountUser.username,
+    });
     const reservationDate = new Date(reservation.date);
     const startOfDay = new Date(reservationDate);
     startOfDay.setHours(0, 0, 0, 0);
@@ -87,7 +105,11 @@ router.post('/reservations', auth.simple, async (req, res) => {
     res.status(201).send({ reservation, QRCode });
   } catch (e) {
     console.error('Reservation creation error:', e);
-    res.status(400).send({ error: e.message || 'Reservation could not be created.' });
+    const accountUser = await User.findById(req.user._id).catch(() => req.user);
+    res.status(400).send({
+      error: formatReservationError(e, accountUser, req.body.phone),
+      code: requiresRegistration(accountUser, req.body.phone) ? 'REGISTRATION_REQUIRED' : undefined,
+    });
   }
 });
 
@@ -188,6 +210,14 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     if (!reservation) return res.status(404).send({ error: 'Reservation not found' });
     if (reservation.status !== 'Pending') return res.status(400).send({ error: 'Reservation is already confirmed or cancelled' });
 
+    const user = await User.findById(req.user._id);
+    if (requiresRegistration(user, reservation.phone)) {
+      return res.status(403).send({
+        error: REGISTRATION_REQUIRED_MESSAGE,
+        code: 'REGISTRATION_REQUIRED',
+      });
+    }
+
     // Update reservation data with final details from payment step
     const { total, pointsUsed, foodItems, appliedFirstGstBenefit } = req.body;
     if (total !== undefined) reservation.total = total;
@@ -197,7 +227,6 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     
     // Process loyalty points
     const pUsed = pointsUsed || 0;
-    const user = await User.findById(req.user._id);
     if (user.loyaltyPoints < pUsed) {
       return res.status(400).send({ error: 'Insufficient loyalty points' });
     }
@@ -230,7 +259,11 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     res.send({ reservation, QRCode });
   } catch (e) {
     console.error('Reservation confirmation error:', e);
-    res.status(400).send({ error: e.message || 'Reservation could not be confirmed.' });
+    const user = await User.findById(req.user._id).catch(() => req.user);
+    res.status(400).send({
+      error: formatReservationError(e, user),
+      code: requiresRegistration(user) ? 'REGISTRATION_REQUIRED' : undefined,
+    });
   }
 });
 

@@ -49,11 +49,24 @@ const userSchema = Schema(
     facebook: String,
     google: String,
 
+    /** Temporary browse/book account without full registration */
+    isSessionGuest: {
+      type: Boolean,
+      default: false,
+    },
+    guestSessionId: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
+
     phone: {
       type: String,
       unique: true,
+      sparse: true,
       trim: true,
       validate(value) {
+        if (!value) return;
         if (!validator.isMobilePhone(value)) {
           throw new Error('Phone is invalid');
         }

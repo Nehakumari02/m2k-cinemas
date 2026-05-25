@@ -31,6 +31,61 @@ export const uploadImage = (id, image) => async dispatch => {
   }
 };
 
+const GUEST_SESSION_KEY = 'm2kGuestSessionId';
+
+// Continue as guest (no password; reuses browser session when possible)
+export const guestLogin = (displayName = '') => async dispatch => {
+  try {
+    const sessionId = localStorage.getItem(GUEST_SESSION_KEY);
+    const response = await fetch('/users/login/guest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: sessionId || undefined,
+        name: displayName || undefined,
+      }),
+    });
+    const responseText = await response.text();
+    let responseData = {};
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch {
+      dispatch({ type: LOGIN_FAIL });
+      dispatch(setAlert('Invalid response from server', 'error', 5000));
+      return;
+    }
+
+    if (response.ok) {
+      const { user, guestSessionId } = responseData;
+      if (guestSessionId) {
+        localStorage.setItem(GUEST_SESSION_KEY, guestSessionId);
+      }
+      user && setUser(user);
+      dispatch({ type: LOGIN_SUCCESS, payload: responseData });
+      dispatch(
+        setAlert(
+          `Welcome${user?.name ? `, ${user.name}` : ''}! You are browsing as a guest.`,
+          'success',
+          5000
+        )
+      );
+      return;
+    }
+
+    dispatch({ type: LOGIN_FAIL });
+    dispatch(
+      setAlert(
+        responseData.error?.message || responseData.error || 'Guest login failed',
+        'error',
+        5000
+      )
+    );
+  } catch (error) {
+    dispatch({ type: LOGIN_FAIL });
+    dispatch(setAlert(error.message || 'Guest login failed', 'error', 5000));
+  }
+};
+
 // Login user
 export const login = (username, password) => async dispatch => {
   try {
@@ -43,6 +98,7 @@ export const login = (username, password) => async dispatch => {
     const responseData = await response.json();
     if (response.ok) {
       const { user } = responseData;
+      localStorage.removeItem(GUEST_SESSION_KEY);
       user && setUser(user);
       dispatch({ type: LOGIN_SUCCESS, payload: responseData });
       dispatch(setAlert(`Welcome ${user.name}`, 'success', 5000));
@@ -71,6 +127,7 @@ export const facebookLogin = e => async dispatch => {
 
     if (response.ok) {
       const { user } = responseData;
+      localStorage.removeItem(GUEST_SESSION_KEY);
       user && setUser(user);
       dispatch({ type: LOGIN_SUCCESS, payload: responseData });
       dispatch(setAlert(`Welcome ${user.name}`, 'success', 5000));
@@ -99,6 +156,7 @@ export const googleLogin = ({ profileObj }) => async dispatch => {
 
     if (response.ok) {
       const { user } = responseData;
+      localStorage.removeItem(GUEST_SESSION_KEY);
       user && setUser(user);
       dispatch({ type: LOGIN_SUCCESS, payload: responseData });
       dispatch(setAlert(`Welcome ${user.name}`, 'success', 5000));
@@ -133,6 +191,7 @@ export const register = ({
     const responseData = await response.json();
     if (response.ok) {
       const { user } = responseData;
+      localStorage.removeItem(GUEST_SESSION_KEY);
       user && setUser(user);
       if (image) dispatch(uploadImage(user._id, image)); // Upload image
       dispatch({ type: REGISTER_SUCCESS, payload: responseData });
@@ -184,6 +243,7 @@ export const logout = () => async dispatch => {
     const responseData = await response.json();
     if (response.ok) {
       removeUser();
+      localStorage.removeItem(GUEST_SESSION_KEY);
       dispatch({ type: LOGOUT });
       dispatch(setAlert('LOGOUT Success', 'success', 5000));
     }

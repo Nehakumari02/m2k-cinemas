@@ -29,6 +29,7 @@ const settingsRouter = require('./routes/settings');
 const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
 const membershipRouter = require('./routes/membership');
+const guestLoginHandler = require('./handlers/guestLoginHandler');
 
 const app = express();
 app.disable('x-powered-by');
@@ -47,6 +48,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.json());
+app.post('/users/login/guest', guestLoginHandler);
 app.use(userRouter);
 app.use(movieRouter);
 app.use(cinemaRouter);
@@ -72,7 +74,11 @@ app.get('/health', (req, res) => {
     ok: true,
     port,
     mongo: mongoose.connection.readyState === 1,
-    routes: ['POST /school-group-inquiries', 'GET /admin/school-group-inquiries'],
+    routes: [
+      'POST /users/login/guest',
+      'POST /school-group-inquiries',
+      'GET /admin/school-group-inquiries',
+    ],
   });
 });
 
@@ -120,6 +126,7 @@ if (hasClientBuild) {
 
 app.listen(port, () => {
   console.log(`app is running in PORT: ${port}`);
+  console.log('Guest login: POST /users/login/guest');
   console.log('School bookings: POST /school-group-inquiries');
   if (!hasClientBuild) {
     console.log(

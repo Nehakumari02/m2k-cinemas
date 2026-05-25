@@ -1,6 +1,14 @@
 import { GET_RESERVATIONS, GET_RESERVATION_SUGGESTED_SEATS } from '../types';
 import { setAlert } from './alert';
 
+const parseReservationApiError = responseData => {
+  if (!responseData) return 'Reservation could not be completed.';
+  if (typeof responseData.error === 'string') return responseData.error;
+  if (responseData.error?.message) return responseData.error.message;
+  if (typeof responseData.message === 'string') return responseData.message;
+  return 'Reservation could not be completed.';
+};
+
 export const getReservations = () => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
@@ -86,16 +94,12 @@ export const addReservation = reservation => async dispatch => {
         data: { reservation, QRCode }
       };
     }
-    dispatch(
-      setAlert(
-        responseData.error || 'Reservation could not be created, please try again.',
-        'error',
-        5000
-      )
-    );
+    const errMsg = parseReservationApiError(responseData);
+    dispatch(setAlert(errMsg, 'error', 6000));
     return {
       status: 'error',
-      message: responseData.error || 'Reservation could not be created'
+      message: errMsg,
+      code: responseData.code,
     };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
@@ -177,8 +181,9 @@ export const confirmReservation = (id, finalData) => async dispatch => {
         } 
       };
     }
-    dispatch(setAlert(responseData.error || 'Confirmation failed', 'error', 5000));
-    return { status: 'error', message: responseData.error };
+    const errMsg = parseReservationApiError(responseData);
+    dispatch(setAlert(errMsg, 'error', 6000));
+    return { status: 'error', message: errMsg, code: responseData.code };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return { status: 'error' };

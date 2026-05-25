@@ -123,6 +123,13 @@ class Navbar extends Component {
                     )}
                   </ListItem>
                 )}
+                {user && user.isSessionGuest && (
+                  <ListItem>
+                    <Link className={classes.navLink} to="/register" style={{ color: '#facc15' }}>
+                      Create full account
+                    </Link>
+                  </ListItem>
+                )}
                 {user && user.role === 'guest' && (
                   <>
                     <ListItem>
@@ -266,6 +273,13 @@ class Navbar extends Component {
                 <li className={classes.innerNavListItem}>
                   <Link className={classes.innerNavLink} to="/mywallet">
                     My Wallet
+                  </Link>
+                </li>
+              )}
+              {user && user.isSessionGuest && (
+                <li className={classes.innerNavListItem}>
+                  <Link className={classes.innerNavLink} to="/register" style={{ color: '#facc15' }}>
+                    Create full account
                   </Link>
                 </li>
               )}
