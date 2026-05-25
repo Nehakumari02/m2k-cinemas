@@ -23,7 +23,14 @@ import {
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import { getAllRefunds, updateRefundStatus } from '../../../store/actions';
-import { LocalActivity, Fastfood, CheckCircle, Cancel } from '@material-ui/icons';
+import {
+  LocalActivity,
+  Fastfood,
+  CheckCircle,
+  Cancel,
+  GetApp as DownloadIcon,
+} from '@material-ui/icons';
+import { downloadRefundsCsv } from '../../../utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,12 +39,24 @@ const useStyles = makeStyles(theme => ({
     minHeight: '100vh',
     color: '#fff',
   },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing(4),
+    flexWrap: 'wrap',
+    gap: theme.spacing(2),
+  },
   title: {
     fontWeight: 800,
-    marginBottom: theme.spacing(4),
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing(2),
+  },
+  downloadBtn: {
+    color: '#fff',
+    borderColor: 'rgba(255,255,255,0.25)',
+    textTransform: 'none',
   },
   card: {
     backgroundColor: '#1a1a24',
@@ -103,9 +122,20 @@ const RefundManagement = () => {
 
   return (
     <div className={classes.root}>
-      <Typography variant="h4" className={classes.title}>
-        Refund Management
-      </Typography>
+      <div className={classes.header}>
+        <Typography variant="h4" className={classes.title}>
+          Refund Management
+        </Typography>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<DownloadIcon />}
+          disabled={!refunds.length}
+          onClick={() => downloadRefundsCsv(refunds)}
+          className={classes.downloadBtn}>
+          Download CSV
+        </Button>
+      </div>
 
       {loading ? (
         <CircularProgress style={{ color: '#b72429' }} />

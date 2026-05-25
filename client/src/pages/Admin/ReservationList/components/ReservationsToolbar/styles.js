@@ -8,6 +8,17 @@ export default theme => ({
     justifyContent: 'space-between'
   },
   searchInput: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+    flex: 1,
+    maxWidth: 360,
+  },
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+  },
+  downloadBtn: {
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
+  },
 });

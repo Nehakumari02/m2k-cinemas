@@ -1,11 +1,19 @@
 export default theme => ({
   root: {},
   row: {
-    height: '42px',
+    minHeight: '42px',
     display: 'flex',
     alignItems: 'center',
     marginTop: theme.spacing(1),
-    justifyContent: 'flex-end'
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: theme.spacing(1),
+  },
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: theme.spacing(1),
   },
   deleteButton: {
     color: theme.palette.danger.main,

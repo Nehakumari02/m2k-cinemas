@@ -3,11 +3,23 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core';
 import { Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@material-ui/core';
-import { Delete as DeleteIcon, AccountBalanceWallet as WalletIcon } from '@material-ui/icons';
+import {
+  Delete as DeleteIcon,
+  GetApp as DownloadIcon,
+} from '@material-ui/icons';
+import { downloadUsersCsv } from '../../../../../utils';
 import styles from './styles';
 
 const UsersToolbar = props => {
-  const { classes, className, toggleDialog, selectedUsers, deleteUser, addWalletFundsAdmin } = props;
+  const {
+    classes,
+    className,
+    toggleDialog,
+    selectedUsers,
+    deleteUser,
+    addWalletFundsAdmin,
+    users = [],
+  } = props;
   const rootClassName = classNames(classes.root, className);
 
   const [isFundsDialogOpen, setIsFundsDialogOpen] = useState(false);
@@ -24,10 +36,24 @@ const UsersToolbar = props => {
     }
   };
 
+  const handleDownload = () => {
+    if (!users.length) return;
+    downloadUsersCsv(users);
+  };
+
   return (
     <div className={rootClassName}>
       <div className={classes.row}>
-        <div>
+        <Button
+          onClick={handleDownload}
+          color="default"
+          size="small"
+          variant="outlined"
+          startIcon={<DownloadIcon />}
+          disabled={!users.length}>
+          Download CSV
+        </Button>
+        <div className={classes.actions}>
           {selectedUsers.length > 0 && (
             <IconButton className={classes.deleteButton} onClick={deleteUser}>
               <DeleteIcon />
@@ -38,16 +64,11 @@ const UsersToolbar = props => {
               onClick={() => setIsFundsDialogOpen(true)}
               color="primary"
               size="small"
-              variant="outlined"
-              style={{ marginRight: 8 }}>
+              variant="outlined">
               Add Funds
             </Button>
           )}
-          <Button
-            onClick={toggleDialog}
-            color="primary"
-            size="small"
-            variant="outlined">
+          <Button onClick={toggleDialog} color="primary" size="small" variant="outlined">
             {selectedUsers.length === 1 ? 'Edit' : 'Add'}
           </Button>
         </div>
@@ -82,7 +103,8 @@ const UsersToolbar = props => {
 UsersToolbar.propTypes = {
   className: PropTypes.string,
   classes: PropTypes.object.isRequired,
-  selectedUsers: PropTypes.array
+  selectedUsers: PropTypes.array,
+  users: PropTypes.array,
 };
 
 UsersToolbar.defaultProps = {

@@ -2,8 +2,21 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Typography, Select, FormControl, InputLabel, OutlinedInput, FormControlLabel, Switch } from '@material-ui/core';
-import { Button, TextField, MenuItem } from '@material-ui/core';
+import {
+  withStyles,
+  Typography,
+  Select,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  FormControlLabel,
+  Switch,
+  Grid,
+  Button,
+  TextField,
+  MenuItem,
+} from '@material-ui/core';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
@@ -17,6 +30,8 @@ import {
   removeMovie
 } from '../../../../../store/actions';
 import FileUpload from '../../../../../components/FileUpload/FileUpload';
+import FormSection from './FormSection';
+import PeopleSection from './PeopleSection';
 
 class AddMovie extends Component {
   state = {
@@ -329,479 +344,337 @@ class AddMovie extends Component {
       ? () => this.onUpdateMovie()
       : () => this.onAddMovie();
 
+    const { backdropImages } = this.state;
+
     return (
       <div className={rootClassName}>
-        <Typography variant="h4" className={classes.title}>
-          {subtitle}
-        </Typography>
+        <Typography className={classes.pageTitle}>{subtitle}</Typography>
+
         <form autoComplete="off" noValidate>
-          <div className={classes.field}>
-            <TextField
-              className={classes.textField}
-              helperText="Please specify the title"
-              label="Title"
-              margin="dense"
-              required
-              value={title}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('title', event.target.value)
-              }
-            />
-            <TextField
-              className={classes.textField}
-              label="Director (Display)"
-              margin="dense"
-              required
-              value={director}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('director', event.target.value)
-              }
-            />
-          </div>
-          <div className={classes.field}>
-            <FormControl variant="outlined" className={classes.textField} required margin="dense">
-              <InputLabel id="genre-label">Genre</InputLabel>
-              <Select
-                labelId="genre-label"
-                multiple
-                value={genre}
-                onChange={event =>
-                  this.handleFieldChange('genre', event.target.value)
-                }
-                input={<OutlinedInput label="Genre" />}
-              >
-                {genreData.map((genreItem, index) => (
-                  <MenuItem key={genreItem + '-' + index} value={genreItem}>
-                    {genreItem}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              className={classes.textField}
-              label="Cast (Display)"
-              margin="dense"
-              required
-              value={cast}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('cast', event.target.value)
-              }
-            />
-          </div>
-          <div className={`${classes.field} ${classes.mediaField}`}>
-            <div className={`${classes.textField} ${classes.peopleSection}`}>
-              <Typography variant="body2" className={classes.sectionHeading}>
-                Cast (like in PVR)
-              </Typography>
-              <Typography variant="caption" className={classes.sectionHint}>
-                Add cast names one by one, then upload cast images in the same order.
-              </Typography>
-              <div className={classes.inputRow}>
+          <FormSection title="Basic information" subtitle="Title, genre, and display credits shown on listings">
+            <Grid container spacing={2} className={classes.grid}>
+              <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Cast Name"
+                  fullWidth
+                  label="Title"
+                  required
                   variant="outlined"
                   size="small"
-                  fullWidth
-                  value={castNameInput}
-                  onChange={event =>
-                    this.handleFieldChange('castNameInput', event.target.value)
-                  }
+                  value={title}
+                  onChange={e => this.handleFieldChange('title', e.target.value)}
                 />
-                <Button color="primary" variant="contained" onClick={this.addCastMember}>
-                  Add
-                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Director (display)"
+                  required
+                  variant="outlined"
+                  size="small"
+                  value={director}
+                  onChange={e => this.handleFieldChange('director', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth variant="outlined" size="small" required>
+                  <InputLabel id="genre-label">Genre</InputLabel>
+                  <Select
+                    labelId="genre-label"
+                    multiple
+                    value={genre}
+                    onChange={e => this.handleFieldChange('genre', e.target.value)}
+                    input={<OutlinedInput label="Genre" />}>
+                    {genreData.map((genreItem, index) => (
+                      <MenuItem key={`${genreItem}-${index}`} value={genreItem}>
+                        {genreItem}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Cast (display)"
+                  required
+                  variant="outlined"
+                  size="small"
+                  value={cast}
+                  onChange={e => this.handleFieldChange('cast', e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </FormSection>
+
+          <FormSection
+            title="Cast & crew"
+            subtitle="Add names as chips, then upload photos in the same order for booking page cards">
+            <div className={classes.castCrewGrid}>
+              <div className={classes.castCrewCard}>
+                <Typography className={classes.castCrewTitle}>Cast</Typography>
+                <PeopleSection
+                  nameLabel="Cast name"
+                  nameValue={castNameInput}
+                  onNameChange={v => this.handleFieldChange('castNameInput', v)}
+                  onAdd={this.addCastMember}
+                  members={castMembers}
+                  onRemove={this.removeCastMember}
+                  files={castFiles}
+                  onFilesChange={files => this.handleFieldChange('castFiles', files)}
+                  uploadLabel="Upload cast photos"
+                />
               </div>
-              <Typography variant="caption" className={classes.listTitle}>
-                Added Cast ({castMembers.length})
-              </Typography>
-              <div className={classes.memberList}>
-                {castMembers.length ? (
-                  castMembers.map((member, index) => (
-                    <div key={`${member.name}-${index}`} className={classes.memberRow}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {member.image ? (
-                          <img src={member.image} className={classes.avatar} alt={member.name} />
-                        ) : (
-                          <div className={classes.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.6rem', background: '#f1f5f9' }}>NA</div>
-                        )}
-                        <Typography variant="caption" className={classes.memberText}>
-                          {member.name}
-                        </Typography>
-                      </div>
-                      <Button size="small" color="secondary" onClick={() => this.removeCastMember(index)}>
-                        Remove
+              <div className={classes.castCrewCard}>
+                <Typography className={classes.castCrewTitle}>Crew</Typography>
+                <PeopleSection
+                  withRole
+                  nameLabel="Name"
+                  nameValue={crewNameInput}
+                  roleValue={crewRoleInput}
+                  onNameChange={v => this.handleFieldChange('crewNameInput', v)}
+                  onRoleChange={v => this.handleFieldChange('crewRoleInput', v)}
+                  onAdd={this.addCrewMember}
+                  members={crewMembers}
+                  onRemove={this.removeCrewMember}
+                  files={crewFiles}
+                  onFilesChange={files => this.handleFieldChange('crewFiles', files)}
+                  uploadLabel="Upload crew photos"
+                />
+              </div>
+            </div>
+          </FormSection>
+
+          <FormSection title="Backdrop gallery" subtitle="Images for movie detail and booking pages">
+            {!!backdropImages.length && (
+              <>
+                <Typography variant="caption" color="textSecondary">
+                  Current backdrops
+                </Typography>
+                <div className={classes.galleryContainer}>
+                  {backdropImages.map((url, idx) => (
+                    <div key={`existing-${idx}`} className={classes.backdropThumb}>
+                      <img src={url} alt={`backdrop-${idx}`} />
+                      <Button
+                        className={classes.removeBtn}
+                        onClick={() => this.removeExistingBackdrop(idx)}>
+                        Delete
                       </Button>
                     </div>
-                  ))
-                ) : (
-                  <Typography variant="caption" className={classes.emptyText}>
-                    No cast members added yet.
-                  </Typography>
-                )}
-              </div>
-              <Typography variant="body2" className={classes.uploadTitle}>
-                Upload Cast Images (same order as cast list)
-              </Typography>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={event =>
-                  this.handleFieldChange('castFiles', Array.from(event.target.files || []))
-                }
-              />
-              <Typography variant="caption" className={classes.fileHint}>
-                {castFiles.length
-                  ? `${castFiles.length} cast image(s) selected`
-                  : 'No files selected'}
-              </Typography>
-              {!!castFiles.length && (
-                <div className={classes.fileList}>
-                  {castFiles.map((file, idx) => (
-                    <Typography key={`${file.name}-${idx}`} variant="caption" display="block">
-                      {idx + 1}. {file.name}
-                    </Typography>
                   ))}
                 </div>
-              )}
-            </div>
-            <div className={`${classes.textField} ${classes.peopleSection}`}>
-              <Typography variant="body2" className={classes.sectionHeading}>
-                Crew (Director, Producer, etc.)
-              </Typography>
-              <Typography variant="caption" className={classes.sectionHint}>
-                Choose role, add crew name, then upload crew images in same order.
-              </Typography>
-              <div className={classes.inputRow}>
+              </>
+            )}
+            <input
+              id="backdrop-upload"
+              className={classes.hiddenInput}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={event => {
+                this.addBackdropFiles(Array.from(event.target.files || []));
+                event.target.value = '';
+              }}
+            />
+            <label htmlFor="backdrop-upload">
+              <Button
+                className={classes.uploadBtn}
+                variant="outlined"
+                size="small"
+                component="span"
+                startIcon={<CloudUploadIcon />}>
+                Add backdrop images
+              </Button>
+            </label>
+            <Typography variant="caption" display="block" style={{ marginTop: 8, color: '#64748b' }}>
+              {backdropFiles.length
+                ? `${backdropFiles.length} new image(s) ready to upload`
+                : 'No new files selected'}
+            </Typography>
+            {!!backdropFiles.length && (
+              <div className={classes.galleryContainer}>
+                {backdropFiles.map((file, idx) => (
+                  <div key={`new-${idx}`} className={classes.backdropThumb}>
+                    <img src={URL.createObjectURL(file)} alt={`new-backdrop-${idx}`} />
+                    <Button
+                      className={classes.removeBtn}
+                      onClick={() => this.removeBackdropFile(idx)}>
+                      Cancel
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </FormSection>
+
+          <FormSection title="Story & details">
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
                 <TextField
-                  select
-                  label="Crew Role"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  label="Description"
+                  required
                   variant="outlined"
                   size="small"
-                  className={classes.crewRoleField}
-                  value={crewRoleInput}
-                  onChange={event =>
-                    this.handleFieldChange('crewRoleInput', event.target.value)
-                  }>
-                  {['Director', 'Producer', 'Writer', 'Music', 'Cinematographer', 'Editor'].map(role => (
-                    <MenuItem key={role} value={role}>
-                      {role}
+                  value={description}
+                  onChange={e => this.handleFieldChange('description', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  label="Synopsis"
+                  required
+                  variant="outlined"
+                  size="small"
+                  value={synopsis}
+                  onChange={e => this.handleFieldChange('synopsis', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  label="Content warning (optional)"
+                  variant="outlined"
+                  size="small"
+                  value={contentWarning}
+                  onChange={e => this.handleFieldChange('contentWarning', e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </FormSection>
+
+          <FormSection title="Release & format">
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Language"
+                  required
+                  variant="outlined"
+                  size="small"
+                  value={language}
+                  onChange={e => this.handleFieldChange('language', e.target.value)}>
+                  {languageData.map((langItem, index) => (
+                    <MenuItem key={`${langItem}-${index}`} value={langItem}>
+                      {langItem}
                     </MenuItem>
                   ))}
                 </TextField>
+              </Grid>
+              <Grid item xs={12} sm={4}>
                 <TextField
-                  label="Crew Name"
+                  fullWidth
+                  label="Duration (mins)"
+                  type="number"
                   variant="outlined"
                   size="small"
+                  value={duration}
+                  onChange={e => this.handleFieldChange('duration', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
                   fullWidth
-                  value={crewNameInput}
-                  onChange={event =>
-                    this.handleFieldChange('crewNameInput', event.target.value)
-                  }
+                  label="Rating (1–10)"
+                  type="number"
+                  variant="outlined"
+                  size="small"
+                  value={rating}
+                  inputProps={{ min: 0, max: 10, step: 0.1 }}
+                  onChange={e => this.handleFieldChange('rating', e.target.value)}
                 />
-                <Button color="primary" variant="contained" onClick={this.addCrewMember}>
-                  Add
-                </Button>
-              </div>
-              <Typography variant="caption" className={classes.listTitle}>
-                Added Crew ({crewMembers.length})
-              </Typography>
-              <div className={classes.memberList}>
-                {crewMembers.length ? (
-                  crewMembers.map((member, index) => (
-                    <div key={`${member.role}-${member.name}-${index}`} className={classes.memberRow}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {member.image ? (
-                          <img src={member.image} className={classes.avatar} alt={member.name} />
-                        ) : (
-                          <div className={classes.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.6rem', background: '#f1f5f9' }}>NA</div>
-                        )}
-                        <Typography variant="caption" className={classes.memberText}>
-                          <strong>{member.role}:</strong> {member.name}
-                        </Typography>
-                      </div>
-                      <Button size="small" color="secondary" onClick={() => this.removeCrewMember(index)}>
-                        Remove
-                      </Button>
-                    </div>
-                  ))
-                ) : (
-                  <Typography variant="caption" className={classes.emptyText}>
-                    No crew members added yet.
-                  </Typography>
-                )}
-              </div>
-              <Typography variant="body2" className={classes.uploadTitle}>
-                Upload Crew Images (same order as crew list)
-              </Typography>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={event =>
-                  this.handleFieldChange('crewFiles', Array.from(event.target.files || []))
-                }
-              />
-              <Typography variant="caption" className={classes.fileHint}>
-                {crewFiles.length
-                  ? `${crewFiles.length} crew image(s) selected`
-                  : 'No files selected'}
-              </Typography>
-              {!!crewFiles.length && (
-                <div className={classes.fileList}>
-                  {crewFiles.map((file, idx) => (
-                    <Typography key={`${file.name}-${idx}`} variant="caption" display="block">
-                      {idx + 1}. {file.name}
-                    </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Format"
+                  required
+                  variant="outlined"
+                  size="small"
+                  value={format}
+                  onChange={e => this.handleFieldChange('format', e.target.value)}>
+                  {formatData.map((formatItem, index) => (
+                    <MenuItem key={`${formatItem}-${index}`} value={formatItem}>
+                      {formatItem}
+                    </MenuItem>
                   ))}
-                </div>
-              )}
-            </div>
-            <div className={classes.textField}>
-              <Typography variant="body2" style={{ fontWeight: 700 }}>
-                Backdrops
-              </Typography>
-              <Typography variant="caption" style={{ color: '#64748b', display: 'block', marginBottom: 8 }}>
-                Upload gallery/backdrop images for movie detail and booking page.
-              </Typography>
-              
-              {/* Existing Backdrops */}
-              {!!this.state.backdropImages.length && (
-                <div style={{ marginBottom: 16 }}>
-                  <Typography variant="caption" className={classes.listTitle}>
-                    Current Backdrops
-                  </Typography>
-                  <div className={classes.galleryContainer}>
-                    {this.state.backdropImages.map((url, idx) => (
-                      <div key={`existing-${idx}`} className={classes.backdropThumb}>
-                        <img src={url} alt={`backdrop-${idx}`} />
-                        <Button 
-                          className={classes.removeBtn} 
-                          onClick={() => this.removeExistingBackdrop(idx)}>
-                          Delete
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={event => {
-                  this.addBackdropFiles(Array.from(event.target.files || []));
-                  event.target.value = '';
-                }}
-              />
-              <Typography variant="caption" style={{ display: 'block', marginTop: 4 }}>
-                {backdropFiles.length
-                  ? `${backdropFiles.length} new backdrop image(s) selected`
-                  : 'No new backdrop files selected'}
-              </Typography>
-              
-              {/* New Backdrop Previews */}
-              {!!backdropFiles.length && (
-                <div className={classes.galleryContainer}>
-                  {backdropFiles.map((file, idx) => (
-                    <div key={`new-${idx}`} className={classes.backdropThumb} style={{ borderColor: '#3b82f6' }}>
-                      <img src={URL.createObjectURL(file)} alt={`new-backdrop-${idx}`} />
-                      <Button 
-                        className={classes.removeBtn} 
-                        onClick={() => this.removeBackdropFile(idx)}>
-                        Cancel
-                      </Button>
-                      <Typography 
-                        variant="caption" 
-                        style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(59, 130, 246, 0.8)', color: 'white', textAlign: 'center', fontSize: '0.5rem' }}>
-                        NEW
-                      </Typography>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className={classes.field}>
-            <TextField
-              fullWidth
-              multiline
-              className={classes.textField}
-              label="Description"
-              margin="dense"
-              required
-              variant="outlined"
-              value={description}
-              onChange={event =>
-                this.handleFieldChange('description', event.target.value)
-              }
-            />
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              className={classes.textField}
-              label="Synopsis"
-              margin="dense"
-              required
-              variant="outlined"
-              value={synopsis}
-              onChange={event =>
-                this.handleFieldChange('synopsis', event.target.value)
-              }
-            />
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              className={classes.textField}
-              label="Content Warning (optional)"
-              margin="dense"
-              variant="outlined"
-              value={contentWarning}
-              onChange={event =>
-                this.handleFieldChange('contentWarning', event.target.value)
-              }
-            />
-          </div>
-          <div className={classes.field}>
-            <TextField
-              select
-              className={classes.textField}
-              label="Language"
-              margin="dense"
-              required
-              value={language}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('language', event.target.value)
-              }>
-              {languageData.map((langItem, index) => (
-                <MenuItem key={langItem + '-' + index} value={langItem}>
-                  {langItem}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              className={classes.textField}
-              label="Duration"
-              margin="dense"
-              type="number"
-              value={duration}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('duration', event.target.value)
-              }
-            />
-            <TextField
-              className={classes.textField}
-              label="Rating (1-10)"
-              margin="dense"
-              type="number"
-              value={rating}
-              variant="outlined"
-              inputProps={{ min: 0, max: 10, step: 0.1 }}
-              onChange={event =>
-                this.handleFieldChange('rating', event.target.value)
-              }
-            />
-            <TextField
-              select
-              className={classes.textField}
-              label="Format"
-              margin="dense"
-              required
-              value={format}
-              variant="outlined"
-              onChange={event =>
-                this.handleFieldChange('format', event.target.value)
-              }>
-              {formatData.map((formatItem, index) => (
-                <MenuItem key={formatItem + '-' + index} value={formatItem}>
-                  {formatItem}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              className={classes.textField}
-              label="Certificate (optional)"
-              margin="dense"
-              placeholder="U, UA, A…"
-              variant="outlined"
-              value={certificate}
-              helperText="Shown after runtime (e.g. 2h 30m U)"
-              onChange={event =>
-                this.handleFieldChange('certificate', event.target.value)
-              }
-            />
-            <TextField
-              fullWidth
-              multiline
-              rows={2}
-              className={classes.textField}
-              label="Languages line (optional)"
-              margin="dense"
-              variant="outlined"
-              placeholder="e.g. HindiOriginal + Hindi, Tamil"
-              value={languages}
-              helperText="Overrides the single Language field on the booking sidebar when set"
-              onChange={event =>
-                this.handleFieldChange('languages', event.target.value)
-              }
-            />
-          </div>
-          {/* The redundant fields were moved to the top for better organization */}
-          <div className={classes.field}>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-              <KeyboardDatePicker
-                className={classes.textField}
-                inputVariant="outlined"
-                margin="normal"
-                id="release-date"
-                label="Release Date"
-                value={releaseDate}
-                onChange={date =>
-                  this.handleFieldChange('releaseDate', date._d)
-                }
-                KeyboardButtonProps={{
-                  'aria-label': 'change date'
-                }}
-              />
-
-              <KeyboardDatePicker
-                className={classes.textField}
-                inputVariant="outlined"
-                margin="normal"
-                id="end-date"
-                label="End Date"
-                value={endDate}
-                onChange={date => this.handleFieldChange('endDate', date._d)}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date'
-                }}
-              />
-            </MuiPickersUtilsProvider>
-          </div>
-          <div className={classes.field}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={isPublished}
-                  onChange={event =>
-                    this.handleFieldChange('isPublished', event.target.checked)
-                  }
-                  color="primary"
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Certificate"
+                  placeholder="U, UA, A…"
+                  variant="outlined"
+                  size="small"
+                  value={certificate}
+                  onChange={e => this.handleFieldChange('certificate', e.target.value)}
                 />
-              }
-              label="Published (visible to users)"
-            />
-          </div>
-          <div className={classes.field}>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <MuiPickersUtilsProvider utils={MomentUtils}>
+                  <KeyboardDatePicker
+                    fullWidth
+                    inputVariant="outlined"
+                    size="small"
+                    label="Release date"
+                    value={releaseDate}
+                    format="DD/MM/YYYY"
+                    onChange={date => this.handleFieldChange('releaseDate', date._d)}
+                  />
+                </MuiPickersUtilsProvider>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <MuiPickersUtilsProvider utils={MomentUtils}>
+                  <KeyboardDatePicker
+                    fullWidth
+                    inputVariant="outlined"
+                    size="small"
+                    label="End date"
+                    value={endDate}
+                    format="DD/MM/YYYY"
+                    onChange={date => this.handleFieldChange('endDate', date._d)}
+                  />
+                </MuiPickersUtilsProvider>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  label="Languages line (optional)"
+                  placeholder="e.g. Hindi, Tamil"
+                  variant="outlined"
+                  size="small"
+                  value={languages}
+                  onChange={e => this.handleFieldChange('languages', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  className={classes.switchRow}
+                  control={
+                    <Switch
+                      checked={isPublished}
+                      onChange={e => this.handleFieldChange('isPublished', e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Published (visible to users)"
+                />
+              </Grid>
+            </Grid>
+          </FormSection>
+
+          <FormSection title="Poster" subtitle="Main movie image for cards and listings">
             <FileUpload
               className={classes.upload}
               file={image}
@@ -810,25 +683,19 @@ class AddMovie extends Component {
                 this.handleFieldChange('image', file);
               }}
             />
+          </FormSection>
+
+          <div className={classes.actions}>
+            <Button color="primary" variant="contained" onClick={submitAction}>
+              {submitButton}
+            </Button>
+            {this.props.edit && (
+              <Button color="secondary" variant="outlined" onClick={this.onRemoveMovie}>
+                Delete movie
+              </Button>
+            )}
           </div>
         </form>
-
-        <Button
-          className={classes.buttonFooter}
-          color="primary"
-          variant="contained"
-          onClick={submitAction}>
-          {submitButton}
-        </Button>
-        {this.props.edit && (
-          <Button
-            color="secondary"
-            className={classes.buttonFooter}
-            variant="contained"
-            onClick={this.onRemoveMovie}>
-            Delete Movie
-          </Button>
-        )}
       </div>
     );
   }

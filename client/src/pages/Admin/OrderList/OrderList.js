@@ -25,15 +25,14 @@ import {
   TableRow,
   Collapse
 } from '@material-ui/core';
-import { 
-  ExpandMore as ExpandIcon, 
-  ExpandLess as CollapseIcon, 
+import {
+  ExpandMore as ExpandIcon,
+  ExpandLess as CollapseIcon,
   Assignment as OrderIcon,
-  LocalShipping as ShippingIcon,
-  CheckCircle as DeliveredIcon,
-  Cancel as CancelIcon
+  GetApp as DownloadIcon,
 } from '@material-ui/icons';
 import { getAllOrders, updateOrderStatus } from '../../../store/actions';
+import { downloadOrdersCsv } from '../../../utils';
 
 const styles = theme => ({
   root: {
@@ -253,6 +252,19 @@ class OrderList extends Component {
             <OrderIcon className={classes.titleIcon} />
             <Typography className={classes.pageTitle}>Merchandise Orders</Typography>
           </div>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon />}
+            disabled={!orders.length}
+            onClick={() => downloadOrdersCsv(orders)}
+            style={{
+              color: '#fff',
+              borderColor: 'rgba(255,255,255,0.25)',
+              textTransform: 'none',
+            }}>
+            Download CSV
+          </Button>
         </div>
 
         <Box className={classes.tablePaper}>

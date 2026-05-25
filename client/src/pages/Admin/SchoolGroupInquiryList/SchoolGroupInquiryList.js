@@ -20,7 +20,8 @@ import {
   IconButton,
   Tooltip,
 } from '@material-ui/core';
-import { School, Visibility, Refresh } from '@material-ui/icons';
+import { School, Visibility, Refresh, GetApp as DownloadIcon } from '@material-ui/icons';
+import { downloadSchoolInquiriesCsv } from '../../../utils';
 import setAuthHeaders from '../../../utils/setAuthHeaders';
 import apiUrl from '../../../utils/apiUrl';
 
@@ -106,6 +107,16 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
     padding: theme.spacing(8),
     color: 'rgba(255,255,255,0.35)',
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+  },
+  downloadBtn: {
+    color: '#fff',
+    borderColor: 'rgba(255,255,255,0.25)',
+    textTransform: 'none',
   },
 }));
 
@@ -197,11 +208,22 @@ export default function SchoolGroupInquiryList() {
           <School style={{ color: '#b72429' }} />
           School Booking Enquiries
         </Typography>
-        <Tooltip title="Refresh">
-          <IconButton onClick={fetchInquiries} style={{ color: '#fff' }}>
-            <Refresh />
-          </IconButton>
-        </Tooltip>
+        <div className={classes.headerActions}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon />}
+            disabled={!inquiries.length}
+            onClick={() => downloadSchoolInquiriesCsv(inquiries)}
+            className={classes.downloadBtn}>
+            Download CSV
+          </Button>
+          <Tooltip title="Refresh">
+            <IconButton onClick={fetchInquiries} style={{ color: '#fff' }}>
+              <Refresh />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
 
       {loading ? (

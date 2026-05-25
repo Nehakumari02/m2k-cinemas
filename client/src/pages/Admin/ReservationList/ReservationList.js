@@ -47,6 +47,8 @@ class ReservationList extends Component {
       <div className={classes.root}>
         <ReservationsToolbar
           reservations={filteredReservations}
+          movies={movies}
+          cinemas={cinemas}
           search={search}
           onChangeSearch={this.onChangeSearch}
           mode={mode}
