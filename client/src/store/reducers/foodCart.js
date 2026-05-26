@@ -4,7 +4,9 @@ import {
   UPDATE_FOOD_CART_QUANTITY,
   CLEAR_FOOD_CART,
   CREATE_FOOD_ORDER,
-  GET_MY_FOOD_ORDERS
+  GET_MY_FOOD_ORDERS,
+  GET_ALL_FOOD_ORDERS,
+  UPDATE_FOOD_ORDER_STATUS
 } from '../types';
 
 const loadCart = () => {
@@ -18,6 +20,7 @@ const loadCart = () => {
 const initialState = {
   cartItems: loadCart(),
   orders: [],
+  adminOrders: [],
   loading: false
 };
 
@@ -58,6 +61,15 @@ export default function(state = initialState, action) {
       return { ...state, orders: [payload, ...state.orders] };
     case GET_MY_FOOD_ORDERS:
       return { ...state, orders: payload, loading: false };
+    case GET_ALL_FOOD_ORDERS:
+      return { ...state, adminOrders: payload, loading: false };
+    case UPDATE_FOOD_ORDER_STATUS:
+      return {
+        ...state,
+        adminOrders: state.adminOrders.map(o =>
+          o._id === payload._id ? payload : o
+        )
+      };
     default:
       return state;
   }

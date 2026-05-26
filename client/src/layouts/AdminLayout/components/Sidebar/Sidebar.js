@@ -17,6 +17,7 @@ import AccountBoxIcon from '@material-ui/icons/AccountBoxOutlined';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
+import ReceiptIcon from '@material-ui/icons/Receipt';
 import EventIcon from '@material-ui/icons/Event';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import StoreIcon from '@material-ui/icons/StoreOutlined';
@@ -148,6 +149,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Food & Combos"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/food-orders">
+            <ListItemIcon className={classes.listItemIcon}>
+              <ReceiptIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Food Orders"
             />
           </ListItem>
           <ListItem

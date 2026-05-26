@@ -250,7 +250,7 @@ class OrderList extends Component {
         <div className={classes.header}>
           <div className={classes.titleBlock}>
             <OrderIcon className={classes.titleIcon} />
-            <Typography className={classes.pageTitle}>Merchandise Orders</Typography>
+            <Typography className={classes.pageTitle}>Shop Orders</Typography>
           </div>
           <Button
             variant="outlined"

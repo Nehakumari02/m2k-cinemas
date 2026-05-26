@@ -69,4 +69,37 @@ router.get('/food-orders/me', auth.simple, async (req, res) => {
   }
 });
 
+router.get('/admin/food-orders', auth.enhance, async (req, res) => {
+  try {
+    const orders = await FoodOrder.find({})
+      .populate('user', 'name email phone')
+      .sort({ createdAt: -1 });
+    res.send(orders);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+router.patch('/admin/food-orders/:id', auth.enhance, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['status'];
+  const isValidOperation = updates.every(u => allowedUpdates.includes(u));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const order = await FoodOrder.findById(req.params.id);
+    if (!order) return res.sendStatus(404);
+    updates.forEach(u => {
+      order[u] = req.body[u];
+    });
+    await order.save();
+    res.send(order);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 module.exports = router;

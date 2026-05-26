@@ -4,7 +4,9 @@ import {
   UPDATE_FOOD_CART_QUANTITY,
   CLEAR_FOOD_CART,
   CREATE_FOOD_ORDER,
-  GET_MY_FOOD_ORDERS
+  GET_MY_FOOD_ORDERS,
+  GET_ALL_FOOD_ORDERS,
+  UPDATE_FOOD_ORDER_STATUS
 } from '../types';
 import { setAlert } from './alert';
 
@@ -69,5 +71,45 @@ export const getMyFoodOrders = () => async dispatch => {
     }
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const getAllFoodOrders = () => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const res = await fetch('/admin/food-orders', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      dispatch({ type: GET_ALL_FOOD_ORDERS, payload: data });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const updateFoodOrderStatus = (id, status) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const res = await fetch(`/admin/food-orders/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      dispatch({ type: UPDATE_FOOD_ORDER_STATUS, payload: data });
+      dispatch(setAlert('Food order status updated', 'success'));
+      return data;
+    }
+    dispatch(setAlert(data.error || 'Update failed', 'error'));
+    return null;
+  } catch (err) {
+    dispatch(setAlert('Server error', 'error'));
+    return null;
   }
 };

@@ -18,6 +18,7 @@ const Account = lazy(() => import('./pages/Admin/Account'));
 const OfferList = lazy(() => import('./pages/Admin/OfferList'));
 const ExperienceList = lazy(() => import('./pages/Admin/ExperienceList'));
 const FoodList = lazy(() => import('./pages/Admin/FoodList/FoodList'));
+const FoodOrderList = lazy(() => import('./pages/Admin/FoodOrderList'));
 const EventList = lazy(() => import('./pages/Admin/EventList/EventList'));
 const ProductList = lazy(() => import('./pages/Admin/ProductList'));
 const OrderList = lazy(() => import('./pages/Admin/OrderList'));
@@ -371,6 +372,12 @@ const Routes = () => {
             path="/admin/food"
             layout={AdminLayout}
             component={FoodList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/food-orders"
+            layout={AdminLayout}
+            component={FoodOrderList}
           />
           <ProtectedRoute
             exact
