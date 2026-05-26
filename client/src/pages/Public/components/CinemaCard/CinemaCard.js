@@ -6,6 +6,7 @@ import { Paper } from '../../../../components';
 import { EventSeat, AttachMoney, LocationOn, ArrowForward } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { normalizeImage } from '../../../../utils/imageUrl';
+import { formatCinemaAddress } from '../../../../constants/m2kAddresses';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -112,6 +113,7 @@ function CinemaCard(props) {
   const classes = useStyles(props);
   const { className, cinema, linkToDetails = false } = props;
   const cinemaImage = normalizeImage(cinema && cinema.image);
+  const venueAddress = formatCinemaAddress(cinema);
 
   const rootClassName = classNames(classes.root, className);
   const content = (
@@ -129,7 +131,7 @@ function CinemaCard(props) {
           {cinema.name}
         </Typography>
         <Typography className={classes.city} variant="body1">
-          {cinema.city}
+          {venueAddress || cinema.city}
         </Typography>
       </div>
       <div className={classes.statsWrap}>

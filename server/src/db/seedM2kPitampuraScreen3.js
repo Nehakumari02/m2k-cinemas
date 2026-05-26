@@ -5,10 +5,11 @@ require('./mongoose');
 
 const Cinema = require('../models/cinema');
 const { buildM2kPitampuraScreen3Layout } = require('../utils/cinemaLayouts/m2kPitampuraScreen3');
+const { applyM2kVenueMeta } = require('../utils/cinemaLayouts/m2kAddresses');
 
 const seedM2kPitampuraScreen3 = async () => {
   try {
-    const layout = buildM2kPitampuraScreen3Layout();
+    const layout = applyM2kVenueMeta(buildM2kPitampuraScreen3Layout());
     const cinema = await Cinema.findOneAndUpdate(
       { name: layout.name },
       layout,

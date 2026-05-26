@@ -7,6 +7,7 @@ import { getCinema, getShowtimes, getMovies } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { MovieBookingModals } from '../../../components';
 import useMovieBookingFlow from '../../../hooks/useMovieBookingFlow';
+import { formatCinemaAddress } from '../../../constants/m2kAddresses';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -53,6 +54,13 @@ const useStyles = makeStyles(theme => ({
   },
   subtitle: {
     color: '#e2e8f0',
+    textShadow: '0 6px 18px rgba(0,0,0,0.35)',
+  },
+  address: {
+    color: '#cbd5e1',
+    marginTop: theme.spacing(1),
+    maxWidth: 520,
+    lineHeight: 1.6,
     textShadow: '0 6px 18px rgba(0,0,0,0.35)',
   },
   chip: {
@@ -199,7 +207,17 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
         <div className={classes.heroBackdrop} />
         <div className={classes.heroOverlay}>
           <Typography variant="h3" className={classes.title}>{cinema.name}</Typography>
-          <Typography variant="body1" className={classes.subtitle}>{cinema.city}</Typography>
+          {cinema.venueLabel && (
+            <Typography variant="body2" className={classes.subtitle}>{cinema.venueLabel}</Typography>
+          )}
+          <Typography variant="body1" className={classes.subtitle} style={{ textTransform: 'capitalize' }}>
+            {cinema.city}
+          </Typography>
+          {formatCinemaAddress(cinema) && (
+            <Typography variant="body2" className={classes.address}>
+              {formatCinemaAddress(cinema)}
+            </Typography>
+          )}
           <Box mt={1}>
             <Chip className={classes.chip} label={`Ticket Price: ${cinema.ticketPrice} EUR`} />
             <Chip className={classes.chip} label={`Seats: ${cinema.seatsAvailable}`} />

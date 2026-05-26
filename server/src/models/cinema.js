@@ -23,6 +23,24 @@ const cinemaSchema = new Schema({
     trim: true,
     lowercase: true,
   },
+  /** Venue display label (e.g. M2K Cinemas Rohini). */
+  venueLabel: {
+    type: String,
+    trim: true,
+  },
+  /** Full street address for this cinema location. */
+  address: {
+    type: String,
+    trim: true,
+  },
+  legalName: {
+    type: String,
+    trim: true,
+  },
+  registeredAddress: {
+    type: String,
+    trim: true,
+  },
   seats: {
     type: [Schema.Types.Mixed],
     required: true,

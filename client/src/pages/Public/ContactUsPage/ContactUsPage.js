@@ -2,6 +2,12 @@ import React, { useEffect } from 'react';
 import { Typography, Container, Grid, TextField, Button, Paper, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { Email, Phone, LocationOn, Send } from '@material-ui/icons';
+import {
+  M2K_LEGAL_NAME,
+  M2K_REGISTERED_ADDRESS,
+  M2K_ROHINI_VENUE,
+  M2K_PITAMPURA_VENUE,
+} from '../../../constants/m2kAddresses';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -119,12 +125,37 @@ const ContactUsPage = () => {
               <div className={classes.contactInfoBox}>
                 <div className={classes.iconBox}><LocationOn /></div>
                 <div>
-                  <Typography variant="h6" style={{ fontWeight: 800 }}>Our Office</Typography>
-                  <Typography variant="body1" style={{ color: '#64748b' }}>
-                    M2K Cinemas Headquarters<br />
-                    Plot No. 16, District Centre<br />
-                    Mangalam Place, Rohini Sector 3<br />
-                    New Delhi, 110085
+                  <Typography variant="h6" style={{ fontWeight: 800 }}>Registered Address</Typography>
+                  <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
+                    {M2K_LEGAL_NAME}
+                    <br />
+                    M2K Mall, 16, Mangalam Place District Centre,
+                    <br />
+                    Sector 3, Rohini, New Delhi - 110085, India.
+                  </Typography>
+                </div>
+              </div>
+
+              <div className={classes.contactInfoBox}>
+                <div className={classes.iconBox}><LocationOn /></div>
+                <div>
+                  <Typography variant="h6" style={{ fontWeight: 800 }}>{M2K_ROHINI_VENUE.label}</Typography>
+                  <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
+                    M2K Mall, 16, Mangalam Place District Centre,
+                    <br />
+                    Sector 3, Rohini, New Delhi - 110085, India.
+                  </Typography>
+                </div>
+              </div>
+
+              <div className={classes.contactInfoBox}>
+                <div className={classes.iconBox}><LocationOn /></div>
+                <div>
+                  <Typography variant="h6" style={{ fontWeight: 800 }}>{M2K_PITAMPURA_VENUE.label}</Typography>
+                  <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
+                    M2K Mall, Plot No 4, Community Centre,
+                    <br />
+                    Road No. 44, Pitampura, New Delhi, Delhi 110034
                   </Typography>
                 </div>
               </div>
