@@ -219,8 +219,8 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
             </Typography>
           )}
           <Box mt={1}>
-            <Chip className={classes.chip} label={`Ticket Price: ${cinema.ticketPrice} EUR`} />
-            <Chip className={classes.chip} label={`Seats: ${cinema.seatsAvailable}`} />
+            <Chip className={classes.chip} label={`From ₹${cinema.ticketPrice} per ticket`} />
+            <Chip className={classes.chip} label={`${cinema.seatsAvailable} seats in hall`} />
           </Box>
           <div className={classes.ctaRow}>
             <Button

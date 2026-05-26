@@ -144,10 +144,6 @@ class BookingPage extends Component {
       setSelectedTime
     } = this.props;
     const hasValidCinemaId = this.isValidObjectId(selectedCinema);
-    const prevMovieId = prevProps.movie && prevProps.movie._id;
-    const movieId = this.props.movie && this.props.movie._id;
-    const warningText = this.props.movie && this.props.movie.contentWarning;
-
     const wasDetailStep =
       prevProps.location.pathname.endsWith('/seats') ||
       prevProps.location.pathname.endsWith('/payment');
@@ -932,8 +928,7 @@ class BookingPage extends Component {
       paymentMethod,
       paymentDetails,
       reviews,
-      loadingReviews,
-      contentWarningOpen
+      loadingReviews
     } = this.state;
     const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
     const castMembers = castCrew.filter(
