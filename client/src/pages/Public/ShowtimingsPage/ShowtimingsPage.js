@@ -5,7 +5,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, Chip, MenuItem, TextField, Button } from '@material-ui/core';
 import { getMovies, getCinemas, getShowtimes } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
-import { ContentWarningModal } from '../../../components';
+import { MovieBookingModals } from '../../../components';
+import useMovieBookingFlow from '../../../hooks/useMovieBookingFlow';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -141,20 +142,10 @@ function ShowtimingsPage({
   const classes = useStyles();
   const history = useHistory();
   const [selectedDate, setSelectedDate] = useState('');
-  const [warningMovie, setWarningMovie] = useState(null);
+  const bookingFlow = useMovieBookingFlow();
 
-  const onBookTickets = (movie) => {
-    if (movie.contentWarning) {
-      setWarningMovie(movie);
-    } else {
-      history.push(`/movie/booking/${movie._id}`);
-    }
-  };
-
-  const handleContinue = () => {
-    const id = warningMovie._id;
-    setWarningMovie(null);
-    history.push(`/movie/booking/${id}`);
+  const onBookTickets = movie => {
+    bookingFlow.startBooking(movie);
   };
   const [selectedMovie, setSelectedMovie] = useState('all');
   const [selectedCinema, setSelectedCinema] = useState('all');
@@ -354,12 +345,7 @@ function ShowtimingsPage({
           </Grid>
         )}
       </Grid>
-      <ContentWarningModal
-        open={!!warningMovie}
-        handleClose={() => setWarningMovie(null)}
-        handleContinue={handleContinue}
-        movie={warningMovie}
-      />
+      <MovieBookingModals flow={bookingFlow} />
     </Container>
   );
 }

@@ -64,9 +64,10 @@ export default theme => ({
     scrollMarginTop: '130px',
   },
   carousel: {
-    width: '90%',
+    width: '92%',
+    maxWidth: 1400,
     margin: '0 auto',
-    paddingBottom: theme.spacing(4),
+    paddingBottom: theme.spacing(5),
   },
 
   /* ── Cinemas ──────────────────────────────── */

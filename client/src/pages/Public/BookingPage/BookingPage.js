@@ -1176,6 +1176,7 @@ class BookingPage extends Component {
             {showInvitation && !!selectedSeats.length && (
               <>
                 <BookingInvitation
+                  cinema={cinema}
                   selectedSeats={selectedSeats}
                   sendInvitations={this.sendInvitations}
                   ignore={() => {
@@ -1200,6 +1201,14 @@ class BookingPage extends Component {
               <>
                 <BookingSeats
                   seats={seats}
+                  rowLabels={cinema.rowLabels}
+                  gridWidth={cinema.gridWidth}
+                  seatNumbering={cinema.seatNumbering}
+                  centerAisle={
+                    cinema.layoutKey === 'm2k-venue'
+                      ? false
+                      : cinema.centerAisle !== false
+                  }
                   onSelectSeat={(indexRow, index) =>
                     this.onSelectSeat(indexRow, index)
                   }

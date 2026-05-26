@@ -1,10 +1,16 @@
 export default theme => ({
+  root: {
+    position: 'relative',
+    paddingBottom: theme.spacing(1),
+  },
   container: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
-    padding: theme.spacing(0, 4),
-    marginBottom: theme.spacing(2),
+    padding: theme.spacing(0, 1, 2, 1),
+    marginBottom: theme.spacing(1),
+    gap: theme.spacing(2),
+    flexWrap: 'wrap',
   },
   titleBlock: {
     display: 'flex',
@@ -16,13 +22,20 @@ export default theme => ({
     color: '#0f172a',
     textTransform: 'capitalize',
     letterSpacing: '0.02em',
+    lineHeight: 1.2,
+  },
+  countBadge: {
+    marginTop: 6,
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: '#64748b',
   },
   titleAccent: {
-    marginTop: '6px',
-    width: '42px',
-    height: '3px',
+    marginTop: 6,
+    width: 42,
+    height: 3,
     background: '#b72429',
-    borderRadius: '2px',
+    borderRadius: 2,
   },
   button: {
     color: '#b72429',
@@ -31,41 +44,134 @@ export default theme => ({
     fontWeight: 700,
     letterSpacing: '0.06em',
     padding: '6px 18px',
-    borderRadius: '6px',
+    borderRadius: 8,
+    whiteSpace: 'nowrap',
     '&:hover': {
       backgroundColor: 'rgba(183,36,41,0.08)',
       borderColor: '#b72429',
-    }
+    },
   },
-  carousel: {
-    width: '85%',
-    height: '100%',
-    margin: 'auto'
+  trackWrap: {
+    position: 'relative',
+    margin: theme.spacing(0, -0.5),
+    '& .slick-list': {
+      margin: theme.spacing(0, 0.5),
+      overflow: 'hidden',
+      borderRadius: 12,
+    },
+    '& .slick-track': {
+      display: 'flex',
+      alignItems: 'stretch',
+    },
+    '& .slick-slide': {
+      height: 'auto',
+      '& > div': {
+        height: '100%',
+      },
+    },
+    '& .slick-dots': {
+      bottom: -32,
+      '& li': {
+        margin: '0 3px',
+        width: 8,
+        height: 8,
+      },
+      '& li button:before': {
+        fontSize: 8,
+        color: '#cbd5e1',
+        opacity: 1,
+      },
+      '& li.slick-active button:before': {
+        color: '#b72429',
+        opacity: 1,
+        transform: 'scale(1.35)',
+      },
+    },
   },
-  arrow: {
-    cursor: 'pointer',
+  slide: {
+    padding: theme.spacing(1, 1.25),
+    boxSizing: 'border-box',
+    outline: 'none',
+  },
+  arrowBtn: {
     position: 'absolute',
-    top: 0,
-    bottom: 60,
-    width: '8%',
+    top: '42%',
+    transform: 'translateY(-50%)',
+    zIndex: 3,
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    background: '#fff',
+    border: '1px solid rgba(15,23,42,0.1)',
+    boxShadow: '0 4px 16px rgba(15,23,42,0.12)',
     display: 'flex',
     alignItems: 'center',
-    color: '#334155',
-    zIndex: 1,
-    '&.prevArrow': {
-      left: 0,
-      justifyContent: 'flex-start',
-      background: 'linear-gradient(90deg, rgba(248,250,252,0.98) 0%, rgba(248,250,252,0) 100%)',
-      opacity: ({ currentSlide }) => (currentSlide ? 1 : 0)
+    justifyContent: 'center',
+    color: '#b72429',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease',
+    '&:hover': {
+      transform: 'translateY(-50%) scale(1.06)',
+      boxShadow: '0 8px 24px rgba(183,36,41,0.2)',
+      background: '#fff',
     },
-    '&.nextArrow': {
-      right: 0,
-      justifyContent: 'flex-end',
-      background: 'linear-gradient(90deg, rgba(248,250,252,0) 0%, rgba(248,250,252,0.98) 100%)',
-      opacity: ({ currentSlide, slideCount }) =>
-        currentSlide === slideCount ? 0 : 1
-    }
+    '&:focus': {
+      outline: '2px solid rgba(183,36,41,0.4)',
+      outlineOffset: 2,
+    },
   },
-
-  slider: { '& .slick-slide': { padding: theme.spacing(0.5) } }
+  arrowDisabled: {
+    opacity: 0.35,
+    pointerEvents: 'none',
+    boxShadow: 'none',
+  },
+  prevArrow: {
+    left: -8,
+    [theme.breakpoints.down('sm')]: {
+      left: 4,
+    },
+  },
+  nextArrow: {
+    right: -8,
+    [theme.breakpoints.down('sm')]: {
+      right: 4,
+    },
+  },
+  edgeFadeLeft: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 40,
+    width: 48,
+    zIndex: 2,
+    background: 'linear-gradient(90deg, #f8fafc 30%, transparent)',
+    [theme.breakpoints.down('sm')]: {
+      width: 28,
+    },
+  },
+  edgeFadeRight: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 40,
+    width: 48,
+    zIndex: 2,
+    background: 'linear-gradient(270deg, #f8fafc 30%, transparent)',
+    [theme.breakpoints.down('sm')]: {
+      width: 28,
+    },
+  },
+  swipeHint: {
+    display: 'none',
+    textAlign: 'center',
+    fontSize: '0.72rem',
+    color: '#94a3b8',
+    marginTop: theme.spacing(4),
+    letterSpacing: '0.04em',
+    [theme.breakpoints.down('sm')]: {
+      display: 'block',
+    },
+  },
 });

@@ -6,6 +6,12 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "seed:pitampura": "node src/db/seedM2kPitampura.js",
+    "seed:rohini": "node src/db/seedM2kRohini.js",
+    "seed:rohini-screen2": "node src/db/seedM2kRohiniScreen2.js",
+    "seed:pitampura-screen2": "node src/db/seedM2kPitampuraScreen2.js",
+    "seed:pitampura-screen3": "node src/db/seedM2kPitampuraScreen3.js",
+    "seed:m2k": "node src/db/seedM2kPitampura.js && node src/db/seedM2kRohini.js && node src/db/seedM2kRohiniScreen2.js && node src/db/seedM2kPitampuraScreen2.js && node src/db/seedM2kPitampuraScreen3.js",
     "database": "/Users/georgesimos/mongodb/bin/mongod --dbpath=/Users/georgesimos//mongodb-data"
   },
   "author": "George Simos <georgesimos.com>",

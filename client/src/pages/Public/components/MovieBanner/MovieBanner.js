@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 import { Rating } from '@material-ui/lab';
 import {
@@ -13,7 +13,8 @@ import { Link, useHistory } from 'react-router-dom';
 import ArrowRightAlt from '@material-ui/icons/ArrowRightAlt';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import { normalizeImage } from '../../../../utils/imageUrl';
-import { ContentWarningModal } from '../../../../components';
+import { MovieBookingModals } from '../../../../components';
+import useMovieBookingFlow from '../../../../hooks/useMovieBookingFlow';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -31,22 +32,13 @@ function MovieBanner(props) {
   const { movie, fullDescription } = props;
   const classes = useStyles(props);
   const history = useHistory();
-  const [showWarning, setShowWarning] = useState(false);
+  const bookingFlow = useMovieBookingFlow();
   if (!movie) return null;
   const imageUrl = normalizeImage(movie.image);
 
-  const onBookTickets = (e) => {
+  const onBookTickets = e => {
     if (e) e.preventDefault();
-    if (movie.contentWarning) {
-      setShowWarning(true);
-    } else {
-      history.push(`/movie/booking/${movie._id}`);
-    }
-  };
-
-  const handleContinue = () => {
-    setShowWarning(false);
-    history.push(`/movie/booking/${movie._id}`);
+    bookingFlow.startBooking(movie);
   };
 
   return (
@@ -146,12 +138,7 @@ function MovieBanner(props) {
           </>
         )}
       </div>
-      <ContentWarningModal
-        open={showWarning}
-        handleClose={() => setShowWarning(false)}
-        handleContinue={handleContinue}
-        movie={movie}
-      />
+      <MovieBookingModals flow={bookingFlow} />
     </div>
   );
 }

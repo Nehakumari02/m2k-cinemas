@@ -16,3 +16,5 @@ export { default as SnackbarContentWrapper } from './SnackbarContentWrapper';
 export { default as Status } from './Status';
 export { default as RefundRequestModal } from './RefundRequestModal/RefundRequestModal';
 export { default as ContentWarningModal } from './ContentWarningModal/ContentWarningModal';
+export { default as TermsAndConditionsModal } from './TermsAndConditionsModal';
+export { default as MovieBookingModals } from './MovieBookingModals';

@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import classNames from 'classnames';
+import { getSeatNumberFromRight } from '../../../../../utils/venueSeatFromRight';
+import { getSeatNumberFromLeft } from '../../../../../utils/venueSeatFromLeft';
 
 const SEAT_COLORS = {
   available: '#3a3a4a',
@@ -87,10 +89,13 @@ const useStyles = makeStyles(theme => ({
     userSelect: 'none'
   },
   seatsGroup: {
-    display: 'flex',
+    display: 'grid',
     gap: '4px',
     flexWrap: 'nowrap',
-    justifyContent: 'center'
+    justifyContent: 'start'
+  },
+  seatsGroupFixed: {
+    flex: '0 0 auto'
   },
 
   /* ── Seat ── */
@@ -147,6 +152,28 @@ const useStyles = makeStyles(theme => ({
   aisleGap: {
     width: '20px',
     flexShrink: 0
+  },
+  seatSpacer: {
+    width: '26px',
+    height: '24px',
+    flexShrink: 0,
+    [theme.breakpoints.down('sm')]: {
+      width: '20px',
+      height: '18px'
+    }
+  },
+  walkwayRow: {
+    width: '82%',
+    margin: '14px 0 18px',
+    padding: '8px 0',
+    textAlign: 'center',
+    fontSize: '0.7rem',
+    fontWeight: 800,
+    letterSpacing: '0.35em',
+    color: '#64748b',
+    borderTop: '1px dashed rgba(100,116,139,0.45)',
+    borderBottom: '1px dashed rgba(100,116,139,0.45)',
+    userSelect: 'none'
   },
 
   /* ── Legend ── */
@@ -224,7 +251,21 @@ function getSeatBgColor(seatValue, category) {
   return category.color + '33'; // 20% opacity hex
 }
 
-export default function BookingSeats({ seats, onSelectSeat }) {
+const EMPTY_SEAT = -1;
+
+function isBookableSeat(seatValue) {
+  const n = Number(seatValue);
+  return !Number.isNaN(n) && n >= 0;
+}
+
+export default function BookingSeats({
+  seats,
+  onSelectSeat,
+  rowLabels,
+  gridWidth: gridWidthProp,
+  centerAisle = true,
+  seatNumbering
+}) {
   const classes = useStyles();
 
   if (!seats || seats.length === 0) return null;
@@ -233,8 +274,19 @@ export default function BookingSeats({ seats, onSelectSeat }) {
   const third = Math.ceil(totalRows / 3);
   const categoryBreaks = [0, third, third * 2];
 
-  // Aisle gap in the middle
-  const aisleAt = seats[0] ? Math.floor(seats[0].length / 2) : -1;
+  const maxWidth = seats.reduce((max, row) => Math.max(max, row.length), 0);
+  const gridWidth = gridWidthProp || maxWidth;
+  const aisleAt =
+    centerAisle && gridWidth > 0 ? Math.floor(gridWidth / 2) : -1;
+  const gridTemplate = `repeat(${gridWidth}, 26px)`;
+
+  const getRowLabel = rowIndex =>
+    (rowLabels && rowLabels[rowIndex]) || ROW_LETTERS[rowIndex] || String(rowIndex + 1);
+
+  const padRow = seatRow => {
+    if (seatRow.length >= gridWidth) return seatRow;
+    return [...seatRow, ...Array(gridWidth - seatRow.length).fill(EMPTY_SEAT)];
+  };
 
   return (
     <div className={classes.wrapper}>
@@ -250,7 +302,37 @@ export default function BookingSeats({ seats, onSelectSeat }) {
       {seats.map((seatRow, rowIndex) => {
         const category = getCategory(rowIndex, totalRows);
         const showBand = categoryBreaks.includes(rowIndex);
-        const rowLetter = ROW_LETTERS[rowIndex] || String(rowIndex + 1);
+        const rowLetter = getRowLabel(rowIndex);
+
+        if (rowLetter === 'WAY') {
+          return (
+            <div key={rowIndex} className={classes.walkwayRow}>
+              WAY
+            </div>
+          );
+        }
+
+        let seatNumber = 0;
+        const paddedRow = padRow(seatRow);
+        const useVenueNumbers =
+          seatNumbering === 'rohini' ||
+          seatNumbering === 'rohini-screen2' ||
+          seatNumbering === 'pitampura-screen2' ||
+          seatNumbering === 'pitampura-screen3';
+
+        const getVenueSeat = (row, col) => {
+          if (seatNumbering === 'pitampura-screen2') {
+            return getSeatNumberFromLeft(row, col);
+          }
+          if (
+            seatNumbering === 'rohini' ||
+            seatNumbering === 'rohini-screen2' ||
+            seatNumbering === 'pitampura-screen3'
+          ) {
+            return getSeatNumberFromRight(row, col);
+          }
+          return null;
+        };
 
         return (
           <Fragment key={rowIndex}>
@@ -280,30 +362,38 @@ export default function BookingSeats({ seats, onSelectSeat }) {
             {/* Seat Row */}
             <div className={classes.row}>
               <span className={classes.rowLabel}>{rowLetter}</span>
-              <div className={classes.seatsGroup}>
-                {seatRow.map((seatValue, seatIndex) => {
+              <div
+                className={classNames(classes.seatsGroup, classes.seatsGroupFixed)}
+                style={{ gridTemplateColumns: gridTemplate }}>
+                {paddedRow.map((seatValue, seatIndex) => {
+                  if (!isBookableSeat(seatValue)) {
+                    return <div key={seatIndex} className={classes.seatSpacer} />;
+                  }
+
+                  const venueSeat = useVenueNumbers
+                    ? getVenueSeat(paddedRow, seatIndex)
+                    : null;
+                  seatNumber += 1;
+                  const displaySeat = venueSeat != null ? venueSeat : seatNumber;
+
                   return (
-                    <Fragment key={seatIndex}>
-                      {seatIndex === aisleAt && (
-                        <div className={classes.aisleGap} />
+                    <button
+                      key={seatIndex}
+                      className={classNames(
+                        classes.seat,
+                        seatValue === 1 && classes.seatReserved,
+                        seatValue === 2 && classes.seatSelected,
+                        (seatValue === 5 || seatValue === 6) && classes.seatSpecial
                       )}
-                      <button
-                        className={classNames(
-                          classes.seat,
-                          seatValue === 1 && classes.seatReserved,
-                          seatValue === 2 && classes.seatSelected,
-                          (seatValue === 5 || seatValue === 6) && classes.seatSpecial
-                        )}
-                        style={{ backgroundColor: getSeatBgColor(seatValue, category) }}
-                        onClick={() =>
-                          seatValue !== 1 && onSelectSeat(rowIndex, seatIndex)
-                        }
-                        title={`Row ${rowLetter} Seat ${seatIndex + 1}${
-                          seatValue === 1 ? ' (Reserved)' : ''
-                        }`}>
-                        {seatIndex + 1}
-                      </button>
-                    </Fragment>
+                      style={{ backgroundColor: getSeatBgColor(seatValue, category) }}
+                      onClick={() =>
+                        seatValue !== 1 && onSelectSeat(rowIndex, seatIndex)
+                      }
+                      title={`Row ${rowLetter} Seat ${displaySeat}${
+                        seatValue === 1 ? ' (Reserved)' : ''
+                      }`}>
+                      {displaySeat}
+                    </button>
                   );
                 })}
               </div>

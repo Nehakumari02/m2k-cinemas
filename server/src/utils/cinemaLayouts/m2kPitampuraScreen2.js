@@ -1,0 +1,153 @@
+/**
+ * M2K Pitampura Screen 2 — 28-column grid from venue diagram.
+ * Bottom (A–K): 11 + aisle + 12 seats, numbers 1→23 left to right.
+ * Top (L–U): staggered seat-1 column; screen at front = row A.
+ */
+const EMPTY = -1;
+const AVAILABLE = 0;
+
+const GRID_WIDTH = 28;
+
+const row = () => Array(GRID_WIDTH).fill(EMPTY);
+
+/** Rows A–K: seats 1–11 | aisle | 12–23 */
+function buildBottomSectionRow() {
+  const r = row();
+  for (let i = 2; i <= 12; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  for (let i = 15; i <= 26; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+/** Row U: 1–11 | 12–18 (U1 @ col 4/T3; U12 @ col 15/T11) */
+function buildRowU() {
+  const r = row();
+  for (let i = 4; i <= 14; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  for (let i = 15; i <= 21; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+/** Row T: 1–10 | 11–20 (T10 @ col 11/S7; T11 @ col 15/S8) */
+function buildRowT() {
+  const r = row();
+  for (let i = 2; i <= 11; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  for (let i = 15; i <= 24; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+/** Row S: 1–7 | 8–15 (seat 1 @ col 5/R2, seat 7 @ col 11/R8, seat 8 @ col 15/R9) */
+function buildRowS() {
+  const r = row();
+  for (let i = 5; i <= 11; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  for (let i = 15; i <= 22; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+/** Rows R, Q, P, N, M, L: 1–8 | 9–17 (seat 1 @ col 4, one right of S) */
+function buildRowRL() {
+  const r = row();
+  for (let i = 4; i <= 11; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  for (let i = 15; i <= 23; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+function buildWalkwayRow() {
+  return row();
+}
+
+function countBookableSeats(seats) {
+  return seats.reduce(
+    (total, seatRow) =>
+      total + seatRow.filter((cell) => cell === AVAILABLE || cell === 5).length,
+    0
+  );
+}
+
+function buildM2kPitampuraScreen2Layout() {
+  const seats = [
+    buildBottomSectionRow(), // A
+    buildBottomSectionRow(), // B
+    buildBottomSectionRow(), // C
+    buildBottomSectionRow(), // D
+    buildBottomSectionRow(), // E
+    buildBottomSectionRow(), // F
+    buildBottomSectionRow(), // G
+    buildBottomSectionRow(), // H
+    buildBottomSectionRow(), // J
+    buildBottomSectionRow(), // K
+    buildWalkwayRow(),
+    buildRowRL(), // L
+    buildRowRL(), // M
+    buildRowRL(), // N
+    buildRowRL(), // P
+    buildRowRL(), // Q
+    buildRowRL(), // R
+    buildRowS(), // S
+    buildRowT(), // T
+    buildRowU() // U
+  ];
+
+  const rowLabels = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'J',
+    'K',
+    'WAY',
+    'L',
+    'M',
+    'N',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U'
+  ];
+
+  return {
+    name: 'M2K PITAMPURA SCREEN 2',
+    city: 'delhi',
+    ticketPrice: 290,
+    specialPrice: 460,
+    layoutKey: 'm2k-venue',
+    seatNumbering: 'pitampura-screen2',
+    seats,
+    rowLabels,
+    gridWidth: GRID_WIDTH,
+    centerAisle: false,
+    seatsAvailable: countBookableSeats(seats)
+  };
+}
+
+module.exports = {
+  EMPTY,
+  AVAILABLE,
+  GRID_WIDTH,
+  buildM2kPitampuraScreen2Layout,
+  countBookableSeats
+};

@@ -2,6 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Typography, TextField, Grid, Button, Box } from '@material-ui/core';
 import { Paper } from '../../../../../components';
+import { getSeatDisplayLabel } from '../../../../../utils/seatLabels';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,11 +18,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const convertToAlphabet = value => (value + 10).toString(36).toUpperCase();
-
 export default function BookingInvitation(props) {
   const classes = useStyles(props);
   const {
+    cinema,
     selectedSeats,
     sendInvitations,
     ignore,
@@ -54,25 +54,29 @@ export default function BookingInvitation(props) {
           </Button>
         </Box>
         <Grid className={classes.gridContainer} container spacing={3}>
-          {selectedSeats.map((seat, index) => (
+          {selectedSeats.map((seat, index) => {
+            const { row, seat: seatNum } = getSeatDisplayLabel(
+              cinema,
+              seat[0],
+              seat[1]
+            );
+            const seatKey = `${row}-${seatNum}`;
+            return (
             <Grid item xs={12} md={6} lg={4} key={'seat-' + index}>
               <TextField
                 fullWidth
                 label="email"
-                name={`${convertToAlphabet(seat[0])}-${seat[1]}`}
-                helperText={`Please select an Email for Row : ${convertToAlphabet(
-                  seat[0]
-                )} - Seat Number : ${seat[1]}`}
+                name={seatKey}
+                helperText={`Please select an Email for Row : ${row} - Seat Number : ${seatNum}`}
                 margin="dense"
                 required
-                value={
-                  invitations[`${convertToAlphabet(seat[0])}-${seat[1]}`] || ''
-                }
+                value={invitations[seatKey] || ''}
                 variant="outlined"
                 onChange={event => onSetInvitation(event)}
               />
             </Grid>
-          ))}
+            );
+          })}
           <Grid item xs={12} container>
             <Grid item>
               <Button

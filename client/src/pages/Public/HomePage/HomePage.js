@@ -180,6 +180,7 @@ class HomePage extends Component {
             <MovieCarousel
               carouselClass={classes.carousel}
               title="All Movies"
+              to="/movies"
               movies={movies}
             />
           </div>

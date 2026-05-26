@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
@@ -13,15 +13,17 @@ import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
 import { normalizeImage } from '../../../../utils/imageUrl';
-import { ContentWarningModal } from '../../../../components';
+import { MovieBookingModals } from '../../../../components';
+import useMovieBookingFlow from '../../../../hooks/useMovieBookingFlow';
 
 const useStyles = makeStyles(theme => ({
   link: {
     display: 'block',
-    width: '100%'
+    width: '100%',
   },
   card: {
-    width: 230,
+    width: ({ variant }) => (variant === 'carousel' ? '100%' : 230),
+    maxWidth: ({ variant }) => (variant === 'carousel' ? 220 : 'none'),
     margin: '0 auto',
     backgroundColor: '#ffffff',
     borderRadius: 12,
@@ -181,13 +183,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MovieCardSimple = props => {
-  const classes = useStyles();
+  const { movie, variant } = props;
+  const classes = useStyles({ variant });
   const history = useHistory();
   const dispatch = useDispatch();
   const wishlist = useSelector(state => state.wishlistState?.wishlist || []);
   const user = useSelector(state => state.authState?.user);
-  const { movie } = props;
-  const [showWarning, setShowWarning] = useState(false);
+  const bookingFlow = useMovieBookingFlow();
   
   const isWishlisted = wishlist.some(w => (w._id || w) === movie._id);
 
@@ -210,20 +212,11 @@ const MovieCardSimple = props => {
   const onBookTickets = event => {
     event.preventDefault();
     event.stopPropagation();
-    if (movie.contentWarning) {
-      setShowWarning(true);
-    } else {
-      history.push(`/movie/booking/${movie._id}`);
-    }
+    bookingFlow.startBooking(movie);
   };
 
   const onCardClick = () => {
     history.push(`/movie/${movie._id}`);
-  };
-
-  const handleContinue = () => {
-    setShowWarning(false);
-    history.push(`/movie/booking/${movie._id}`);
   };
 
   return (
@@ -271,18 +264,17 @@ const MovieCardSimple = props => {
           </CardContent>
         </CardActionArea>
       </Card>
-      <ContentWarningModal
-        open={showWarning}
-        handleClose={() => setShowWarning(false)}
-        handleContinue={handleContinue}
-        movie={movie}
-      />
+      <MovieBookingModals flow={bookingFlow} />
     </div>
   );
 };
 
 MovieCardSimple.propTypes = {
-  movie: PropTypes.object.isRequired
+  movie: PropTypes.object.isRequired,
+  variant: PropTypes.oneOf(['carousel', 'default']),
+};
+MovieCardSimple.defaultProps = {
+  variant: 'default',
 };
 export default MovieCardSimple;
 
