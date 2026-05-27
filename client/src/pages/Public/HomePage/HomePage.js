@@ -83,6 +83,8 @@ class HomePage extends Component {
       ...topOffers.map(offer => ({ type: 'offer', data: offer }))
     ];
     const primaryCinemas = filterPrimaryCinemas(cinemas);
+    const moviePrices = (movies || []).map(m => Number(m.ticketPrice)).filter(p => p > 0);
+    const minMoviePrice = moviePrices.length ? Math.min(...moviePrices) : 0;
 
     const heroSettings = {
       dots: true,
@@ -208,7 +210,7 @@ class HomePage extends Component {
           <Grid container spacing={3}>
             {primaryCinemas.map(cinema => (
               <Grid key={cinema._id} item xs={12} sm={6} md={4} lg={3}>
-                <CinemaCard cinema={cinema} linkToDetails />
+                <CinemaCard cinema={cinema} linkToDetails minMoviePrice={minMoviePrice} />
               </Grid>
             ))}
           </Grid>

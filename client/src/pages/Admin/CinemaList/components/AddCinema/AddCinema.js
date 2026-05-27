@@ -124,16 +124,20 @@ class AddCinema extends Component {
   // ── Submit ──
   onSubmitAction = async type => {
     const { getCinemas, createCinemas, updateCinemas, removeCinemas } = this.props;
-    const { _id, name, image, ticketPrice, specialPrice, city } = this.state;
+    const { _id, name, image, specialPrice, city } = this.state;
     const seats = this.buildSeatsFromConfigs();
     const seatsAvailable = this.getTotalSeats();
-    const cinema = { 
-      name, 
-      ticketPrice: Number(ticketPrice), 
-      specialPrice: specialPrice ? Number(specialPrice) : 0, 
-      city, 
-      seatsAvailable, 
-      seats 
+    const existingPrice =
+      this.props.editCinema && Number(this.props.editCinema.ticketPrice) > 0
+        ? Number(this.props.editCinema.ticketPrice)
+        : 0;
+    const cinema = {
+      name,
+      ticketPrice: existingPrice,
+      specialPrice: specialPrice ? Number(specialPrice) : 0,
+      city,
+      seatsAvailable,
+      seats,
     };
 
     let notification = {};
@@ -242,7 +246,7 @@ class AddCinema extends Component {
 
   render() {
     const { classes, className } = this.props;
-    const { name, image, ticketPrice, specialPrice, city, rowConfigs, notification } = this.state;
+    const { name, image, specialPrice, city, rowConfigs, notification } = this.state;
     const totalSeats = this.getTotalSeats();
     const totalRows = rowConfigs.length;
 
@@ -298,20 +302,12 @@ class AddCinema extends Component {
           <div className={classes.field}>
             <TextField
               className={classes.textField}
-              label="Normal Ticket Price"
-              margin="dense"
-              type="number"
-              value={ticketPrice}
-              variant="outlined"
-              onChange={e => this.handleFieldChange('ticketPrice', e.target.value)}
-            />
-            <TextField
-              className={classes.textField}
-              label="Special Ticket Price"
+              label="Premium seat surcharge (₹)"
               margin="dense"
               type="number"
               value={specialPrice}
               variant="outlined"
+              helperText="Added to each movie's ticket price for premium/special seats. Regular seats use the movie price only."
               onChange={e => this.handleFieldChange('specialPrice', e.target.value)}
             />
           </div>

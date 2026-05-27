@@ -189,6 +189,7 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'synopsis',
     'contentWarning',
     'duration',
+    'ticketPrice',
     'rating',
     'releaseDate',
     'endDate',

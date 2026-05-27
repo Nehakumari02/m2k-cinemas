@@ -66,7 +66,7 @@ class CinemaList extends Component {
                   md={6}
                   xs={12}
                   onClick={() => this.openEditDialog(cinema)}>
-                  <CinemaCard cinema={cinema} />
+                  <CinemaCard cinema={cinema} admin />
                 </Grid>
               ))}
             </Grid>

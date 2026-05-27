@@ -3,7 +3,8 @@ import classNames from 'classnames';
 import { makeStyles } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 import { Paper } from '../../../../components';
-import { EventSeat, AttachMoney, LocationOn, ArrowForward } from '@material-ui/icons';
+import { EventSeat, LocationOn, ArrowForward } from '@material-ui/icons';
+import { formatPremiumSeatLabel } from '../../../../utils/seatPricing';
 import { Link } from 'react-router-dom';
 import { normalizeImage } from '../../../../utils/imageUrl';
 import { formatCinemaAddress } from '../../../../constants/m2kAddresses';
@@ -111,7 +112,8 @@ const useStyles = makeStyles(theme => ({
 
 function CinemaCard(props) {
   const classes = useStyles(props);
-  const { className, cinema, linkToDetails = false } = props;
+  const { className, cinema, linkToDetails = false, admin = false, minMoviePrice } = props;
+  const premiumLabel = formatPremiumSeatLabel(cinema);
   const cinemaImage = normalizeImage(cinema && cinema.image);
   const venueAddress = formatCinemaAddress(cinema);
 
@@ -135,12 +137,31 @@ function CinemaCard(props) {
         </Typography>
       </div>
       <div className={classes.statsWrap}>
-        <div className={classes.stats}>
-          <AttachMoney className={classes.eventIcon} />
-          <Typography className={classes.eventText} variant="body2">
-            ₹{cinema.ticketPrice} per ticket
-          </Typography>
-        </div>
+        {admin ? (
+          <>
+            <Typography className={classes.eventText} variant="body2">
+              Ticket price is set per movie (Movies admin)
+            </Typography>
+            {premiumLabel && (
+              <Typography className={classes.eventText} variant="body2">
+                {premiumLabel}
+              </Typography>
+            )}
+          </>
+        ) : (
+          <>
+            <Typography className={classes.eventText} variant="body2">
+              {minMoviePrice > 0
+                ? `From ₹${minMoviePrice} per ticket (by movie)`
+                : 'Ticket price varies by movie'}
+            </Typography>
+            {premiumLabel && (
+              <Typography className={classes.eventText} variant="body2">
+                {premiumLabel}
+              </Typography>
+            )}
+          </>
+        )}
         <div className={classes.stats}>
           <EventSeat className={classes.eventIcon} />
           <Typography className={classes.eventText} variant="body2">

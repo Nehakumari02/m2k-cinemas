@@ -44,6 +44,7 @@ import {
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { calculateBookingTotals } from '../../../utils/bookingPricing';
+import { getMovieBaseTicketPrice, getSeatTicketPrice } from '../../../utils/seatPricing';
 import { isReservationSeatHold } from '../../../utils/reservationSeats';
 import { ResponsiveDialog } from '../../../components';
 import LoginForm from '../Login/components/LoginForm';
@@ -337,6 +338,15 @@ class BookingPage extends Component {
     });
   };
 
+  getSelectedSeatsTicketTotal = () => {
+    const { movie, cinema, selectedSeats } = this.props;
+    if (!cinema || !selectedSeats.length) return 0;
+    return selectedSeats.reduce((acc, [row, col]) => {
+      const seatVal = cinema.seats[row][col];
+      return acc + getSeatTicketPrice(movie, cinema, seatVal);
+    }, 0);
+  };
+
   // JSpdf Generator For generating the PDF
   jsPdfGenerator = () => {
     const { movie, cinema, selectedDate, selectedTime, QRCode, selectedFood } = this.props;
@@ -371,7 +381,7 @@ class BookingPage extends Component {
     }
 
     doc.setFontType('bold');
-    const ticketsTotal = this.props.selectedSeats.length * cinema.ticketPrice;
+    const ticketsTotal = this.getSelectedSeatsTicketTotal();
     const foodTotal = foodItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     doc.text(`Total Paid: ₹${ticketsTotal + foodTotal}`, 20, currentY);
 
@@ -473,14 +483,7 @@ class BookingPage extends Component {
       }
     }
 
-    const ticketsAmount = selectedSeats.reduce((acc, [row, col]) => {
-      const seatVal = Number(cinema.seats[row][col]);
-      const isSpecial = seatVal === 6 || seatVal === 5;
-      const price = isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0
-        ? Number(cinema.specialPrice)
-        : Number(cinema.ticketPrice);
-      return acc + price;
-    }, 0);
+    const ticketsAmount = this.getSelectedSeatsTicketTotal();
     const foodItems = Object.values(this.props.selectedFood || {}).map(item => ({
       foodId: item._id,
       name: item.name,
@@ -544,7 +547,7 @@ class BookingPage extends Component {
           date: selectedDate,
           startAt: selectedTime,
           seats: this.bookSeats(),
-          ticketPrice: cinema.ticketPrice,
+          ticketPrice: getMovieBaseTicketPrice(movie, cinema),
           total: afterDiscountTotal,
           pointsUsed: pointsUsed,
           foodItems,
@@ -640,8 +643,8 @@ class BookingPage extends Component {
       date: selectedDate,
       startAt: selectedTime,
       seats: this.bookSeats(),
-      ticketPrice: Number(cinema.ticketPrice || 0),
-      total: Number(selectedSeats.length * (cinema.ticketPrice || 0)),
+      ticketPrice: getMovieBaseTicketPrice(movie, cinema),
+      total: Number(this.getSelectedSeatsTicketTotal()),
       foodItems: [],
       movieId: movie._id,
       cinemaId: cinema._id,
@@ -1199,6 +1202,8 @@ class BookingPage extends Component {
                   rowLabels={cinema.rowLabels}
                   gridWidth={cinema.gridWidth}
                   seatNumbering={cinema.seatNumbering}
+                  movie={movie}
+                  cinema={cinema}
                   centerAisle={
                     cinema.layoutKey === 'm2k-venue'
                       ? false
@@ -1256,7 +1261,7 @@ class BookingPage extends Component {
                   <BookingCheckout
                     user={user}
                     membershipPlans={this.props.membershipPlans}
-                    ticketPrice={cinema.ticketPrice}
+                    ticketPrice={getMovieBaseTicketPrice(movie, cinema)}
                     seatsAvailable={cinema.seatsAvailable}
                     selectedSeats={selectedSeats.length}
                     selectedFood={this.props.selectedFood}
@@ -1277,11 +1282,7 @@ class BookingPage extends Component {
                     onRemoveCoupon={this.onRemoveCoupon}
                     offers={this.props.offers}
                     timeLeft={this.state.timeLeft}
-                    totalTicketsPrice={selectedSeats.reduce((acc, [row, col]) => {
-                      const seatVal = Number(cinema.seats[row][col]);
-                      const isSpecial = seatVal === 6 || seatVal === 5;
-                      return acc + (isSpecial && cinema.specialPrice && Number(cinema.specialPrice) !== 0 ? Number(cinema.specialPrice) : Number(cinema.ticketPrice));
-                    }, 0)}
+                    totalTicketsPrice={this.getSelectedSeatsTicketTotal()}
                   />
                 )}
               </>

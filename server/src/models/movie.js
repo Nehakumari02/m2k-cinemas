@@ -78,6 +78,13 @@ const movieSchema = new Schema({
     type: Number,
     required: true,
   },
+  /** Base ticket price (₹) for regular seats at this movie */
+  ticketPrice: {
+    type: Number,
+    required: false,
+    default: 0,
+    min: 0,
+  },
   rating: {
     type: Number,
     required: false,

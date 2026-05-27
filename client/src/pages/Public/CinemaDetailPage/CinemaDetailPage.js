@@ -8,6 +8,7 @@ import { normalizeImage } from '../../../utils/imageUrl';
 import { MovieBookingModals } from '../../../components';
 import useMovieBookingFlow from '../../../hooks/useMovieBookingFlow';
 import { formatCinemaAddress } from '../../../constants/m2kAddresses';
+import { formatPremiumSeatLabel, getMovieBaseTicketPrice } from '../../../utils/seatPricing';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -190,6 +191,10 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
     (movie, index, self) => self.findIndex(m => m._id === movie._id) === index
   );
 
+  const moviePrices = uniqueMovies.map(m => Number(m.ticketPrice)).filter(p => p > 0);
+  const minMoviePrice = moviePrices.length ? Math.min(...moviePrices) : getMovieBaseTicketPrice(null, cinema);
+  const premiumLabel = formatPremiumSeatLabel(cinema);
+
   const image = cinema && cinema.image ? cinema.image : 'https://source.unsplash.com/featured/?cinema';
 
   if (!cinema) {
@@ -219,7 +224,15 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
             </Typography>
           )}
           <Box mt={1}>
-            <Chip className={classes.chip} label={`From ₹${cinema.ticketPrice} per ticket`} />
+            <Chip
+              className={classes.chip}
+              label={
+                minMoviePrice > 0
+                  ? `From ₹${minMoviePrice} per ticket (by movie)`
+                  : 'Ticket price set per movie'
+              }
+            />
+            {premiumLabel && <Chip className={classes.chip} label={premiumLabel} />}
             <Chip className={classes.chip} label={`${cinema.seatsAvailable} seats in hall`} />
           </Box>
           <div className={classes.ctaRow}>

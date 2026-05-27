@@ -11,8 +11,11 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TablePagination
+  TablePagination,
+  IconButton,
+  Tooltip
 } from '@material-ui/core';
+import { Edit as EditIcon } from '@material-ui/icons';
 
 import { Portlet, PortletContent } from '../../../../../components';
 import styles from './styles';
@@ -80,6 +83,7 @@ class ShowtimesTable extends Component {
                 <TableCell align="left">Start Date</TableCell>
                 <TableCell align="left">End Date</TableCell>
                 <TableCell align="left">Time</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -125,6 +129,16 @@ class ShowtimesTable extends Component {
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {showtime.startAt}
+                    </TableCell>
+                    <TableCell className={classes.tableCell} align="right">
+                      <Tooltip title="Edit showtime">
+                        <IconButton
+                          size="small"
+                          onClick={() => this.props.onEditShowtime(showtime._id)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -38,8 +38,7 @@ export const getShowtimes = () => async dispatch => {
 export const addShowtime = showtime => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
-    const url = '/showtimes/';
-    const response = await fetch(url, {
+    const response = await fetch('/showtimes/', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -49,14 +48,14 @@ export const addShowtime = showtime => async dispatch => {
     });
     if (response.ok) {
       dispatch(setAlert('Showtime Created', 'success', 5000));
-      return { status: 'success', message: 'Showtime Created' };
+      return { status: 'success' };
     }
+    const data = await response.json().catch(() => ({}));
+    dispatch(setAlert((data && data.message) || 'Failed to save showtime', 'error', 5000));
+    return { status: 'error' };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
-    return {
-      status: 'error',
-      message: ' Cinema have not been saved, try again.'
-    };
+    return { status: 'error' };
   }
 };
 

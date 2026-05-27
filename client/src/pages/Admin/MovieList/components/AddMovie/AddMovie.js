@@ -40,6 +40,7 @@ class AddMovie extends Component {
     genre: [],
     language: '',
     duration: '',
+    ticketPrice: '',
     description: '',
     director: '',
     cast: '',
@@ -76,6 +77,7 @@ class AddMovie extends Component {
         synopsis,
         contentWarning,
         duration,
+        ticketPrice,
         rating,
         releaseDate,
         endDate,
@@ -102,6 +104,7 @@ class AddMovie extends Component {
         synopsis: synopsis || '',
         contentWarning: contentWarning || '',
         duration,
+        ticketPrice: ticketPrice != null && ticketPrice !== '' ? String(ticketPrice) : '',
         rating: rating || '',
         endDate,
         isPublished: isPublished !== undefined ? isPublished : true,
@@ -146,6 +149,7 @@ class AddMovie extends Component {
       title,
       language,
       duration,
+      ticketPrice,
       description,
       director,
       cast,
@@ -170,6 +174,7 @@ class AddMovie extends Component {
       genre: genre.join(','),
       language,
       duration,
+      ticketPrice: Number(ticketPrice) || 0,
       description,
       director,
       cast,
@@ -199,6 +204,7 @@ class AddMovie extends Component {
       title,
       language,
       duration,
+      ticketPrice,
       description,
       director,
       cast,
@@ -232,6 +238,7 @@ class AddMovie extends Component {
       genre: genre.join(','),
       language,
       duration,
+      ticketPrice: Number(ticketPrice) || 0,
       description,
       director,
       cast,
@@ -315,6 +322,7 @@ class AddMovie extends Component {
       genre,
       language,
       duration,
+      ticketPrice,
       description,
       synopsis,
       contentWarning,
@@ -577,6 +585,20 @@ class AddMovie extends Component {
                   size="small"
                   value={duration}
                   onChange={e => this.handleFieldChange('duration', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Ticket price (₹)"
+                  type="number"
+                  required
+                  variant="outlined"
+                  size="small"
+                  inputProps={{ min: 0, step: 1 }}
+                  helperText="Regular seat price for this movie"
+                  value={ticketPrice}
+                  onChange={e => this.handleFieldChange('ticketPrice', e.target.value)}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>

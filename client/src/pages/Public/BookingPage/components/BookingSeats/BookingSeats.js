@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 import classNames from 'classnames';
 import { getSeatNumberFromRight } from '../../../../../utils/venueSeatFromRight';
 import { getSeatNumberFromLeft } from '../../../../../utils/venueSeatFromLeft';
+import { getSeatTicketPrice } from '../../../../../utils/seatPricing';
 
 const SEAT_COLORS = {
   available: '#3a3a4a',
@@ -203,6 +204,22 @@ const useStyles = makeStyles(theme => ({
     borderRadius: '4px 4px 2px 2px',
     flexShrink: 0
   },
+  selectedSeatPriceBar: {
+    marginTop: theme.spacing(2),
+    padding: '8px 14px',
+    borderRadius: 12,
+    border: '1px solid rgba(183,36,41,0.35)',
+    backgroundColor: 'rgba(183,36,41,0.12)',
+    color: '#b72429',
+    fontWeight: 900,
+    fontSize: '0.85rem',
+    textAlign: 'center',
+    width: '82%',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      padding: '8px 10px',
+    },
+  },
 
   [theme.breakpoints.down('sm')]: {
     seat: { width: '20px', height: '18px', fontSize: '0.5rem' },
@@ -264,7 +281,9 @@ export default function BookingSeats({
   rowLabels,
   gridWidth: gridWidthProp,
   centerAisle = true,
-  seatNumbering
+  seatNumbering,
+  movie,
+  cinema,
 }) {
   const classes = useStyles();
 
@@ -287,6 +306,20 @@ export default function BookingSeats({
     if (seatRow.length >= gridWidth) return seatRow;
     return [...seatRow, ...Array(gridWidth - seatRow.length).fill(EMPTY_SEAT)];
   };
+
+  const selectedSeats = seats.reduce((acc, row, rowIndex) => {
+    row.forEach((seatValue, seatIndex) => {
+      if (seatValue === 2 || seatValue === 6) {
+        acc.push([rowIndex, seatIndex, seatValue]);
+      }
+    });
+    return acc;
+  }, []);
+  const selectedCount = selectedSeats.length;
+  const selectedTotalPrice = selectedSeats.reduce(
+    (sum, [, , seatValue]) => sum + getSeatTicketPrice(movie, cinema, seatValue),
+    0
+  );
 
   return (
     <div className={classes.wrapper}>
@@ -375,6 +408,10 @@ export default function BookingSeats({
                     : null;
                   seatNumber += 1;
                   const displaySeat = venueSeat != null ? venueSeat : seatNumber;
+                  const seatPrice =
+                    seatValue !== 1
+                      ? getSeatTicketPrice(movie, cinema, seatValue)
+                      : null;
 
                   return (
                     <button
@@ -386,12 +423,13 @@ export default function BookingSeats({
                         (seatValue === 5 || seatValue === 6) && classes.seatSpecial
                       )}
                       style={{ backgroundColor: getSeatBgColor(seatValue, category) }}
-                      onClick={() =>
-                        seatValue !== 1 && onSelectSeat(rowIndex, seatIndex)
-                      }
+                      onClick={() => {
+                        if (seatValue === 1) return;
+                        onSelectSeat(rowIndex, seatIndex);
+                      }}
                       title={`Row ${rowLetter} Seat ${displaySeat}${
                         seatValue === 1 ? ' (Reserved)' : ''
-                      }`}>
+                      }${seatPrice != null ? ` • ₹${seatPrice}` : ''}`}>
                       {displaySeat}
                     </button>
                   );
@@ -450,6 +488,12 @@ export default function BookingSeats({
           <span style={{ color: '#42a5f5', fontWeight: 700 }}>●</span> CLASSIC
         </div>
       </div>
+
+      {selectedCount > 0 && (
+        <div className={classes.selectedSeatPriceBar}>
+          {selectedCount} seat{selectedCount > 1 ? 's' : ''} selected : ₹{selectedTotalPrice}
+        </div>
+      )}
     </div>
   );
 }

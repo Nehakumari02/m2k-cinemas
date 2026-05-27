@@ -12,7 +12,7 @@ import {
 import MomentUtils from '@date-io/moment';
 
 import styles from './styles';
-import { addShowtime, updateShowtime } from '../../../../../store/actions';
+import { addShowtime, updateShowtime, getShowtimes } from '../../../../../store/actions';
 
 class AddShowtime extends Component {
   state = {
@@ -54,42 +54,38 @@ class AddShowtime extends Component {
     this.setState(newState);
   };
 
-  onAddShowtime = () => {
+  onAddShowtime = async () => {
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
-    const showtime = {
-      startAt,
-      startDate,
-      endDate,
-      movieId,
-      cinemaId
-    };
-    this.props.addShowtime(showtime);
+    if (!startAt || !startDate || !endDate || !movieId || !cinemaId) return;
+    const showtime = { startAt, startDate, endDate, movieId, cinemaId };
+    const result = await this.props.addShowtime(showtime);
+    if (result && result.status === 'success') {
+      this.props.getShowtimes();
+    }
   };
 
-  onUpdateShowtime = () => {
+  onUpdateShowtime = async () => {
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
-    const showtime = {
-      startAt,
-      startDate,
-      endDate,
-      movieId,
-      cinemaId
-    };
-    this.props.updateShowtime(showtime, this.props.selectedShowtime._id);
+    if (!startAt || !startDate || !endDate || !movieId || !cinemaId) return;
+    const showtime = { startAt, startDate, endDate, movieId, cinemaId };
+    const result = await this.props.updateShowtime(showtime, this.props.selectedShowtime._id);
+    if (result && result.status === 'success') {
+      this.props.getShowtimes();
+    }
   };
 
   onFilterMinDate = () => {
-    const { nowShowing } = this.props;
+    const { movies } = this.props;
     const { movieId } = this.state;
-    const selectedMovie = nowShowing.find(movie => movie._id === movieId);
-    if (selectedMovie) return selectedMovie.startDate;
+    const selectedMovie = movies.find(movie => movie._id === movieId);
+    if (selectedMovie) return new Date(selectedMovie.releaseDate);
     return new Date();
   };
 
   onFilterMaxDate = () => {
-    const { nowShowing } = this.props;
+    const { movies } = this.props;
     const { movieId } = this.state;
-    const selectedMovie = nowShowing.find(movie => movie._id === movieId);
+    const selectedMovie = movies.find(movie => movie._id === movieId);
     if (selectedMovie) return new Date(selectedMovie.endDate);
     return false;
   };
@@ -97,7 +93,7 @@ class AddShowtime extends Component {
   render() {
     const { nowShowing, movies, cinemas, classes, className } = this.props;
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
-    const movieOptions = nowShowing.length ? nowShowing : movies;
+    const movieOptions = movies;
     const cinemaGroups = groupCinemasByLocation(cinemas);
 
     const rootClassName = classNames(classes.root, className);
@@ -197,7 +193,7 @@ class AddShowtime extends Component {
                 minDate={new Date()}
                 maxDate={this.onFilterMaxDate()}
                 value={startDate}
-                onChange={date => this.handleFieldChange('startDate', date._d)}
+                onChange={date => this.handleFieldChange('startDate', date && (date._d || date))}
                 KeyboardButtonProps={{
                   'aria-label': 'change date'
                 }}
@@ -212,7 +208,7 @@ class AddShowtime extends Component {
                 minDate={new Date(startDate)}
                 maxDate={this.onFilterMaxDate()}
                 value={endDate}
-                onChange={date => this.handleFieldChange('endDate', date._d)}
+                onChange={date => this.handleFieldChange('endDate', date && (date._d || date))}
                 KeyboardButtonProps={{
                   'aria-label': 'change date'
                 }}
@@ -244,7 +240,7 @@ const mapStateToProps = ({ movieState, cinemaState }) => ({
   cinemas: cinemaState.cinemas
 });
 
-const mapDispatchToProps = { addShowtime, updateShowtime };
+const mapDispatchToProps = { addShowtime, updateShowtime, getShowtimes };
 
 export default connect(
   mapStateToProps,

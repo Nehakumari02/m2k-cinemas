@@ -12,6 +12,7 @@ const cinemaSchema = new Schema({
     type: Number,
     required: true,
   },
+  /** Extra ₹ added to the movie base price for premium/special seats (not the full seat price). */
   specialPrice: {
     type: Number,
     required: false,

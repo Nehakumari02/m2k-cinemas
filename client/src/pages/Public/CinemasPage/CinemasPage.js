@@ -10,7 +10,7 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
-import { getCinemas } from '../../../store/actions';
+import { getCinemas, getMovies } from '../../../store/actions';
 import CinemaCard from '../components/CinemaCard/CinemaCard';
 import { filterPrimaryCinemas } from '../../../utils/cinemaListing';
 
@@ -78,7 +78,7 @@ const useStyles = makeStyles(theme => ({
 
 function CinemasPage(props) {
   const classes = useStyles(props);
-  const { cinemas, getCinemas } = props;
+  const { cinemas, movies, getCinemas, getMovies } = props;
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState('all');
 
@@ -91,9 +91,15 @@ function CinemasPage(props) {
 
   useEffect(() => {
     if (!cinemas.length) getCinemas();
-  }, [cinemas, getCinemas]);
+    if (!movies.length) getMovies();
+  }, [cinemas, movies, getCinemas, getMovies]);
 
   const listingCinemas = useMemo(() => filterPrimaryCinemas(cinemas), [cinemas]);
+
+  const minMoviePrice = useMemo(() => {
+    const prices = (movies || []).map(m => Number(m.ticketPrice)).filter(p => p > 0);
+    return prices.length ? Math.min(...prices) : 0;
+  }, [movies]);
 
   const cityOptions = useMemo(() => {
     const cities = listingCinemas
@@ -174,7 +180,7 @@ function CinemasPage(props) {
         {filteredCinemas.length ? (
           filteredCinemas.map(cinema => (
             <Grid key={cinema._id} item xs={12} sm={6} md={4}>
-              <CinemaCard cinema={cinema} linkToDetails />
+              <CinemaCard cinema={cinema} linkToDetails minMoviePrice={minMoviePrice} />
             </Grid>
           ))
         ) : (
@@ -189,10 +195,11 @@ function CinemasPage(props) {
   );
 }
 
-const mapStateToProps = ({ cinemaState }) => ({
-  cinemas: cinemaState.cinemas
+const mapStateToProps = ({ cinemaState, movieState }) => ({
+  cinemas: cinemaState.cinemas,
+  movies: movieState.movies,
 });
 
-const mapDispatchToProps = { getCinemas };
+const mapDispatchToProps = { getCinemas, getMovies };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CinemasPage);

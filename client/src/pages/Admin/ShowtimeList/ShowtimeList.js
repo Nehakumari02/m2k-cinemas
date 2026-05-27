@@ -16,6 +16,10 @@ import {
 import { ResponsiveDialog } from '../../../components';
 
 class ShowtimeList extends Component {
+  state = {
+    editShowtimeId: null,
+  };
+
   static propTypes = {
     className: PropTypes.string,
     classes: PropTypes.object.isRequired
@@ -40,22 +44,49 @@ class ShowtimeList extends Component {
     selectedShowtimes.forEach(element => deleteShowtime(element));
   };
 
+  openAddDialog = () => {
+    this.setState({ editShowtimeId: null });
+    this.props.toggleDialog();
+  };
+
+  openEditDialog = showtimeId => {
+    const { selectedShowtimes, selectShowtime, toggleDialog } = this.props;
+    if (!selectedShowtimes.includes(showtimeId)) {
+      selectShowtime(showtimeId);
+    }
+    this.setState({ editShowtimeId: showtimeId });
+    toggleDialog();
+  };
+
+  openSelectedEditDialog = () => {
+    const { selectedShowtimes } = this.props;
+    if (selectedShowtimes.length === 1) {
+      this.openEditDialog(selectedShowtimes[0]);
+    }
+  };
+
+  closeDialog = () => {
+    this.setState({ editShowtimeId: null });
+    this.props.toggleDialog();
+  };
+
   render() {
     const {
       classes,
       showtimes,
       selectedShowtimes,
       openDialog,
-      toggleDialog,
       selectShowtime,
       selectAllShowtimes
     } = this.props;
+        const { editShowtimeId } = this.state;
 
     return (
       <div className={classes.root}>
         <ShowtimesToolbar
           showtimes={showtimes}
-          toggleDialog={toggleDialog}
+          toggleDialog={this.openAddDialog}
+          editSelectedShowtime={this.openSelectedEditDialog}
           selectedShowtimes={selectedShowtimes}
           deleteShowtime={this.handleDeleteShowtime}
         />
@@ -65,6 +96,7 @@ class ShowtimeList extends Component {
           ) : (
             <ShowtimesTable
               onSelectShowtime={selectShowtime}
+              onEditShowtime={this.openEditDialog}
               selectedShowtimes={selectedShowtimes}
               selectAllShowtimes={selectAllShowtimes}
               showtimes={showtimes}
@@ -74,10 +106,10 @@ class ShowtimeList extends Component {
         <ResponsiveDialog
           id="Add-showtime"
           open={openDialog}
-          handleClose={() => toggleDialog()}>
+          handleClose={this.closeDialog}>
           <AddShowtime
             selectedShowtime={showtimes.find(
-              showtime => showtime._id === selectedShowtimes[0]
+              showtime => showtime._id === (editShowtimeId || selectedShowtimes[0])
             )}
           />
         </ResponsiveDialog>

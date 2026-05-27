@@ -99,6 +99,7 @@ function MovieCard(props) {
         <AccessTimeIcon className={classes.updateIcon} />
         <Typography className={classes.updateText} variant="body2">
           {movie.duration} minutes
+          {Number(movie.ticketPrice) > 0 ? ` · ₹${movie.ticketPrice} per ticket` : ''}
         </Typography>
       </div>
     </Paper>

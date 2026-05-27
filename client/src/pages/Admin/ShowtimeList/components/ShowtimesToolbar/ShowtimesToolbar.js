@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core';
 import { Button, IconButton } from '@material-ui/core';
-import { Delete as DeleteIcon } from '@material-ui/icons';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import styles from './styles';
 
 class ShowtimesToolbar extends Component {
@@ -23,7 +23,8 @@ class ShowtimesToolbar extends Component {
       className,
       selectedShowtimes,
       toggleDialog,
-      deleteShowtime
+      deleteShowtime,
+      editSelectedShowtime
     } = this.props;
 
     const rootClassName = classNames(classes.root, className);
@@ -40,12 +41,19 @@ class ShowtimesToolbar extends Component {
               </IconButton>
             )}
 
-            <Button
-              onClick={() => toggleDialog()}
-              color="primary"
-              size="small"
-              variant="outlined">
-              {selectedShowtimes.length === 1 ? 'Edit' : 'Add'}
+            {selectedShowtimes.length === 1 && (
+              <Button
+                onClick={editSelectedShowtime}
+                color="primary"
+                size="small"
+                variant="outlined"
+                style={{ marginRight: 8 }}
+                startIcon={<EditIcon fontSize="small" />}>
+                Edit
+              </Button>
+            )}
+            <Button onClick={toggleDialog} color="primary" size="small" variant="outlined">
+              Add
             </Button>
           </div>
         </div>
