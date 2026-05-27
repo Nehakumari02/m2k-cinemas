@@ -128,11 +128,17 @@ const useStyles = makeStyles((theme) => ({
   galleryContainer: {
     marginTop: theme.spacing(6),
   },
+  gridItem: {
+    display: 'flex',
+  },
   imageCard: {
+    width: '100%',
+    aspectRatio: '4 / 3',
     borderRadius: '16px',
     overflow: 'hidden',
     position: 'relative',
     cursor: 'pointer',
+    backgroundColor: '#1a1a24',
     boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
@@ -140,15 +146,17 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: '0 20px 40px rgba(183, 36, 41, 0.2)',
       '& $imageOverlay': {
         opacity: 1,
-      }
-    }
+      },
+    },
   },
   image: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '100%',
     height: '100%',
     objectFit: 'cover',
     display: 'block',
-    minHeight: '250px'
   },
   imageOverlay: {
     position: 'absolute',

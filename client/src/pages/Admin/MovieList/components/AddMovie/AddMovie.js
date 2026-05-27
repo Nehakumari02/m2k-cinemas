@@ -428,7 +428,7 @@ class AddMovie extends Component {
                 <Typography className={classes.castCrewTitle}>Crew</Typography>
                 <PeopleSection
                   withRole
-                  nameLabel="Name"
+                  nameLabel="Crew name"
                   nameValue={crewNameInput}
                   roleValue={crewRoleInput}
                   onNameChange={v => this.handleFieldChange('crewNameInput', v)}

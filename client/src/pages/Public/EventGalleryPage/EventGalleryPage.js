@@ -117,7 +117,7 @@ const EventGalleryPage = ({ match, history }) => {
           <div className={classes.galleryContainer}>
             <Grid container spacing={4}>
               {gallery.map((imgUrl, index) => (
-                <Grid item xs={12} sm={6} md={4} key={`${imgUrl}-${index}`}>
+                <Grid item xs={12} sm={6} md={4} key={`${imgUrl}-${index}`} className={classes.gridItem}>
                   <div className={classes.imageCard} onClick={() => setSelectedImage(imgUrl)} role="presentation">
                     <img src={normalizeImage(imgUrl)} alt={`${event.title} ${index + 1}`} className={classes.image} />
                     <div className={classes.imageOverlay}>

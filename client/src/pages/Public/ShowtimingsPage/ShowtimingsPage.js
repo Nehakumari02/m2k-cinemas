@@ -236,7 +236,7 @@ function ShowtimingsPage({
           Showtimings
         </Typography>
         <Typography variant="body1" className={classes.subtitle}>
-          Choose date, movie, and cinema to book your preferred show like PVR listings.
+          Choose date, movie, and cinema to book your preferred show like M2K listings.
         </Typography>
       </div>
 

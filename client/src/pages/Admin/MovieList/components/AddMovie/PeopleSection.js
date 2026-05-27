@@ -14,18 +14,10 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  inputRow: {
-    display: 'grid',
-    gridTemplateColumns: '1fr auto',
-    gap: theme.spacing(1),
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing(1.5),
-  },
-  inputRowWithRole: {
-    display: 'grid',
-    gridTemplateColumns: '120px 1fr auto',
-    gap: theme.spacing(1),
-    alignItems: 'flex-start',
+  fieldStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(1.5),
     marginBottom: theme.spacing(1.5),
   },
   chips: {
@@ -41,9 +33,12 @@ const styles = theme => ({
     fontStyle: 'italic',
   },
   uploadRow: {
-    marginTop: 'auto',
-    paddingTop: theme.spacing(1.5),
-    borderTop: '1px solid #e8ecf1',
+    paddingTop: 0,
+  },
+  addButton: {
+    alignSelf: 'flex-start',
+    textTransform: 'none',
+    fontWeight: 700,
   },
   uploadBtn: {
     textTransform: 'none',
@@ -89,37 +84,87 @@ function PeopleSection({
 
   return (
     <div className={classes.root}>
-      <div className={withRole ? classes.inputRowWithRole : classes.inputRow}>
-        {withRole && (
+      <div className={classes.fieldStack}>
+        {withRole ? (
+          <>
+            <TextField
+              label={nameLabel}
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={nameValue}
+              onChange={e => onNameChange(e.target.value)}
+            />
+            <TextField
+              select
+              label="Role"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={roleValue}
+              onChange={e => onRoleChange(e.target.value)}>
+              {CREW_ROLES.map(role => (
+                <MenuItem key={role} value={role}>
+                  {role}
+                </MenuItem>
+              ))}
+            </TextField>
+          </>
+        ) : (
           <TextField
-            select
-            label="Role"
+            label={nameLabel}
             variant="outlined"
             size="small"
-            value={roleValue}
-            onChange={e => onRoleChange(e.target.value)}>
-            {CREW_ROLES.map(role => (
-              <MenuItem key={role} value={role}>
-                {role}
-              </MenuItem>
-            ))}
-          </TextField>
+            fullWidth
+            value={nameValue}
+            onChange={e => onNameChange(e.target.value)}
+          />
         )}
-        <TextField
-          label={nameLabel}
-          variant="outlined"
+
+        <div className={classes.uploadRow}>
+          <input
+            id={inputId}
+            className={classes.fileInput}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={e => {
+              onFilesChange(Array.from(e.target.files || []));
+              e.target.value = '';
+            }}
+          />
+          <label htmlFor={inputId}>
+            <Button
+              className={classes.uploadBtn}
+              variant="outlined"
+              size="small"
+              component="span"
+              startIcon={<CloudUploadIcon />}>
+              {uploadLabel}
+            </Button>
+          </label>
+          <Typography className={classes.fileMeta}>
+            {files.length
+              ? `${files.length} image${files.length > 1 ? 's' : ''} selected (same order as list below)`
+              : 'Optional — match photo order to names below'}
+          </Typography>
+          {!!files.length && (
+            <div className={classes.fileNames}>
+              {files.map((file, idx) => (
+                <div key={`${file.name}-${idx}`}>
+                  {idx + 1}. {file.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <Button
+          className={classes.addButton}
+          color="primary"
+          variant="contained"
           size="small"
-          fullWidth
-          value={nameValue}
-          onChange={e => onNameChange(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              onAdd();
-            }
-          }}
-        />
-        <Button color="primary" variant="contained" size="small" onClick={onAdd}>
+          onClick={onAdd}>
           {addLabel}
         </Button>
       </div>
@@ -136,44 +181,6 @@ function PeopleSection({
           ))
         ) : (
           <Typography className={classes.empty}>No names added yet</Typography>
-        )}
-      </div>
-
-      <div className={classes.uploadRow}>
-        <input
-          id={inputId}
-          className={classes.fileInput}
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={e => {
-            onFilesChange(Array.from(e.target.files || []));
-            e.target.value = '';
-          }}
-        />
-        <label htmlFor={inputId}>
-          <Button
-            className={classes.uploadBtn}
-            variant="outlined"
-            size="small"
-            component="span"
-            startIcon={<CloudUploadIcon />}>
-            {uploadLabel}
-          </Button>
-        </label>
-        <Typography className={classes.fileMeta}>
-          {files.length
-            ? `${files.length} image${files.length > 1 ? 's' : ''} selected (same order as list above)`
-            : 'Optional — match photo order to names above'}
-        </Typography>
-        {!!files.length && (
-          <div className={classes.fileNames}>
-            {files.map((file, idx) => (
-              <div key={`${file.name}-${idx}`}>
-                {idx + 1}. {file.name}
-              </div>
-            ))}
-          </div>
         )}
       </div>
     </div>

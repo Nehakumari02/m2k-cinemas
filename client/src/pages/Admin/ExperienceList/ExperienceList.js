@@ -26,6 +26,7 @@ import {
   updateExperience,
   removeExperience,
 } from '../../../store/actions';
+import { normalizeImage } from '../../../utils/imageUrl';
 
 const styles = theme => ({
   root: { padding: theme.spacing(3), minHeight: '100vh', backgroundColor: '#0e0e14', color: '#fff' },
@@ -37,9 +38,28 @@ const styles = theme => ({
   cardContent: { minHeight: 210 },
   cardTitle: { fontWeight: 700, marginBottom: theme.spacing(1) },
   cardDesc: { color: 'rgba(255,255,255,0.7)', fontSize: '.85rem', marginBottom: theme.spacing(1.5) },
-  chip: { marginRight: theme.spacing(1), marginBottom: theme.spacing(1) },
-  cardActions: { justifyContent: 'flex-end' },
+  chip: {
+    marginRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+    color: '#fff',
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  cardActions: {
+    justifyContent: 'flex-end',
+    borderTop: '1px solid rgba(255,255,255,0.1)',
+    padding: theme.spacing(1, 1.5),
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    gap: 4,
+  },
+  editBtn: { color: '#fff', '&:hover': { color: '#b72429', backgroundColor: 'rgba(183,36,41,0.15)' } },
+  deleteBtn: { color: 'rgba(255,255,255,0.75)', '&:hover': { color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)' } },
   dialogPaper: { backgroundColor: '#1a1a24', color: '#fff', borderRadius: 16, minWidth: 520 },
+  dialogTitle: { color: '#fff', fontWeight: 700 },
+  dialogActions: {
+    padding: theme.spacing(2, 3),
+    '& .MuiButton-root': { color: 'rgba(255,255,255,0.7)' },
+    '& .MuiButton-contained': { color: '#fff', backgroundColor: '#b72429' },
+  },
   imageUpload: {
     display: 'flex',
     flexDirection: 'column',
@@ -127,7 +147,7 @@ class ExperienceList extends Component {
         isActive: exp.isActive !== false,
       },
       imageFile: null,
-      imagePreview: exp.image || null,
+      imagePreview: exp.image ? normalizeImage(exp.image) : null,
     });
 
   closeDialog = () => this.setState({ dialogOpen: false });
@@ -184,7 +204,16 @@ class ExperienceList extends Component {
         <Grid container spacing={3}>
           {experiences.map(exp => (
             <Grid item key={exp._id} xs={12} sm={6} md={4} lg={3}>
-              <Card className={classes.card} style={{ background: exp.gradient }}>
+              <Card
+                className={classes.card}
+                style={{
+                  background: exp.image
+                    ? `linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.85)), url("${normalizeImage(
+                        exp.image
+                      )}") center/cover no-repeat`
+                    : exp.gradient,
+                }}
+              >
                 <CardContent className={classes.cardContent}>
                   <Typography className={classes.cardTitle} variant="h5">{exp.title}</Typography>
                   <Typography className={classes.cardDesc}>{exp.subtitle}</Typography>
@@ -199,12 +228,12 @@ class ExperienceList extends Component {
                 </CardContent>
                 <CardActions className={classes.cardActions}>
                   <Tooltip title="Edit">
-                    <IconButton size="small" onClick={() => this.openEdit(exp)}>
+                    <IconButton size="small" className={classes.editBtn} onClick={() => this.openEdit(exp)}>
                       <Edit fontSize="small" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete">
-                    <IconButton size="small" onClick={() => this.setState({ deleteConfirm: exp })}>
+                    <IconButton size="small" className={classes.deleteBtn} onClick={() => this.setState({ deleteConfirm: exp })}>
                       <Delete fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -215,7 +244,9 @@ class ExperienceList extends Component {
         </Grid>
 
         <Dialog open={dialogOpen} onClose={this.closeDialog} classes={{ paper: classes.dialogPaper }}>
-          <DialogTitle>{isEditing ? 'Edit Experience' : 'Add Experience'}</DialogTitle>
+          <DialogTitle className={classes.dialogTitle}>
+            {isEditing ? 'Edit Experience' : 'Add Experience'}
+          </DialogTitle>
           <DialogContent>
             <label htmlFor="experience-image-upload">
               <div className={classes.imageUpload}>
@@ -246,9 +277,9 @@ class ExperienceList extends Component {
             <TextField label="Icon (emoji)" name="icon" value={form.icon} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} />
             <FormControlLabel control={<Switch checked={form.isActive} onChange={this.handleChange} name="isActive" />} label="Active" />
           </DialogContent>
-          <DialogActions>
+          <DialogActions className={classes.dialogActions}>
             <Button onClick={this.closeDialog}>Cancel</Button>
-            <Button onClick={this.handleSave} variant="contained" color="secondary">
+            <Button onClick={this.handleSave} variant="contained">
               {isEditing ? 'Save Changes' : 'Create'}
             </Button>
           </DialogActions>
