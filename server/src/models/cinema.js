@@ -72,6 +72,11 @@ const cinemaSchema = new Schema({
     type: Boolean,
     default: true,
   },
+  /** When false, hide from public cinemas browse (screens still bookable via showtimes). */
+  showOnCinemasPage: {
+    type: Boolean,
+    default: true,
+  },
   seatsAvailable: {
     type: Number,
     required: true,

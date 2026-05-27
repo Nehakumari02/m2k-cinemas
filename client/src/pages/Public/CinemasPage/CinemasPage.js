@@ -12,6 +12,7 @@ import {
 import { Search } from '@material-ui/icons';
 import { getCinemas } from '../../../store/actions';
 import CinemaCard from '../components/CinemaCard/CinemaCard';
+import { filterPrimaryCinemas } from '../../../utils/cinemaListing';
 
 const useStyles = makeStyles(theme => ({
   page: {
@@ -92,17 +93,19 @@ function CinemasPage(props) {
     if (!cinemas.length) getCinemas();
   }, [cinemas, getCinemas]);
 
+  const listingCinemas = useMemo(() => filterPrimaryCinemas(cinemas), [cinemas]);
+
   const cityOptions = useMemo(() => {
-    const cities = (cinemas || [])
+    const cities = listingCinemas
       .map(cinema => cinema.city)
       .filter(Boolean)
       .map(city => city.trim());
     return ['all', ...Array.from(new Set(cities)).sort((a, b) => a.localeCompare(b))];
-  }, [cinemas]);
+  }, [listingCinemas]);
 
   const filteredCinemas = useMemo(() => {
     const term = normalize(search);
-    return (cinemas || []).filter(cinema => {
+    return listingCinemas.filter(cinema => {
       const cinemaName = normalize(cinema.name);
       const cinemaCity = normalize(cinema.city);
       const combined = `${cinemaName} ${cinemaCity}`.trim();
@@ -116,7 +119,7 @@ function CinemasPage(props) {
         combined.includes(term);
       return cityPass && searchPass;
     });
-  }, [cinemas, search, selectedCity]);
+  }, [listingCinemas, search, selectedCity]);
 
   return (
     <Container maxWidth="lg" className={classes.page}>

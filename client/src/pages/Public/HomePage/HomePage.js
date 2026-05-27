@@ -19,6 +19,7 @@ import QuickBookBar from '../components/QuickBookBar/QuickBookBar';
 import ExperiencesSection from '../components/ExperiencesSection/ExperiencesSection';
 import OffersSection from '../components/OffersSection/OffersSection';
 import FoodSection from '../components/FoodSection/FoodSection';
+import { filterPrimaryCinemas } from '../../../utils/cinemaListing';
 import styles from './styles';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -81,6 +82,7 @@ class HomePage extends Component {
       ...heroMovies.map(movie => ({ type: 'movie', data: movie })),
       ...topOffers.map(offer => ({ type: 'offer', data: offer }))
     ];
+    const primaryCinemas = filterPrimaryCinemas(cinemas);
 
     const heroSettings = {
       dots: true,
@@ -124,7 +126,7 @@ class HomePage extends Component {
         </div>
 
         {/* ── Quick Book Bar ── */}
-        <QuickBookBar movies={movies} cinemas={cinemas} />
+        <QuickBookBar movies={movies} cinemas={primaryCinemas} />
 
         {/* ── Section Tabs ── */}
         <div className={classes.tabsBar}>
@@ -204,7 +206,7 @@ class HomePage extends Component {
             <div className={classes.titleAccent} />
           </div>
           <Grid container spacing={3}>
-            {cinemas.slice(0, 4).map(cinema => (
+            {primaryCinemas.map(cinema => (
               <Grid key={cinema._id} item xs={12} sm={6} md={4} lg={3}>
                 <CinemaCard cinema={cinema} linkToDetails />
               </Grid>

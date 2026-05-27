@@ -17,11 +17,13 @@ function applyM2kVenueMeta(layout) {
   const name = String(layout.name || '');
   const isRohini = /rohini/i.test(name);
   const isPitampura = /pitampura/i.test(name);
+  const isScreen = /\bscreen\b/i.test(name);
 
   const base = {
     ...layout,
     legalName: M2K_LEGAL_NAME,
     registeredAddress: M2K_REGISTERED_ADDRESS,
+    showOnCinemasPage: !isScreen,
   };
 
   if (isRohini) {

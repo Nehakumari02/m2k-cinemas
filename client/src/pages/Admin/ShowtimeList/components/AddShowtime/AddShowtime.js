@@ -3,7 +3,8 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles, Typography } from '@material-ui/core';
-import { Button, TextField, MenuItem } from '@material-ui/core';
+import { Button, TextField, MenuItem, ListSubheader } from '@material-ui/core';
+import { groupCinemasByLocation } from '../../../../../utils/cinemaListing';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
@@ -97,6 +98,7 @@ class AddShowtime extends Component {
     const { nowShowing, movies, cinemas, classes, className } = this.props;
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
     const movieOptions = nowShowing.length ? nowShowing : movies;
+    const cinemaGroups = groupCinemasByLocation(cinemas);
 
     const rootClassName = classNames(classes.root, className);
     const title = this.props.selectedShowtime
@@ -162,19 +164,25 @@ class AddShowtime extends Component {
               fullWidth
               select
               className={classes.textField}
-              label="Cinema"
+              label="Cinema / Screen"
               margin="dense"
               required
               value={cinemaId}
               variant="outlined"
+              helperText="All screens are listed — pick the auditorium for this showtime"
               onChange={event =>
                 this.handleFieldChange('cinemaId', event.target.value)
               }>
-              {cinemas.map(cinema => (
-                <MenuItem key={cinema._id} value={cinema._id}>
-                  {cinema.name}
-                </MenuItem>
-              ))}
+              {cinemaGroups.map(group => [
+                <ListSubheader key={`header-${group.label}`}>
+                  {group.label}
+                </ListSubheader>,
+                ...group.cinemas.map(cinema => (
+                  <MenuItem key={cinema._id} value={cinema._id}>
+                    {cinema.name}
+                  </MenuItem>
+                )),
+              ])}
             </TextField>
           </div>
 

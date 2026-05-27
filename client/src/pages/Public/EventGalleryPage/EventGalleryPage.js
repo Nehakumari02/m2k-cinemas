@@ -64,8 +64,8 @@ const EventGalleryPage = ({ match, history }) => {
     );
   }
 
-  const gallery = Array.isArray(event.gallery) ? event.gallery : [];
-  const allImages = [event.image, ...gallery].filter((val, idx, self) => val && self.indexOf(val) === idx);
+  const gallery = Array.isArray(event.gallery) ? event.gallery.filter(Boolean) : [];
+  const heroImage = event.image;
 
   return (
     <div className={classes.root}>
@@ -74,23 +74,49 @@ const EventGalleryPage = ({ match, history }) => {
           Back to Events
         </Button>
 
-        <header className={classes.header}>
-          <Typography className={classes.title} variant="h2">
-            {event.title} <span className={classes.highlight}>Gallery</span>
-          </Typography>
-          <Typography className={classes.subtitle}>{event.date}</Typography>
-        </header>
+        <div className={classes.eventHeroWrap}>
+          <section className={classes.eventHero}>
+            {heroImage && (
+              <div className={classes.eventHeroImageWrap}>
+                <img
+                  src={normalizeImage(heroImage)}
+                  alt={event.title}
+                  className={classes.eventHeroImage}
+                />
+              </div>
+            )}
+            <div className={classes.eventHeroBody}>
+              <Typography className={classes.eventHeroTitle} component="h1" variant="h5">
+                {event.title}
+              </Typography>
+              {event.date && (
+                <Typography className={classes.eventHeroDate} variant="subtitle2">
+                  {event.date}
+                </Typography>
+              )}
+              {event.description && (
+                <Typography className={classes.eventHeroDescription} variant="body2">
+                  {event.description}
+                </Typography>
+              )}
+            </div>
+          </section>
+        </div>
 
-        {allImages.length === 0 ? (
+        <Typography className={classes.gallerySectionTitle} component="h2" variant="h5">
+          Photo <span className={classes.highlight}>Gallery</span>
+        </Typography>
+
+        {gallery.length === 0 ? (
           <Box className={classes.emptyState}>
             <PhotoLibrary style={{ fontSize: '4rem', marginBottom: 16 }} />
-            <Typography variant="h6">No images in this gallery yet.</Typography>
-            <Typography variant="body2">Check back later for exciting photos!</Typography>
+            <Typography variant="h6">No additional photos yet.</Typography>
+            <Typography variant="body2">More gallery images will appear here when they are added.</Typography>
           </Box>
         ) : (
           <div className={classes.galleryContainer}>
             <Grid container spacing={4}>
-              {allImages.map((imgUrl, index) => (
+              {gallery.map((imgUrl, index) => (
                 <Grid item xs={12} sm={6} md={4} key={`${imgUrl}-${index}`}>
                   <div className={classes.imageCard} onClick={() => setSelectedImage(imgUrl)} role="presentation">
                     <img src={normalizeImage(imgUrl)} alt={`${event.title} ${index + 1}`} className={classes.image} />
