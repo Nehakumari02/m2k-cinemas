@@ -62,8 +62,6 @@ const userSchema = Schema(
 
     phone: {
       type: String,
-      unique: true,
-      sparse: true,
       trim: true,
       validate(value) {
         if (!value) return;
@@ -164,16 +162,29 @@ userSchema.statics.findByCredentials = async (identifier, password) => {
   return user;
 };
 
+// Only index real phone numbers (multiple guests/users may omit phone)
+userSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      phone: { $exists: true, $type: 'string', $gt: '' },
+    },
+  }
+);
+
 // Hash the plain text password before save
 userSchema.pre('save', async function(next) {
   const user = this;
+  if (user.phone == null || String(user.phone).trim() === '') {
+    user.phone = undefined;
+  }
   if (user.isModified('password') && !user._skipPasswordHash) {
     user.password = await bcrypt.hash(user.password, 8);
   }
   user._skipPasswordHash = false;
   next();
 });
-
 
 const User = mongoose.model('User', userSchema);
 

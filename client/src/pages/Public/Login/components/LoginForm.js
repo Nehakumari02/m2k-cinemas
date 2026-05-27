@@ -83,6 +83,7 @@ function LoginForm(props) {
     }
     if (redirect) {
       if (user && user.role === 'superadmin') return history.push('/admin/dashboard');
+      if (user && user.role === 'guest') return history.push('/mydashboard');
       return history.push('/');
     }
   }, [isAuthenticated, user, redirect, onAuthSuccess]);

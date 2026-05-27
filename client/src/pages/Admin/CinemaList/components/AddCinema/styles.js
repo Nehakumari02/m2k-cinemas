@@ -14,10 +14,30 @@ export default theme => ({
     width: '100%',
     marginRight: theme.spacing(3),
     '& .MuiOutlinedInput-root': {
-      '& fieldset': { borderColor: 'rgba(255,255,255,0.15)' },
-      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
-      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+      backgroundColor: 'rgba(255,255,255,0.03)',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#64748b',
+        borderWidth: 1.4,
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#b72429',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#b72429',
+        borderWidth: 1.8,
+      },
     },
+    '& .MuiOutlinedInput-input': { color: '#fff' },
+    '& .MuiInputLabel-root': { color: '#cbd5e1' },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#f87171' },
+    '& .MuiInputLabel-root.MuiFormLabel-filled': { color: '#cbd5e1' },
+    '& .MuiInputLabel-root.MuiInputLabel-shrink': {
+      color: '#f87171',
+      backgroundColor: 'transparent',
+    },
+    '& .MuiInputLabel-root.Mui-disabled': { color: 'rgba(203,213,225,0.6)' },
+    '& .MuiInputLabel-root.Mui-error': { color: '#f87171' },
+    '& .MuiFormHelperText-root': { color: 'rgba(255,255,255,0.45)' },
   },
   portletFooter: {
     paddingLeft: theme.spacing(3),
@@ -100,11 +120,26 @@ export default theme => ({
     width: '100px',
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
-      '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
-      '&:hover fieldset': { borderColor: 'rgba(183,36,41,0.4)' },
-      '&.Mui-focused fieldset': { borderColor: '#b72429' },
+      backgroundColor: 'rgba(255,255,255,0.03)',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#64748b',
+        borderWidth: 1.3,
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#b72429',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#b72429',
+        borderWidth: 1.8,
+      },
     },
-    '& .MuiInputLabel-root': { fontSize: '0.8rem' },
+    '& .MuiOutlinedInput-input': { color: '#fff' },
+    '& .MuiInputLabel-root': { fontSize: '0.8rem', color: '#cbd5e1' },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#f87171' },
+    '& .MuiInputLabel-root.MuiInputLabel-shrink': {
+      color: '#f87171',
+      backgroundColor: 'transparent',
+    },
   },
   rowCategoryName: {
     fontSize: '0.7rem',
