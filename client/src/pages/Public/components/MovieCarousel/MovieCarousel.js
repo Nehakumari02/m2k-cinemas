@@ -105,7 +105,14 @@ function buildSettings(movieCount, isMobile) {
   };
 }
 
-function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
+function MovieCarousel({
+  carouselClass,
+  movies = [],
+  title,
+  to = null,
+  autoScroll = false,
+  autoScrollSpeed = 3500,
+}) {
   const classes = useStyles();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -118,10 +125,13 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
   const settings = useMemo(
     () => ({
       ...baseSettings,
+      autoplay: autoScroll && movies.length > 1,
+      autoplaySpeed: autoScrollSpeed,
+      pauseOnHover: true,
       nextArrow: <CarouselArrow direction="next" infinite={baseSettings.infinite} />,
       prevArrow: <CarouselArrow direction="prev" infinite={baseSettings.infinite} />,
     }),
-    [baseSettings]
+    [baseSettings, autoScroll, autoScrollSpeed, movies.length]
   );
 
   if (!movies.length) return null;

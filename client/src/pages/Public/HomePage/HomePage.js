@@ -150,6 +150,8 @@ class HomePage extends Component {
               carouselClass={classes.carousel}
               title="Now Showing"
               to="/movie/category/nowShowing"
+              autoScroll
+              autoScrollSpeed={3200}
               movies={nowShowing}
             />
           </div>
@@ -162,6 +164,8 @@ class HomePage extends Component {
               carouselClass={classes.carousel}
               title="Coming Soon"
               to="/movie/category/comingSoon"
+              autoScroll
+              autoScrollSpeed={3600}
               movies={comingSoon}
             />
           </div>
@@ -185,6 +189,8 @@ class HomePage extends Component {
               carouselClass={classes.carousel}
               title="All Movies"
               to="/movies"
+              autoScroll
+              autoScrollSpeed={3400}
               movies={movies}
             />
           </div>
