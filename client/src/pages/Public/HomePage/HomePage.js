@@ -25,7 +25,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 class HomePage extends Component {
-  state = { activeTab: 'nowShowing' };
+  state = { activeTab: 'nowShowing', homeBanner: null };
 
   componentDidMount() {
     const {
@@ -47,7 +47,20 @@ class HomePage extends Component {
     if (user) {
       if (!suggested.length) getMovieSuggestion(user.username);
     }
+    this.fetchHomeBannerSetting();
   }
+
+  fetchHomeBannerSetting = async () => {
+    try {
+      const response = await fetch('/settings/homePageBanner');
+      if (!response.ok) return;
+      const data = await response.json();
+      const value = data && data.value ? data.value : null;
+      this.setState({ homeBanner: value });
+    } catch (e) {
+      // keep default hero if setting is missing/unavailable
+    }
+  };
 
   componentDidUpdate(prevProps) {
     if (this.props.user !== prevProps.user) {
@@ -73,7 +86,7 @@ class HomePage extends Component {
       suggested,
       offers
     } = this.props;
-    const { activeTab } = this.state;
+    const { activeTab, homeBanner } = this.state;
     const heroMovies = (nowShowing && nowShowing.length ? nowShowing : movies).slice(0, 3);
 
     // Combine movies and top 2 offers for the banner
@@ -110,7 +123,30 @@ class HomePage extends Component {
       <Fragment>
         {/* ── Hero Banner ── */}
         <div className={classes.heroCarousel}>
-          {heroItems.length ? (
+          {homeBanner && homeBanner.enabled && homeBanner.imageUrl ? (
+            <div className={classes.customHero}>
+              <div
+                className={classes.customHeroBackdrop}
+                style={{ backgroundImage: `url("${homeBanner.imageUrl}")` }}
+              />
+              <div className={classes.customHeroOverlay} />
+              <div className={classes.customHeroContent}>
+                <Typography className={classes.customHeroTitle} variant="h2">
+                  {homeBanner.title || 'Welcome to M2K Cinemas'}
+                </Typography>
+                {!!homeBanner.subtitle && (
+                  <Typography className={classes.customHeroSubtitle} variant="body1">
+                    {homeBanner.subtitle}
+                  </Typography>
+                )}
+                {!!homeBanner.ctaText && !!homeBanner.ctaLink && (
+                  <Link className={classes.customHeroCta} to={homeBanner.ctaLink}>
+                    {homeBanner.ctaText}
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : heroItems.length ? (
             <Slider {...heroSettings}>
               {heroItems.map((item, idx) => (
                 <div key={item.data._id || idx}>

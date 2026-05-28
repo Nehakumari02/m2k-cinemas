@@ -23,6 +23,8 @@ const EventList = lazy(() => import('./pages/Admin/EventList/EventList'));
 const ProductList = lazy(() => import('./pages/Admin/ProductList'));
 const OrderList = lazy(() => import('./pages/Admin/OrderList'));
 const LoyaltySettings = lazy(() => import('./pages/Admin/LoyaltySettings/LoyaltySettings'));
+const HomeBannerSettings = lazy(() => import('./pages/Admin/HomeBannerSettings'));
+const NewsletterSubscribers = lazy(() => import('./pages/Admin/NewsletterSubscribers'));
 const RefundManagement = lazy(() => import('./pages/Admin/RefundManagement/RefundManagement'));
 const SchoolGroupInquiryList = lazy(() =>
   import('./pages/Admin/SchoolGroupInquiryList/SchoolGroupInquiryList')
@@ -390,6 +392,18 @@ const Routes = () => {
             path="/admin/loyalty"
             layout={AdminLayout}
             component={LoyaltySettings}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/home-banner"
+            layout={AdminLayout}
+            component={HomeBannerSettings}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/newsletter-subscribers"
+            layout={AdminLayout}
+            component={NewsletterSubscribers}
           />
           <ProtectedRoute
             exact

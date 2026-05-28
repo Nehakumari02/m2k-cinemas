@@ -2,6 +2,7 @@ const express = require('express');
 const router = new express.Router();
 const auth = require('../middlewares/auth');
 const Setting = require('../models/setting');
+const upload = require('../utils/multer');
 
 // GET all settings
 router.get('/settings', async (req, res) => {
@@ -40,5 +41,35 @@ router.post('/settings', auth.enhance, async (req, res) => {
     res.status(400).send(e);
   }
 });
+
+// Upload home page banner image (Admin only)
+router.post(
+  '/settings/home-banner/upload',
+  auth.enhance,
+  upload('settings').single('file'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send({ error: { message: 'Please upload an image file' } });
+      }
+
+      const imageUrl = `/${req.file.path}`;
+      let setting = await Setting.findOne({ key: 'homePageBanner' });
+      const existingValue =
+        setting && setting.value && typeof setting.value === 'object' ? setting.value : {};
+      const value = { ...existingValue, imageUrl };
+
+      if (setting) {
+        setting.value = value;
+      } else {
+        setting = new Setting({ key: 'homePageBanner', value });
+      }
+      await setting.save();
+      return res.send({ imageUrl, setting });
+    } catch (e) {
+      return res.status(400).send({ error: { message: e.message || 'Failed to upload banner image' } });
+    }
+  }
+);
 
 module.exports = router;

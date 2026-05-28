@@ -25,6 +25,8 @@ import ShippingIcon from '@material-ui/icons/LocalShippingOutlined';
 import StarIcon from '@material-ui/icons/StarBorderOutlined';
 import RedeemIcon from '@material-ui/icons/Redeem';
 import SchoolIcon from '@material-ui/icons/School';
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
 // Component styles
 import styles from './styles';
 
@@ -214,6 +216,32 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Loyalty Points"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/home-banner">
+            <ListItemIcon className={classes.listItemIcon}>
+              <PhotoLibraryIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Home Banner"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/newsletter-subscribers">
+            <ListItemIcon className={classes.listItemIcon}>
+              <MailOutlineIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Newsletter"
             />
           </ListItem>
           <ListItem

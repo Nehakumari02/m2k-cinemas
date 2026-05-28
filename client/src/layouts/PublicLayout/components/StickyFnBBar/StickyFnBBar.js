@@ -85,7 +85,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const HIDE_ON_PATHS = ['/login', '/register', '/food-checkout', '/merch-checkout'];
+const HIDE_ON_PATHS = ['/login', '/register', '/food-checkout', '/merch-checkout', '/events'];
 
 function shouldHideBar(pathname) {
   if (HIDE_ON_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`))) {

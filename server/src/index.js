@@ -29,6 +29,7 @@ const settingsRouter = require('./routes/settings');
 const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
 const membershipRouter = require('./routes/membership');
+const newsletterRouter = require('./routes/newsletter');
 const guestLoginHandler = require('./handlers/guestLoginHandler');
 
 const app = express();
@@ -68,6 +69,7 @@ app.use(settingsRouter);
 app.use(refundRouter);
 app.use(schoolGroupInquiryRouter);
 app.use(membershipRouter);
+app.use(newsletterRouter);
 
 app.get('/health', (req, res) => {
   res.send({

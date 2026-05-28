@@ -22,6 +22,7 @@ const API_PREFIXES = [
   '/uploads',
   '/admin',
   '/memberships',
+  '/newsletter',
 ];
 
 module.exports = function setupProxy(app) {

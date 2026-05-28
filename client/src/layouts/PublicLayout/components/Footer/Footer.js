@@ -30,8 +30,9 @@ export default function Footer() {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleNewsletter = (e) => {
+  const handleNewsletter = async (e) => {
     e.preventDefault();
     const trimmedEmail = email.trim();
     const trimmedMobile = mobile.replace(/\D/g, '');
@@ -51,9 +52,30 @@ export default function Footer() {
       return;
     }
 
-    alert('Thank you for subscribing to our newsletter!');
-    setEmail('');
-    setMobile('');
+    setSubmitting(true);
+    try {
+      const response = await fetch('/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: hasEmail ? trimmedEmail : undefined,
+          phone: hasMobile ? trimmedMobile : undefined,
+          source: 'footer_newsletter',
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        alert(data.message || 'Thank you for subscribing to our newsletter!');
+        setEmail('');
+        setMobile('');
+      } else {
+        alert((data && data.error && data.error.message) || 'Failed to subscribe. Please try again.');
+      }
+    } catch (err) {
+      alert('Server error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -182,9 +204,10 @@ export default function Footer() {
                   variant="contained"
                   type="submit"
                   fullWidth
+                  disabled={submitting}
                   style={{ backgroundColor: '#b72429', color: 'white', fontWeight: 700, textTransform: 'none' }}
                 >
-                  Join
+                  {submitting ? 'Joining...' : 'Join'}
                 </Button>
               </div>
             </form>

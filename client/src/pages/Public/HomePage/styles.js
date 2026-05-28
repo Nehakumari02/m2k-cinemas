@@ -14,6 +14,55 @@ export default theme => ({
       opacity: 1
     }
   },
+  customHero: {
+    minHeight: '68vh',
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  customHeroBackdrop: {
+    position: 'absolute',
+    inset: 0,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    transform: 'scale(1.01)',
+  },
+  customHeroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(90deg, rgba(2,6,23,.82) 12%, rgba(2,6,23,.45) 55%, rgba(2,6,23,.2) 100%)',
+  },
+  customHeroContent: {
+    position: 'relative',
+    zIndex: 2,
+    width: 'min(720px, 92%)',
+    marginLeft: '6%',
+    color: '#fff',
+  },
+  customHeroTitle: {
+    fontWeight: 900,
+    fontSize: '3rem',
+    lineHeight: 1.1,
+    marginBottom: theme.spacing(1.5),
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '2rem',
+    },
+  },
+  customHeroSubtitle: {
+    color: 'rgba(255,255,255,0.9)',
+    maxWidth: 620,
+    marginBottom: theme.spacing(2.5),
+  },
+  customHeroCta: {
+    display: 'inline-block',
+    textDecoration: 'none',
+    color: '#fff',
+    backgroundColor: '#b72429',
+    borderRadius: 10,
+    padding: '10px 18px',
+    fontWeight: 700,
+  },
 
   /* ── Section Tabs ─────────────────────────── */
   tabsBar: {

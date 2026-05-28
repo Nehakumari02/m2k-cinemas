@@ -22,7 +22,7 @@ function PublicLayout(props) {
   const location = useLocation();
   const keepTopSpacing = location.pathname === '/';
   const hideStickyFnB =
-    ['/login', '/register', '/food-checkout', '/merch-checkout'].some(
+    ['/login', '/register', '/food-checkout', '/merch-checkout', '/events'].some(
       p => location.pathname === p || location.pathname.startsWith(`${p}/`)
     ) || location.pathname.includes('/movie/booking/');
   const classes = useStyles({ keepTopSpacing, showStickyFnB: !hideStickyFnB });
