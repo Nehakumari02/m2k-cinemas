@@ -1204,6 +1204,37 @@ class BookingPage extends Component {
                   seatNumbering={cinema.seatNumbering}
                   movie={movie}
                   cinema={cinema}
+                  screenAtBottom={
+                    String(cinema.name || '').trim().toLowerCase().startsWith('m2k pitampura') ||
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini'
+                  }
+                  reverseRows={
+                    String(cinema.name || '').trim().toLowerCase().startsWith('m2k pitampura')
+                  }
+                  firstRowShiftRight={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura' ? 1 : 0
+                  }
+                  rowShiftRightLabels={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
+                      ? ['B']
+                      : []
+                  }
+                  shiftRowLabelsRight={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['U', 'T', 'S', 'R', 'Q', 'P', 'N', 'M', 'L']
+                      : []
+                  }
+                  middleGapThreeRows={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U']
+                      : []
+                  }
+                  shiftRightPartRowsRight={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini' ||
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
+                      ? ['A']
+                      : []
+                  }
                   centerAisle={
                     cinema.layoutKey === 'm2k-venue'
                       ? false

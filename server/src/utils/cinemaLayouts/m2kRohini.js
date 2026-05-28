@@ -33,13 +33,13 @@ function buildRowA() {
   return r;
 }
 
-/** Row B: 17 seats — 17–10 (cols 2–9) | 9–1 (cols 10–18); seat 1 under row A seat 3 */
+/** Row B: 17 seats — 17–10 (cols 2–9) | 9–1 (cols 12–20) with center divider */
 function buildRowB() {
   const r = row();
   for (let i = 2; i <= 9; i += 1) {
     r[i] = AVAILABLE;
   }
-  for (let i = 10; i <= 18; i += 1) {
+  for (let i = 12; i <= 20; i += 1) {
     r[i] = AVAILABLE;
   }
   return r;

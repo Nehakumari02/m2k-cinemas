@@ -251,7 +251,65 @@ const CATEGORIES = [
   }
 ];
 
-function getCategory(rowIndex, totalRows) {
+function getCategory(rowIndex, totalRows, rowLabel, seatNumbering) {
+  if (seatNumbering === 'pitampura-screen2' && rowLabel) {
+    if (rowLabel === 'U') {
+      return {
+        key: 'platinum',
+        label: 'PLATINUM',
+        color: '#e040fb',
+        bg: 'rgba(224,64,251,0.12)',
+      };
+    }
+    if (rowLabel === 'T' || rowLabel === 'S') {
+      return {
+        key: 'gold',
+        label: 'GOLD',
+        color: '#b72429',
+        bg: 'rgba(183,36,41,0.12)',
+      };
+    }
+    if (/^[A-R]$/.test(rowLabel)) {
+      return {
+        key: 'silver',
+        label: 'SILVER',
+        color: '#42a5f5',
+        bg: 'rgba(66,165,245,0.12)',
+      };
+    }
+  }
+  if (seatNumbering === 'pitampura-screen3' && rowLabel) {
+    if (rowLabel === 'N') {
+      return {
+        key: 'gold',
+        label: 'GOLD',
+        color: '#b72429',
+        bg: 'rgba(183,36,41,0.12)',
+      };
+    }
+    return {
+      key: 'silver',
+      label: 'SILVER',
+      color: '#42a5f5',
+      bg: 'rgba(66,165,245,0.12)',
+    };
+  }
+  if (seatNumbering === 'rohini' && rowLabel && rowLabel !== 'WAY') {
+    if (rowLabel === 'A' || rowLabel === 'B') {
+      return {
+        key: 'gold',
+        label: 'GOLD',
+        color: '#b72429',
+        bg: 'rgba(183,36,41,0.12)',
+      };
+    }
+    return {
+      key: 'silver',
+      label: 'SILVER',
+      color: '#42a5f5',
+      bg: 'rgba(66,165,245,0.12)',
+    };
+  }
   const third = Math.ceil(totalRows / 3);
   if (rowIndex < third) return CATEGORIES[0]; // GOLD — front
   if (rowIndex < third * 2) return CATEGORIES[1]; // PREMIUM — middle
@@ -284,14 +342,19 @@ export default function BookingSeats({
   seatNumbering,
   movie,
   cinema,
+  screenAtBottom = false,
+  reverseRows = false,
+  firstRowShiftRight = 0,
+  rowShiftRightLabels = [],
+  shiftRowLabelsRight = [],
+  middleGapThreeRows = [],
+  shiftRightPartRowsRight = [],
 }) {
   const classes = useStyles();
 
   if (!seats || seats.length === 0) return null;
 
   const totalRows = seats.length;
-  const third = Math.ceil(totalRows / 3);
-  const categoryBreaks = [0, third, third * 2];
 
   const maxWidth = seats.reduce((max, row) => Math.max(max, row.length), 0);
   const gridWidth = gridWidthProp || maxWidth;
@@ -306,6 +369,11 @@ export default function BookingSeats({
     if (seatRow.length >= gridWidth) return seatRow;
     return [...seatRow, ...Array(gridWidth - seatRow.length).fill(EMPTY_SEAT)];
   };
+  const renderRows = seats.map((seatRow, originalRowIndex) => ({
+    seatRow,
+    originalRowIndex,
+  }));
+  if (reverseRows) renderRows.reverse();
 
   const selectedSeats = seats.reduce((acc, row, rowIndex) => {
     row.forEach((seatValue, seatIndex) => {
@@ -323,23 +391,38 @@ export default function BookingSeats({
 
   return (
     <div className={classes.wrapper}>
-      {/* ── Screen ── */}
-      <div className={classes.screenWrapper}>
-        <div className={classes.screenCurve} />
-        <span className={classes.screenLabel}>
-          All Eyes This Way Please!
-        </span>
-      </div>
+      {!screenAtBottom && (
+        <div className={classes.screenWrapper}>
+          <div className={classes.screenCurve} />
+          <span className={classes.screenLabel}>
+            All Eyes This Way Please!
+          </span>
+        </div>
+      )}
 
       {/* ── Seat Grid ── */}
-      {seats.map((seatRow, rowIndex) => {
-        const category = getCategory(rowIndex, totalRows);
-        const showBand = categoryBreaks.includes(rowIndex);
-        const rowLetter = getRowLabel(rowIndex);
+      {renderRows.map(({ seatRow, originalRowIndex }, displayRowIndex) => {
+        const category = getCategory(
+          originalRowIndex,
+          totalRows,
+          getRowLabel(originalRowIndex),
+          seatNumbering
+        );
+        const previousCategory =
+          displayRowIndex > 0
+            ? getCategory(
+                renderRows[displayRowIndex - 1].originalRowIndex,
+                totalRows,
+                getRowLabel(renderRows[displayRowIndex - 1].originalRowIndex),
+                seatNumbering
+              )
+            : null;
+        const showBand = displayRowIndex === 0 || previousCategory.key !== category.key;
+        const rowLetter = getRowLabel(originalRowIndex);
 
         if (rowLetter === 'WAY') {
           return (
-            <div key={rowIndex} className={classes.walkwayRow}>
+            <div key={originalRowIndex} className={classes.walkwayRow}>
               WAY
             </div>
           );
@@ -347,6 +430,77 @@ export default function BookingSeats({
 
         let seatNumber = 0;
         const paddedRow = padRow(seatRow);
+        const shouldShiftByFirstRow = firstRowShiftRight > 0 && displayRowIndex === 0;
+        const shouldShiftWholeRowByLabel = Array.isArray(rowShiftRightLabels)
+          ? rowShiftRightLabels.includes(rowLetter)
+          : false;
+        const shouldShiftLeftClusterOnly = Array.isArray(shiftRowLabelsRight)
+          ? shiftRowLabelsRight.includes(rowLetter)
+          : false;
+        const rowShiftRight = shouldShiftByFirstRow || shouldShiftWholeRowByLabel ? 1 : 0;
+
+        let displayRow = paddedRow;
+        let displaySeatSourceMap = paddedRow.map((_, idx) => idx);
+
+        if (rowShiftRight > 0) {
+          displayRow = [...Array(rowShiftRight).fill(EMPTY_SEAT), ...paddedRow].slice(0, gridWidth);
+          displaySeatSourceMap = displayRow.map((_, idx) => idx - rowShiftRight);
+        } else if (
+          shouldShiftLeftClusterOnly ||
+          (Array.isArray(middleGapThreeRows) && middleGapThreeRows.includes(rowLetter)) ||
+          (Array.isArray(shiftRightPartRowsRight) && shiftRightPartRowsRight.includes(rowLetter))
+        ) {
+          const runs = [];
+          let runStart = -1;
+          for (let i = 0; i < paddedRow.length; i += 1) {
+            if (isBookableSeat(paddedRow[i])) {
+              if (runStart === -1) runStart = i;
+            } else if (runStart !== -1) {
+              runs.push([runStart, i - 1]);
+              runStart = -1;
+            }
+          }
+          if (runStart !== -1) runs.push([runStart, paddedRow.length - 1]);
+
+          if (runs.length) {
+            const [leftStart, leftEnd] = runs[0];
+            const [rightStart] = runs[1] || [];
+            const shouldIncreaseMiddleGap = Array.isArray(middleGapThreeRows)
+              ? middleGapThreeRows.includes(rowLetter)
+              : false;
+            const shouldShiftRightClusterOnly = Array.isArray(shiftRightPartRowsRight)
+              ? shiftRightPartRowsRight.includes(rowLetter)
+              : false;
+            const nextRow = Array(gridWidth).fill(EMPTY_SEAT);
+            const nextMap = Array(gridWidth).fill(-1);
+            const leftShift = shouldShiftLeftClusterOnly ? 1 : 0;
+            const rightShift = shouldShiftRightClusterOnly ? 1 : 0;
+            const leftCount = leftEnd - leftStart + 1;
+            const baseGap = typeof rightStart === 'number' ? rightStart - leftEnd - 1 : 0;
+            const targetGap = shouldIncreaseMiddleGap ? 3 : baseGap;
+            const leftTargetStart = leftStart + leftShift;
+            const rightTargetStart =
+              typeof rightStart === 'number'
+                ? leftTargetStart + leftCount + targetGap + rightShift
+                : -1;
+
+            for (let sourceIndex = 0; sourceIndex < paddedRow.length; sourceIndex += 1) {
+              if (!isBookableSeat(paddedRow[sourceIndex])) continue;
+              let targetIndex = sourceIndex;
+              if (sourceIndex >= leftStart && sourceIndex <= leftEnd) {
+                targetIndex = leftTargetStart + (sourceIndex - leftStart);
+              } else if (typeof rightStart === 'number' && sourceIndex >= rightStart) {
+                targetIndex = rightTargetStart + (sourceIndex - rightStart);
+              }
+              if (targetIndex >= 0 && targetIndex < gridWidth) {
+                nextRow[targetIndex] = paddedRow[sourceIndex];
+                nextMap[targetIndex] = sourceIndex;
+              }
+            }
+            displayRow = nextRow;
+            displaySeatSourceMap = nextMap;
+          }
+        }
         const useVenueNumbers =
           seatNumbering === 'rohini' ||
           seatNumbering === 'rohini-screen2' ||
@@ -368,7 +522,7 @@ export default function BookingSeats({
         };
 
         return (
-          <Fragment key={rowIndex}>
+          <Fragment key={originalRowIndex}>
             {/* Category label band */}
             {showBand && (
               <div className={classes.categoryBand}>
@@ -398,16 +552,25 @@ export default function BookingSeats({
               <div
                 className={classNames(classes.seatsGroup, classes.seatsGroupFixed)}
                 style={{ gridTemplateColumns: gridTemplate }}>
-                {paddedRow.map((seatValue, seatIndex) => {
+                {displayRow.map((displaySeatValue, seatIndex) => {
+                  const sourceSeatIndex = displaySeatSourceMap[seatIndex];
+                  const seatValue =
+                    sourceSeatIndex >= 0 &&
+                    sourceSeatIndex < paddedRow.length &&
+                    isBookableSeat(paddedRow[sourceSeatIndex])
+                      ? paddedRow[sourceSeatIndex]
+                      : EMPTY_SEAT;
+
                   if (!isBookableSeat(seatValue)) {
                     return <div key={seatIndex} className={classes.seatSpacer} />;
                   }
 
                   const venueSeat = useVenueNumbers
-                    ? getVenueSeat(paddedRow, seatIndex)
+                    ? getVenueSeat(paddedRow, sourceSeatIndex)
                     : null;
                   seatNumber += 1;
-                  const displaySeat = venueSeat != null ? venueSeat : seatNumber;
+                  const displaySeat =
+                    venueSeat != null ? venueSeat : seatNumber;
                   const seatPrice =
                     seatValue !== 1
                       ? getSeatTicketPrice(movie, cinema, seatValue)
@@ -425,7 +588,7 @@ export default function BookingSeats({
                       style={{ backgroundColor: getSeatBgColor(seatValue, category) }}
                       onClick={() => {
                         if (seatValue === 1) return;
-                        onSelectSeat(rowIndex, seatIndex);
+                        onSelectSeat(originalRowIndex, sourceSeatIndex);
                       }}
                       title={`Row ${rowLetter} Seat ${displaySeat}${
                         seatValue === 1 ? ' (Reserved)' : ''
@@ -479,19 +642,28 @@ export default function BookingSeats({
           Special (Diamond)
         </div>
         <div className={classes.legendItem}>
+          <span style={{ color: '#42a5f5', fontWeight: 700 }}>●</span> SILVER
+        </div>
+        <div className={classes.legendItem}>
           <span style={{ color: '#b72429', fontWeight: 700 }}>●</span> GOLD
         </div>
         <div className={classes.legendItem}>
-          <span style={{ color: '#e040fb', fontWeight: 700 }}>●</span> PREMIUM
-        </div>
-        <div className={classes.legendItem}>
-          <span style={{ color: '#42a5f5', fontWeight: 700 }}>●</span> CLASSIC
+          <span style={{ color: '#e040fb', fontWeight: 700 }}>●</span> PLATINUM
         </div>
       </div>
 
       {selectedCount > 0 && (
         <div className={classes.selectedSeatPriceBar}>
           {selectedCount} seat{selectedCount > 1 ? 's' : ''} selected : ₹{selectedTotalPrice}
+        </div>
+      )}
+
+      {screenAtBottom && (
+        <div className={classes.screenWrapper}>
+          <div className={classes.screenCurve} />
+          <span className={classes.screenLabel}>
+            All Eyes This Way Please!
+          </span>
         </div>
       )}
     </div>
