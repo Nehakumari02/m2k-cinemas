@@ -30,7 +30,9 @@ const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
 const membershipRouter = require('./routes/membership');
 const newsletterRouter = require('./routes/newsletter');
+const activityLogsRouter = require('./routes/activityLogs');
 const guestLoginHandler = require('./handlers/guestLoginHandler');
+const adminAuditLog = require('./middlewares/adminAuditLog');
 
 const app = express();
 app.disable('x-powered-by');
@@ -49,6 +51,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.json());
+app.use(adminAuditLog);
 app.post('/users/login/guest', guestLoginHandler);
 app.use(userRouter);
 app.use(movieRouter);
@@ -70,6 +73,7 @@ app.use(refundRouter);
 app.use(schoolGroupInquiryRouter);
 app.use(membershipRouter);
 app.use(newsletterRouter);
+app.use(activityLogsRouter);
 
 app.get('/health', (req, res) => {
   res.send({

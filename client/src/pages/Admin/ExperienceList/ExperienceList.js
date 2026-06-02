@@ -209,8 +209,8 @@ class ExperienceList extends Component {
                 style={{
                   background: exp.image
                     ? `linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.85)), url("${normalizeImage(
-                        exp.image
-                      )}") center/cover no-repeat`
+                      exp.image
+                    )}") center/cover no-repeat`
                     : exp.gradient,
                 }}
               >

@@ -27,6 +27,7 @@ import RedeemIcon from '@material-ui/icons/Redeem';
 import SchoolIcon from '@material-ui/icons/School';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import HistoryIcon from '@material-ui/icons/History';
 // Component styles
 import styles from './styles';
 
@@ -242,6 +243,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Newsletter"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/activity-logs">
+            <ListItemIcon className={classes.listItemIcon}>
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Activity Logs"
             />
           </ListItem>
           <ListItem
