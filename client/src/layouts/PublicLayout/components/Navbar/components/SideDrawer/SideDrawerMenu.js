@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   List,
@@ -10,7 +10,12 @@ import {
   IconButton,
   Divider,
   Badge,
+  Collapse,
 } from '@material-ui/core';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import GroupIcon from '@material-ui/icons/Group';
+import BusinessIcon from '@material-ui/icons/Business';
 import CloseIcon from '@material-ui/icons/Close';
 import HomeIcon from '@material-ui/icons/Home';
 import MovieIcon from '@material-ui/icons/Movie';
@@ -72,7 +77,12 @@ export default function SideDrawerMenu({
   foodCartCount,
   showClose = true,
 }) {
+  const [openGroupBooking, setOpenGroupBooking] = useState(false);
   const close = () => onNavigate();
+
+  const handleGroupBookingClick = () => {
+    setOpenGroupBooking(!openGroupBooking);
+  };
 
   return (
     <Box
@@ -152,12 +162,32 @@ export default function SideDrawerMenu({
             primary="Membership"
             onNavigate={close}
           />
-          <NavRow
-            to="/school-group-booking"
-            icon={<SchoolIcon />}
-            primary="School group booking"
-            onNavigate={close}
-          />
+          <ListItem button onClick={handleGroupBookingClick}>
+            <ListItemIcon style={{ minWidth: 40, color: '#b72429' }}>
+              <GroupIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Group booking"
+              primaryTypographyProps={{ style: { fontWeight: 600, color: '#0f172a' } }}
+            />
+            {openGroupBooking ? <ExpandLess /> : <ExpandMore />}
+          </ListItem>
+          <Collapse in={openGroupBooking} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItem button component={Link} to="/group-booking?type=school" onClick={close} style={{ paddingLeft: 72 }}>
+                <ListItemIcon style={{ minWidth: 32, color: '#b72429' }}>
+                  <SchoolIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="School group booking" primaryTypographyProps={{ style: { fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' } }} />
+              </ListItem>
+              <ListItem button component={Link} to="/group-booking?type=corporate" onClick={close} style={{ paddingLeft: 72 }}>
+                <ListItemIcon style={{ minWidth: 32, color: '#b72429' }}>
+                  <BusinessIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Corporate group booking" primaryTypographyProps={{ style: { fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' } }} />
+              </ListItem>
+            </List>
+          </Collapse>
 
           <Divider style={{ margin: '8px 16px' }} />
           <SectionLabel>More</SectionLabel>

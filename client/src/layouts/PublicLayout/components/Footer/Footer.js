@@ -89,27 +89,19 @@ export default function Footer() {
               M2K CINEMAS
             </Typography>
             <Box mb={1.5}>
-              <span className={classes.addressLabel}>Registered</span>
-              <Typography component="p" className={classes.addressBlock}>
-                {M2K_LEGAL_NAME} — {M2K_REGISTERED_ADDRESS}
-              </Typography>
-              <span className={classes.addressLabel}>{M2K_ROHINI_VENUE.label}</span>
-              <Typography component="p" className={classes.addressBlock}>
-                {M2K_ROHINI_VENUE.address}
-              </Typography>
-              <span className={classes.addressLabel}>{M2K_PITAMPURA_VENUE.label}</span>
+              <span className={classes.addressLabel}>M2K Entertainment Pvt. Ltd</span>
               <Typography component="p" className={classes.addressBlock} style={{ marginBottom: 8 }}>
-                {M2K_PITAMPURA_VENUE.address}
+                {M2K_REGISTERED_ADDRESS}
               </Typography>
               <Typography variant="caption" style={{ color: '#94a3b8', display: 'block', fontSize: '0.7rem' }}>
                 +91 0124 4525000 · info@m2kcinemas.com
               </Typography>
             </Box>
             <Box display="flex" gap={1} mt={1}>
-              <IconButton size="small" style={{ color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><FacebookIcon /></IconButton>
-              <IconButton size="small" style={{ color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><InstagramIcon /></IconButton>
-              <IconButton size="small" style={{ color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><TwitterIcon /></IconButton>
-              <IconButton size="small" style={{ color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)' }}><YouTubeIcon /></IconButton>
+              <IconButton size="small" style={{ color: '#1877F2', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><FacebookIcon /></IconButton>
+              <IconButton size="small" style={{ color: '#E1306C', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><InstagramIcon /></IconButton>
+              <IconButton size="small" style={{ color: '#1DA1F2', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><TwitterIcon /></IconButton>
+              <IconButton size="small" style={{ color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.05)' }}><YouTubeIcon /></IconButton>
             </Box>
           </Grid>
 
@@ -136,9 +128,9 @@ export default function Footer() {
               </li>
               <li style={{ marginBottom: 6 }}>
                 <Link
-                  to="/school-group-booking"
+                  to="/group-booking"
                   style={{ color: '#f8fafc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700 }}>
-                  School Booking
+                  Group Booking
                 </Link>
               </li>
             </ul>
@@ -220,9 +212,9 @@ export default function Footer() {
           </Typography>
           <Box display="flex" flexWrap="wrap" alignItems="center" style={{ gap: 16 }}>
             <Link
-              to="/school-group-booking"
+              to="/group-booking"
               style={{ color: '#b72429', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700 }}>
-              School Booking
+              Group Booking
             </Link>
             <Link to="/offers" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.8rem' }}>
               Offers

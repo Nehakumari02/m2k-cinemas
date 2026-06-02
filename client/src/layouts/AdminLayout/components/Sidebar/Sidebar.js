@@ -25,6 +25,7 @@ import ShippingIcon from '@material-ui/icons/LocalShippingOutlined';
 import StarIcon from '@material-ui/icons/StarBorderOutlined';
 import RedeemIcon from '@material-ui/icons/Redeem';
 import SchoolIcon from '@material-ui/icons/School';
+import BusinessIcon from '@material-ui/icons/Business';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import HistoryIcon from '@material-ui/icons/History';
@@ -126,6 +127,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="School Bookings"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/corporate-bookings">
+            <ListItemIcon className={classes.listItemIcon}>
+              <BusinessIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Corporate Bookings"
             />
           </ListItem>
           <ListItem

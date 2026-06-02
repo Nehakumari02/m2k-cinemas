@@ -28,7 +28,10 @@ const NewsletterSubscribers = lazy(() => import('./pages/Admin/NewsletterSubscri
 const ActivityLogs = lazy(() => import('./pages/Admin/ActivityLogs'));
 const RefundManagement = lazy(() => import('./pages/Admin/RefundManagement/RefundManagement'));
 const SchoolGroupInquiryList = lazy(() =>
-  import('./pages/Admin/SchoolGroupInquiryList/SchoolGroupInquiryList')
+  import('./pages/Admin/SchoolGroupInquiryList')
+);
+const CorporateGroupInquiryList = lazy(() =>
+  import('./pages/Admin/CorporateGroupInquiryList')
 );
 
 // Register - Login
@@ -47,7 +50,7 @@ const CinemasPage = lazy(() => import('./pages/Public/CinemasPage'));
 const CinemaDetailPage = lazy(() => import('./pages/Public/CinemaDetailPage'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
 const OffersPage = lazy(() => import('./pages/Public/OffersPage'));
-const SchoolGroupBookingPage = lazy(() => import('./pages/Public/SchoolGroupBookingPage'));
+const GroupBookingPage = lazy(() => import('./pages/Public/GroupBookingPage'));
 const MembershipPage = lazy(() => import('./pages/Public/MembershipPage'));
 const ExperiencePage = lazy(() => import('./pages/Public/ExperiencePage'));
 const ShowtimingsPage = lazy(() => import('./pages/Public/ShowtimingsPage'));
@@ -126,9 +129,9 @@ const Routes = () => {
           />
           <WithLayoutRoute
             exact
-            path="/school-group-booking"
+            path="/group-booking"
             layout={PublicLayout}
-            component={SchoolGroupBookingPage}
+            component={GroupBookingPage}
           />
           <WithLayoutRoute
             exact
@@ -351,6 +354,12 @@ const Routes = () => {
             path="/admin/school-bookings"
             layout={AdminLayout}
             component={SchoolGroupInquiryList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/corporate-bookings"
+            layout={AdminLayout}
+            component={CorporateGroupInquiryList}
           />
           <ProtectedRoute
             exact

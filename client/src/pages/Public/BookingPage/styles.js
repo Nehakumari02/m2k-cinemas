@@ -148,6 +148,9 @@ export default theme => ({
     '&:hover': {
       background: 'linear-gradient(90deg, #8b1c20, #6d1518)',
     },
+    '&.Mui-disabled': {
+      color: 'rgba(255, 255, 255, 0.7)',
+    },
   },
   [theme.breakpoints.down('md')]: {
     root: { height: '100%' },

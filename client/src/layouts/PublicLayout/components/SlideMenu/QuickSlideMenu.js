@@ -58,10 +58,19 @@ const useStyles = makeStyles({
     justifyContent: 'center',
   },
   moreBtn: {
+    display: 'block',
+    width: '100%',
+    padding: '13px 8px',
+    textAlign: 'center',
+    cursor: 'pointer',
     color: '#e2e8f0',
-    padding: 6,
+    fontSize: '0.78rem',
+    fontWeight: 500,
+    border: 'none',
+    background: 'none',
+    transition: 'background 0.15s ease',
     '&:hover': {
-      background: 'rgba(255, 255, 255, 0.12)',
+      background: 'rgba(255, 255, 255, 0.1)',
     },
   },
 });
@@ -79,17 +88,18 @@ export default function QuickSlideMenu({ onNavigate, onOpenFullMenu }) {
           </Typography>
         </Link>
       ))}
-      <div className={classes.moreWrap}>
-        <IconButton
+      <div className={classes.moreWrap} style={{ display: 'block', padding: 0 }}>
+        <button
           className={classes.moreBtn}
-          size="small"
           aria-label="Open full menu"
           onClick={() => {
             close();
             onOpenFullMenu();
           }}>
-          <ChevronRightIcon fontSize="small" />
-        </IconButton>
+          <Typography component="span" variant="body2" style={{ fontSize: 'inherit', fontWeight: 'inherit' }}>
+            Show more
+          </Typography>
+        </button>
       </div>
     </nav>
   );

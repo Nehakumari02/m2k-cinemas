@@ -81,16 +81,19 @@ export default theme => ({
     paddingLeft: theme.spacing(2),
   },
   socialIcon: {
-    color: '#1f2937',
     margin: '0 6px',
     display: 'flex',
     alignItems: 'center',
-    transition: 'color 200ms ease, transform 200ms ease',
+    transition: 'transform 200ms ease, opacity 200ms ease',
     '&:hover': {
-      color: '#b72429',
-      transform: 'scale(1.1)'
+      transform: 'scale(1.1)',
+      opacity: 0.8
     }
   },
+  facebookIcon: { color: '#1877F2' },
+  twitterIcon: { color: '#1DA1F2' },
+  instagramIcon: { color: '#E4405F' },
+  youtubeIcon: { color: '#FF0000' },
   navAccount: { 
     marginLeft: 'auto', 
     marginRight: theme.spacing(1),

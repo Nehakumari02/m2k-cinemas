@@ -28,6 +28,7 @@ const foodOrderRouter = require('./routes/foodOrders');
 const settingsRouter = require('./routes/settings');
 const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
+const corporateGroupInquiryRouter = require('./routes/corporateGroupInquiries');
 const membershipRouter = require('./routes/membership');
 const newsletterRouter = require('./routes/newsletter');
 const activityLogsRouter = require('./routes/activityLogs');
@@ -71,6 +72,7 @@ app.use(foodOrderRouter);
 app.use(settingsRouter);
 app.use(refundRouter);
 app.use(schoolGroupInquiryRouter);
+app.use(corporateGroupInquiryRouter);
 app.use(membershipRouter);
 app.use(newsletterRouter);
 app.use(activityLogsRouter);
@@ -84,6 +86,8 @@ app.get('/health', (req, res) => {
       'POST /users/login/guest',
       'POST /school-group-inquiries',
       'GET /admin/school-group-inquiries',
+      'POST /corporate-group-inquiries',
+      'GET /admin/corporate-group-inquiries',
     ],
   });
 });
@@ -134,6 +138,7 @@ app.listen(port, () => {
   console.log(`app is running in PORT: ${port}`);
   console.log('Guest login: POST /users/login/guest');
   console.log('School bookings: POST /school-group-inquiries');
+  console.log('Corporate bookings: POST /corporate-group-inquiries');
   if (!hasClientBuild) {
     console.log(
       'No client/build — API-only mode. Start UI: cd client && npm start → http://localhost:3000'

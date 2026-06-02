@@ -92,16 +92,16 @@ class Navbar extends Component {
             </Link>
             <div className={classes.socialLinks}>
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
-                <FacebookIcon fontSize="small" />
+                <FacebookIcon fontSize="small" className={classes.facebookIcon} />
               </a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
-                <TwitterIcon fontSize="small" />
+                <TwitterIcon fontSize="small" className={classes.twitterIcon} />
               </a>
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
-                <InstagramIcon fontSize="small" />
+                <InstagramIcon fontSize="small" className={classes.instagramIcon} />
               </a>
               <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className={classes.socialIcon}>
-                <YouTubeIcon fontSize="small" />
+                <YouTubeIcon fontSize="small" className={classes.youtubeIcon} />
               </a>
             </div>
           </div>

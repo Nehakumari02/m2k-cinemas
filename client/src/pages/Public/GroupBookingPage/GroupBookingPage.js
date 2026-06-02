@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { makeStyles } from '@material-ui/styles';
 import {
   Typography,
   Button,
+  ButtonGroup,
   TextField,
   Grid,
   Paper,
   Chip,
   CircularProgress,
   Snackbar,
+  SnackbarContent,
 } from '@material-ui/core';
-import { School, Group, LocalOffer, Send } from '@material-ui/icons';
+import { School, Business, Group, LocalOffer, Send } from '@material-ui/icons';
 import { getOffers } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import apiUrl from '../../../utils/apiUrl';
@@ -48,6 +50,11 @@ const useStyles = makeStyles(theme => ({
     background: '#b72429',
     borderRadius: 2,
     margin: '16px auto 0',
+  },
+  toggleContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(4),
   },
   perks: {
     display: 'flex',
@@ -145,41 +152,66 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const FALLBACK_SCHOOL_OFFERS = [
-  {
-    _id: 'school-fallback-1',
-    title: 'School Group Booking — 30% Off',
-    description:
-      'Book for 30+ students and get 30% off ticket price. Ideal for educational trips, annual days, and reward screenings. Staff coordinator support included.',
-    code: 'SCHOOL30',
-    category: 'school_group',
-    minTickets: 30,
-    discountPercentage: 30,
-    validTill: new Date('2026-12-31'),
-    image: '/images/offers/offer4.png',
-  },
-  {
-    _id: 'school-fallback-2',
-    title: 'Large Group Special — 40% Off (50+ students)',
-    description:
-      'Groups of 50 or more students receive 40% off. Private showtime slots available on request. Submit your enquiry below.',
-    code: 'SCHOOL40',
-    category: 'school_group',
-    minTickets: 50,
-    discountPercentage: 40,
-    inquiryOnly: true,
-    validTill: new Date('2026-12-31'),
-    image: '/images/offers/offer2.png',
-  },
-];
+const FALLBACK_OFFERS = {
+  school: [
+    {
+      _id: 'school-fallback-1',
+      title: 'School Group Booking — 30% Off',
+      description: 'Book for 30+ students and get 30% off ticket price. Ideal for educational trips, annual days, and reward screenings. Staff coordinator support included.',
+      code: 'SCHOOL30',
+      category: 'school_group',
+      minTickets: 30,
+      discountPercentage: 30,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer4.png',
+    },
+    {
+      _id: 'school-fallback-2',
+      title: 'Large Group Special — 40% Off (50+ students)',
+      description: 'Groups of 50 or more students receive 40% off. Private showtime slots available on request. Submit your enquiry below.',
+      code: 'SCHOOL40',
+      category: 'school_group',
+      minTickets: 50,
+      discountPercentage: 40,
+      inquiryOnly: true,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer2.png',
+    }
+  ],
+  corporate: [
+    {
+      _id: 'corporate-fallback-1',
+      title: 'Corporate Group Booking — 30% Off',
+      description: 'Book for 30+ employees and get 30% off ticket price. Ideal for team building, annual days, and reward screenings. Corporate coordinator support included.',
+      code: 'CORP30',
+      category: 'corporate_group',
+      minTickets: 30,
+      discountPercentage: 30,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer4.png',
+    },
+    {
+      _id: 'corporate-fallback-2',
+      title: 'Large Group Special — 40% Off (50+ employees)',
+      description: 'Groups of 50 or more employees receive 40% off. Private showtime slots available on request. Submit your enquiry below.',
+      code: 'CORP40',
+      category: 'corporate_group',
+      minTickets: 50,
+      discountPercentage: 40,
+      inquiryOnly: true,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer2.png',
+    }
+  ]
+};
 
 const EMPTY_FORM = {
-  schoolName: '',
+  orgName: '', // Maps to schoolName or companyName
   contactName: '',
   email: '',
   phone: '',
-  studentCount: '',
-  gradeOrClass: '',
+  peopleCount: '', // Maps to studentCount or employeeCount
+  subUnit: '', // Maps to gradeOrClass or department
   preferredDate: '',
   preferredMovie: '',
   preferredCinema: '',
@@ -187,20 +219,30 @@ const EMPTY_FORM = {
   message: '',
 };
 
-function SchoolGroupBookingPage({ offers, getOffers }) {
+function GroupBookingPage({ offers, getOffers }) {
   const classes = useStyles();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const queryType = searchParams.get('type') === 'corporate' ? 'corporate' : 'school';
+
+  const [type, setType] = useState(queryType); // 'school' | 'corporate'
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
+
+  useEffect(() => {
+    const newType = searchParams.get('type') === 'corporate' ? 'corporate' : 'school';
+    setType(newType);
+  }, [location.search]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     getOffers();
   }, [getOffers]);
 
-  const schoolOffers = (offers && offers.length > 0
-    ? offers.filter(o => o.category === 'school_group')
-    : FALLBACK_SCHOOL_OFFERS);
+  const groupOffers = (offers && offers.length > 0
+    ? offers.filter(o => o.category === `${type}_group`)
+    : FALLBACK_OFFERS[type]) || FALLBACK_OFFERS[type];
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -216,28 +258,40 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const response = await fetch(apiUrl('/school-group-inquiries'), {
+      let endpoint = '';
+      let payload = {};
+
+      if (type === 'school') {
+        endpoint = '/school-group-inquiries';
+        payload = {
+          ...form,
+          schoolName: form.orgName,
+          studentCount: Number(form.peopleCount),
+          gradeOrClass: form.subUnit,
+        };
+      } else {
+        endpoint = '/corporate-group-inquiries';
+        payload = {
+          ...form,
+          companyName: form.orgName,
+          employeeCount: Number(form.peopleCount),
+          department: form.subUnit,
+        };
+      }
+
+      const response = await fetch(apiUrl(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          studentCount: Number(form.studentCount),
-        }),
+        body: JSON.stringify(payload),
       });
       const text = await response.text();
       let data = {};
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
-        const isHtml = text.trim().startsWith('<');
-        const cannotPost = text.includes('Cannot POST');
         setSnack({
           open: true,
-          message: isHtml
-            ? cannotPost
-              ? 'The API on port 8080 does not have the school booking route yet. Stop the server, run `cd server && npm run dev` again, and confirm you see "School bookings: POST /school-group-inquiries" in the terminal.'
-              : 'Wrong service on port 8080 (HTML instead of JSON). Use `cd server && npm run dev` for the API—not a static file server alone.'
-            : `Unexpected server response. Check http://localhost:8080/health — then restart the server.`,
+          message: 'Unexpected server response. Please try again.',
           severity: 'error',
         });
         setSubmitting(false);
@@ -260,8 +314,7 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
     } catch {
       setSnack({
         open: true,
-        message:
-          'Cannot reach the server. Run the API on port 8080: cd server && npm run dev — then restart the client (npm start).',
+        message: 'Cannot reach the server. Please check your connection.',
         severity: 'error',
       });
     }
@@ -271,16 +324,36 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
   return (
     <div className={classes.root}>
       <div className={classes.hero}>
-        <School style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />
-        <Typography className={classes.title}>School Group Booking</Typography>
+        {type === 'school' ? (
+          <School style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />
+        ) : (
+          <Business style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />
+        )}
+        <Typography className={classes.title}>Group Booking</Typography>
         <Typography className={classes.subtitle}>
-          Exclusive offers for schools, colleges, and educational institutions. Plan a private
-          screening or block-book seats at special rates — our team will confirm availability and
-          pricing.
+          Exclusive offers for groups. Plan a private screening or block-book seats at special rates — our team will confirm availability and pricing.
         </Typography>
+
+        <div className={classes.toggleContainer}>
+          <ButtonGroup variant="outlined" style={{ borderColor: '#b72429' }}>
+            <Button
+              onClick={() => setType('school')}
+              style={type === 'school' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
+            >
+              School Booking
+            </Button>
+            <Button
+              onClick={() => setType('corporate')}
+              style={type === 'corporate' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
+            >
+              Corporate Booking
+            </Button>
+          </ButtonGroup>
+        </div>
+
         <div className={classes.accent} />
         <div className={classes.perks}>
-          <Chip icon={<Group />} label="30+ student groups" className={classes.perkChip} />
+          <Chip icon={<Group />} label={`30+ ${type === 'school' ? 'students' : 'employees'}`} className={classes.perkChip} />
           <Chip icon={<LocalOffer />} label="Dedicated promo codes" className={classes.perkChip} />
           <Chip label="Coordinator support" className={classes.perkChip} />
         </div>
@@ -291,10 +364,10 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
 
       <div className={classes.section}>
         <Typography className={classes.sectionTitle}>
-          <LocalOffer /> School group offers
+          <LocalOffer /> {type === 'school' ? 'School' : 'Corporate'} group offers
         </Typography>
         <Grid container spacing={3}>
-          {schoolOffers.map(offer => (
+          {groupOffers.map(offer => (
             <Grid item xs={12} sm={6} md={4} key={offer._id || offer.code}>
               <Paper className={classes.offerCard} elevation={0}>
                 <img
@@ -308,7 +381,7 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
                   <Typography className={classes.offerDesc}>{offer.description}</Typography>
                   {offer.minTickets > 0 && (
                     <Typography variant="caption" color="textSecondary" style={{ marginBottom: 8 }}>
-                      Min. {offer.minTickets} students
+                      Min. {offer.minTickets} {type === 'school' ? 'students' : 'employees'}
                       {offer.discountPercentage ? ` · ${offer.discountPercentage}% off` : ''}
                       {offer.inquiryOnly ? ' · Enquiry only' : ''}
                     </Typography>
@@ -318,7 +391,7 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
                     color="primary"
                     variant="outlined"
                     onClick={() => applyOfferCode(offer.code)}
-                    style={{ alignSelf: 'flex-start', fontWeight: 700 }}>
+                    style={{ alignSelf: 'flex-start', fontWeight: 700, color: '#b72429', borderColor: '#b72429' }}>
                     Use this offer
                   </Button>
                 </div>
@@ -332,18 +405,17 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
             <Send /> Submit booking enquiry
           </Typography>
           <Typography variant="body2" color="textSecondary" style={{ marginBottom: 24 }}>
-            Fill in your school details and we will call or email you with showtimes, pricing, and
-            payment options. For online checkout, use your group code at payment (minimum seats may
-            apply).
+            Fill in your details and we will call or email you with showtimes, pricing, and
+            payment options.
           </Typography>
           <form onSubmit={handleSubmit} noValidate>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   className={classes.input}
-                  label="School / Institution name *"
-                  name="schoolName"
-                  value={form.schoolName}
+                  label={type === 'school' ? "School name *" : "Company name *"}
+                  name="orgName"
+                  value={form.orgName}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
@@ -390,11 +462,11 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={4}>
                 <TextField
                   className={classes.input}
-                  label="Number of students *"
-                  name="studentCount"
+                  label={type === 'school' ? "Number of students *" : "Number of employees *"}
+                  name="peopleCount"
                   type="number"
                   inputProps={{ min: 1 }}
-                  value={form.studentCount}
+                  value={form.peopleCount}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
@@ -404,9 +476,9 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={4}>
                 <TextField
                   className={classes.input}
-                  label="Grade / Class"
-                  name="gradeOrClass"
-                  value={form.gradeOrClass}
+                  label={type === 'school' ? "Grade/Class" : "Department"}
+                  name="subUnit"
+                  value={form.subUnit}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
@@ -491,8 +563,16 @@ function SchoolGroupBookingPage({ offers, getOffers }) {
         open={snack.open}
         autoHideDuration={6000}
         onClose={() => setSnack(s => ({ ...s, open: false }))}
-        message={snack.message}
-      />
+      >
+        <SnackbarContent 
+          style={{ 
+            backgroundColor: snack.severity === 'success' ? '#4caf50' : '#d32f2f',
+            color: '#fff',
+            fontWeight: 600
+          }}
+          message={snack.message}
+        />
+      </Snackbar>
     </div>
   );
 }
@@ -501,4 +581,4 @@ const mapStateToProps = ({ offerState }) => ({
   offers: offerState.offers,
 });
 
-export default connect(mapStateToProps, { getOffers })(SchoolGroupBookingPage);
+export default connect(mapStateToProps, { getOffers })(GroupBookingPage);

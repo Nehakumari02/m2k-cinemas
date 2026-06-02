@@ -13,7 +13,7 @@ import {
 export const BOOKING_TERMS = [
   'Dear patron, the baggage counter facility is not available at this cinema. Inconvenience caused is deeply regretted.',
   'Ticket is compulsory for children of 3 years & above.',
-  'Patrons below the age of 18 years will not be allowed to watch the movies certified `A`.',
+  <>Patrons below the age of 18 years will not be allowed to watch the movies certified <strong>`A`</strong>.</>,
   'Due to security reason, except mobile & wallet nothing is allowed inside the cinema premises including handbags, carry bags, helmet, camera, laptop, knife, lighter, match-box, firearms & all kinds of inflammable objects, eatables like chocolate, chips, food item including pan-masala, chewing gum, Gutkas etc.',
   'Smoking cigarettes, consumption of alcohol and people under the influence of alcohol & drugs are strictly not allowed in the cinema premises.',
   'Re-Entry is not allowed in cinema.',
