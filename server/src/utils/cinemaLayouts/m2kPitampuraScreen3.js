@@ -9,10 +9,10 @@ const GRID_WIDTH = 19;
 
 const row = () => Array(GRID_WIDTH).fill(EMPTY);
 
-/** Rows A–D: seats 1–15 (cols 3–17) */
+/** Rows A–D: seats 1–15 (cols 2–16) */
 function buildLowerBlockRow() {
   const r = row();
-  for (let i = 3; i < 18; i += 1) {
+  for (let i = 2; i < 17; i += 1) {
     r[i] = AVAILABLE;
   }
   return r;

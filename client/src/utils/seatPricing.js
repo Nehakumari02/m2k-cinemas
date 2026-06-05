@@ -11,8 +11,30 @@ export function getMovieBaseTicketPrice(movie, cinema) {
   return 0;
 }
 
-export function getSeatTicketPrice(movie, cinema, seatValue) {
-  const base = getMovieBaseTicketPrice(movie, cinema);
+export function getSeatTicketPrice(movie, cinema, seatValue, rowLabel, seatNumbering) {
+  let base = getMovieBaseTicketPrice(movie, cinema);
+  const isRohiniVenue =
+    seatNumbering === 'rohini' || seatNumbering === 'rohini-screen2';
+  if (isRohiniVenue && rowLabel && rowLabel !== 'WAY') {
+    const gold =
+      Number(cinema && cinema.goldPrice) ||
+      Number(cinema && cinema.ticketPrice) ||
+      300;
+    const silver = Number(cinema && cinema.silverPrice) || 250;
+    base = rowLabel === 'A' || rowLabel === 'B' ? gold : silver;
+  }
+
+  const isPitampuraNGold =
+    seatNumbering === 'pitampura' || seatNumbering === 'pitampura-screen3';
+  if (isPitampuraNGold && rowLabel && rowLabel !== 'WAY') {
+    const gold =
+      Number(cinema && cinema.goldPrice) ||
+      Number(cinema && cinema.ticketPrice) ||
+      280;
+    const silver = Number(cinema && cinema.silverPrice) || 250;
+    base = rowLabel === 'N' ? gold : silver;
+  }
+
   const isSpecial = Number(seatValue) === 5 || Number(seatValue) === 6;
   if (!isSpecial) return base;
 

@@ -64,6 +64,8 @@ function MovieCategoryPage(props) {
         <MovieCarousel
           carouselClass={classes.carousel}
           title={title}
+          autoScroll
+          autoScrollSpeed={category === 'nowShowing' ? 3200 : 3600}
           movies={movies}
         />
       ) : (

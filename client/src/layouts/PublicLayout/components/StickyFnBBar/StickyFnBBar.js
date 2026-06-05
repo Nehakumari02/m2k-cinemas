@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import { makeStyles, Badge } from '@material-ui/core';
+import { makeStyles, Badge, Button } from '@material-ui/core';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
+import { MovieBookingModals } from '../../../../components';
+import useMovieBookingFlow from '../../../../hooks/useMovieBookingFlow';
 
 const useStyles = makeStyles(theme => ({
   wrap: {
@@ -12,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 1100,
-    width: 'min(520px, calc(100% - 32px))',
+    width: 'min(300px, calc(100% - 32px))',
     display: 'flex',
     alignItems: 'stretch',
     borderRadius: 14,
@@ -20,19 +22,20 @@ const useStyles = makeStyles(theme => ({
     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.22), 0 2px 8px rgba(0,0,0,0.12)',
     border: '1px solid rgba(255,255,255,0.25)',
     [theme.breakpoints.down('xs')]: {
-      width: 'calc(100% - 20px)',
+      width: 'min(300px, calc(100% - 20px))',
       bottom: theme.spacing(1.5),
     },
   },
   fnbLink: {
     flex: 1,
+    width: '50%',
     minWidth: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     textDecoration: 'none',
     position: 'relative',
-    background: 'linear-gradient(180deg, #b55097 0%, #99337b 100%)',
+    background: 'linear-gradient(180deg, #bc70a3 0%, #7d1c5d 100%)',
     padding: theme.spacing(1.75, 2),
     transition: 'filter 0.2s ease, transform 0.15s ease',
     '&:hover': {
@@ -52,6 +55,7 @@ const useStyles = makeStyles(theme => ({
   },
   secondaryLink: {
     flex: 1,
+    width: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -94,13 +98,15 @@ function shouldHideBar(pathname) {
   return false;
 }
 
-function StickyFnBBar({ foodCartCount }) {
+function StickyFnBBar({ foodCartCount, selectedMovie }) {
   const classes = useStyles();
   const { pathname } = useLocation();
+  const bookingFlow = useMovieBookingFlow();
 
   if (shouldHideBar(pathname)) return null;
 
   const itemCount = (foodCartCount || []).reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const isMoviePage = pathname.startsWith('/movie/') && selectedMovie;
 
   return (
     <div className={classes.wrap} role="navigation" aria-label="Quick actions">
@@ -115,16 +121,29 @@ function StickyFnBBar({ foodCartCount }) {
           </span>
         </Badge>
       </Link>
-      <Link to="/showtimings" className={classes.secondaryLink}>
-        <MovieFilterIcon style={{ fontSize: 20 }} />
-        Book tickets
-      </Link>
+      {isMoviePage ? (
+        <Button 
+          className={classes.secondaryLink} 
+          onClick={() => bookingFlow.startBooking(selectedMovie)}
+          style={{ padding: 0, borderRadius: 0, border: 'none', cursor: 'pointer' }}
+        >
+          <MovieFilterIcon style={{ fontSize: 20 }} />
+          Book tickets
+        </Button>
+      ) : (
+        <Link to="/showtimings" className={classes.secondaryLink}>
+          <MovieFilterIcon style={{ fontSize: 20 }} />
+          Book tickets
+        </Link>
+      )}
+      <MovieBookingModals flow={bookingFlow} />
     </div>
   );
 }
 
 const mapStateToProps = state => ({
   foodCartCount: state.foodCartState.cartItems || [],
+  selectedMovie: state.movieState.selectedMovie,
 });
 
 export default connect(mapStateToProps)(StickyFnBBar);

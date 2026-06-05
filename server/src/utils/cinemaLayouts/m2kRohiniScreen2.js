@@ -120,6 +120,8 @@ function buildM2kRohiniScreen2Layout() {
     name: 'M2K ROHINI SCREEN 2',
     city: 'delhi',
     ticketPrice: 300,
+    goldPrice: 300,
+    silverPrice: 250,
     specialPrice: 480,
     layoutKey: 'm2k-venue',
     seatNumbering: 'rohini-screen2',

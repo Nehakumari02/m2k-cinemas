@@ -84,6 +84,8 @@ function AllMoviesPage(props) {
             carouselClass={classes.carousel}
             title="Now Showing"
             to="/movie/category/nowShowing"
+            autoScroll
+            autoScrollSpeed={3200}
             movies={nowShowing}
           />
         ) : (
@@ -99,6 +101,8 @@ function AllMoviesPage(props) {
             carouselClass={classes.carousel}
             title="Coming Soon"
             to="/movie/category/comingSoon"
+            autoScroll
+            autoScrollSpeed={3600}
             movies={comingSoon}
           />
         ) : (

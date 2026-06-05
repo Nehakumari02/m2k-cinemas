@@ -56,7 +56,6 @@ const styles = theme => ({
   dialogPaper: { backgroundColor: '#1a1a24', color: '#fff', borderRadius: 16, minWidth: 520 },
   dialogTitle: { color: '#fff', fontWeight: 700 },
   dialogActions: {
-    padding: theme.spacing(2, 3),
     '& .MuiButton-root': { color: 'rgba(255,255,255,0.7)' },
     '& .MuiButton-contained': { color: '#fff', backgroundColor: '#b72429' },
   },

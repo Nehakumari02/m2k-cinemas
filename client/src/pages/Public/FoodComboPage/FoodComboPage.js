@@ -66,12 +66,7 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
         <div className={classes.heroOverlay} />
         <div className={classes.heroContent}>
           <Container maxWidth="md">
-            <Typography variant="h1" className={classes.heroTitle}>
-              Deliciously <span>Unmissable</span>
-            </Typography>
-            <Typography variant="h5" className={classes.heroSubtitle}>
-              Order for pickup at the concession counter — separate checkout from movie tickets
-            </Typography>
+
           </Container>
         </div>
       </div>

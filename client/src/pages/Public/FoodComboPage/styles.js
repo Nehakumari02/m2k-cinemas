@@ -113,6 +113,7 @@ export default (theme) => ({
     }
   },
   card: {
+    position: 'relative',
     height: '100%',
     borderRadius: '16px',
     overflow: 'hidden',
@@ -129,6 +130,7 @@ export default (theme) => ({
     overflow: 'hidden'
   },
   media: {
+    position: 'relative',
     height: 240,
     transition: 'transform 0.5s ease',
     '$card:hover &': {

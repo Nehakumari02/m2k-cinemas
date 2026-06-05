@@ -50,12 +50,17 @@ const useStyles = makeStyles(theme => ({
   },
 
   /* ── Category Band ── */
-  categoryBand: {
+  categoryBandFullWidth: {
     display: 'flex',
     alignItems: 'center',
-    width: '82%',
+    width: '100%',
+    alignSelf: 'stretch',
     margin: '10px 0 2px',
     gap: '8px'
+  },
+  categoryBandShiftRight: {
+    paddingLeft: 44,
+    boxSizing: 'border-box'
   },
   categoryLine: {
     flex: 1,
@@ -223,7 +228,7 @@ const useStyles = makeStyles(theme => ({
 
   [theme.breakpoints.down('sm')]: {
     seat: { width: '20px', height: '18px', fontSize: '0.5rem' },
-    categoryBand: { width: '100%' },
+    categoryBandFullWidth: { width: '100%' },
     screenWrapper: { width: '100%' }
   }
 }));
@@ -252,6 +257,26 @@ const CATEGORIES = [
 ];
 
 function getCategory(rowIndex, totalRows, rowLabel, seatNumbering) {
+  if (
+    (seatNumbering === 'pitampura' || seatNumbering === 'pitampura-screen3') &&
+    rowLabel &&
+    rowLabel !== 'WAY'
+  ) {
+    if (rowLabel === 'N') {
+      return {
+        key: 'gold',
+        label: 'GOLD',
+        color: '#b72429',
+        bg: 'rgba(183,36,41,0.12)',
+      };
+    }
+    return {
+      key: 'silver',
+      label: 'SILVER',
+      color: '#42a5f5',
+      bg: 'rgba(66,165,245,0.12)',
+    };
+  }
   if (seatNumbering === 'pitampura-screen2' && rowLabel) {
     if (rowLabel === 'U') {
       return {
@@ -278,8 +303,8 @@ function getCategory(rowIndex, totalRows, rowLabel, seatNumbering) {
       };
     }
   }
-  if (seatNumbering === 'pitampura-screen3' && rowLabel) {
-    if (rowLabel === 'N') {
+  if (seatNumbering === 'rohini' && rowLabel && rowLabel !== 'WAY') {
+    if (rowLabel === 'A' || rowLabel === 'B') {
       return {
         key: 'gold',
         label: 'GOLD',
@@ -294,7 +319,7 @@ function getCategory(rowIndex, totalRows, rowLabel, seatNumbering) {
       bg: 'rgba(66,165,245,0.12)',
     };
   }
-  if (seatNumbering === 'rohini' && rowLabel && rowLabel !== 'WAY') {
+  if (seatNumbering === 'rohini-screen2' && rowLabel && rowLabel !== 'WAY') {
     if (rowLabel === 'A' || rowLabel === 'B') {
       return {
         key: 'gold',
@@ -347,8 +372,12 @@ export default function BookingSeats({
   firstRowShiftRight = 0,
   rowShiftRightLabels = [],
   shiftRowLabelsRight = [],
+  shiftRowLabelsLeft = [],
   middleGapThreeRows = [],
+  middleGapFourRows = [],
+  middleGapTwoRows = [],
   shiftRightPartRowsRight = [],
+  shiftRightPartRowsRightTwice = [],
 }) {
   const classes = useStyles();
 
@@ -384,10 +413,13 @@ export default function BookingSeats({
     return acc;
   }, []);
   const selectedCount = selectedSeats.length;
-  const selectedTotalPrice = selectedSeats.reduce(
-    (sum, [, , seatValue]) => sum + getSeatTicketPrice(movie, cinema, seatValue),
-    0
-  );
+  const selectedTotalPrice = selectedSeats.reduce((sum, [rowIndex, , seatValue]) => {
+    const rowLabel = getRowLabel(rowIndex);
+    return (
+      sum +
+      getSeatTicketPrice(movie, cinema, seatValue, rowLabel, seatNumbering)
+    );
+  }, 0);
 
   return (
     <div className={classes.wrapper}>
@@ -437,6 +469,9 @@ export default function BookingSeats({
         const shouldShiftLeftClusterOnly = Array.isArray(shiftRowLabelsRight)
           ? shiftRowLabelsRight.includes(rowLetter)
           : false;
+        const shouldShiftLeftClusterLeft = Array.isArray(shiftRowLabelsLeft)
+          ? shiftRowLabelsLeft.includes(rowLetter)
+          : false;
         const rowShiftRight = shouldShiftByFirstRow || shouldShiftWholeRowByLabel ? 1 : 0;
 
         let displayRow = paddedRow;
@@ -447,8 +482,13 @@ export default function BookingSeats({
           displaySeatSourceMap = displayRow.map((_, idx) => idx - rowShiftRight);
         } else if (
           shouldShiftLeftClusterOnly ||
+          shouldShiftLeftClusterLeft ||
           (Array.isArray(middleGapThreeRows) && middleGapThreeRows.includes(rowLetter)) ||
-          (Array.isArray(shiftRightPartRowsRight) && shiftRightPartRowsRight.includes(rowLetter))
+          (Array.isArray(middleGapFourRows) && middleGapFourRows.includes(rowLetter)) ||
+          (Array.isArray(middleGapTwoRows) && middleGapTwoRows.includes(rowLetter)) ||
+          (Array.isArray(shiftRightPartRowsRight) && shiftRightPartRowsRight.includes(rowLetter)) ||
+          (Array.isArray(shiftRightPartRowsRightTwice) &&
+            shiftRightPartRowsRightTwice.includes(rowLetter))
         ) {
           const runs = [];
           let runStart = -1;
@@ -465,19 +505,39 @@ export default function BookingSeats({
           if (runs.length) {
             const [leftStart, leftEnd] = runs[0];
             const [rightStart] = runs[1] || [];
-            const shouldIncreaseMiddleGap = Array.isArray(middleGapThreeRows)
+            const shouldIncreaseMiddleGapThree = Array.isArray(middleGapThreeRows)
               ? middleGapThreeRows.includes(rowLetter)
+              : false;
+            const shouldIncreaseMiddleGapFour = Array.isArray(middleGapFourRows)
+              ? middleGapFourRows.includes(rowLetter)
+              : false;
+            const shouldIncreaseMiddleGapTwo = Array.isArray(middleGapTwoRows)
+              ? middleGapTwoRows.includes(rowLetter)
               : false;
             const shouldShiftRightClusterOnly = Array.isArray(shiftRightPartRowsRight)
               ? shiftRightPartRowsRight.includes(rowLetter)
               : false;
+            const shouldShiftRightClusterTwice = Array.isArray(shiftRightPartRowsRightTwice)
+              ? shiftRightPartRowsRightTwice.includes(rowLetter)
+              : false;
             const nextRow = Array(gridWidth).fill(EMPTY_SEAT);
             const nextMap = Array(gridWidth).fill(-1);
-            const leftShift = shouldShiftLeftClusterOnly ? 1 : 0;
-            const rightShift = shouldShiftRightClusterOnly ? 1 : 0;
+            const leftShift = shouldShiftLeftClusterOnly
+              ? 1
+              : shouldShiftLeftClusterLeft
+                ? -1
+                : 0;
+            const rightShift = shouldShiftRightClusterTwice
+              ? 2
+              : shouldShiftRightClusterOnly
+                ? 1
+                : 0;
             const leftCount = leftEnd - leftStart + 1;
             const baseGap = typeof rightStart === 'number' ? rightStart - leftEnd - 1 : 0;
-            const targetGap = shouldIncreaseMiddleGap ? 3 : baseGap;
+            let targetGap = baseGap;
+            if (shouldIncreaseMiddleGapFour) targetGap = 4;
+            else if (shouldIncreaseMiddleGapThree) targetGap = 3;
+            else if (shouldIncreaseMiddleGapTwo) targetGap = 2;
             const leftTargetStart = leftStart + leftShift;
             const rightTargetStart =
               typeof rightStart === 'number'
@@ -525,7 +585,11 @@ export default function BookingSeats({
           <Fragment key={originalRowIndex}>
             {/* Category label band */}
             {showBand && (
-              <div className={classes.categoryBand}>
+              <div
+                className={classNames(
+                  classes.categoryBandFullWidth,
+                  cinema && cinema.layoutKey === 'm2k-venue' && classes.categoryBandShiftRight
+                )}>
                 <div
                   className={classes.categoryLine}
                   style={{ background: category.color }}
@@ -573,7 +637,13 @@ export default function BookingSeats({
                     venueSeat != null ? venueSeat : seatNumber;
                   const seatPrice =
                     seatValue !== 1
-                      ? getSeatTicketPrice(movie, cinema, seatValue)
+                      ? getSeatTicketPrice(
+                          movie,
+                          cinema,
+                          seatValue,
+                          rowLetter,
+                          seatNumbering
+                        )
                       : null;
 
                   return (

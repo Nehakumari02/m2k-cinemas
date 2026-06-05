@@ -22,13 +22,10 @@ function buildBottomSectionRow() {
   return r;
 }
 
-/** Row U: 1–11 | 12–18 (U1 @ col 4/T3; U12 @ col 15/T11) */
+/** Row U (Platinum): 18 seats in one centred block — seats 8–11 at auditorium centre */
 function buildRowU() {
   const r = row();
-  for (let i = 4; i <= 14; i += 1) {
-    r[i] = AVAILABLE;
-  }
-  for (let i = 15; i <= 21; i += 1) {
+  for (let i = 5; i <= 22; i += 1) {
     r[i] = AVAILABLE;
   }
   return r;
@@ -46,7 +43,7 @@ function buildRowT() {
   return r;
 }
 
-/** Row S: 1–7 | 8–15 (seat 1 @ col 5/R2, seat 7 @ col 11/R8, seat 8 @ col 15/R9) */
+/** Row S: 1–7 | 8–15 (S7 under T9 col 11; S8 under T12 col 18) */
 function buildRowS() {
   const r = row();
   for (let i = 5; i <= 11; i += 1) {

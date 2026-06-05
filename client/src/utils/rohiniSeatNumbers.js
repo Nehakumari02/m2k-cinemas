@@ -12,7 +12,7 @@ export function getRohiniSeatNumber(rowLetter, colIndex) {
 
   if (rowLetter === 'B') {
     if (colIndex >= 2 && colIndex <= 9) return 19 - colIndex;
-    if (colIndex >= 12 && colIndex <= 20) return 21 - colIndex;
+    if (colIndex >= 11 && colIndex <= 19) return 20 - colIndex;
     return null;
   }
 

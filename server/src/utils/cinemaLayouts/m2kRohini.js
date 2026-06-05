@@ -33,13 +33,13 @@ function buildRowA() {
   return r;
 }
 
-/** Row B: 17 seats — 17–10 (cols 2–9) | 9–1 (cols 12–20) with center divider */
+/** Row B: 17 seats — 17–10 (cols 2–9) | 9–1 (cols 11–19, seat 9 under row A seat 10) */
 function buildRowB() {
   const r = row();
   for (let i = 2; i <= 9; i += 1) {
     r[i] = AVAILABLE;
   }
-  for (let i = 12; i <= 20; i += 1) {
+  for (let i = 11; i <= 19; i += 1) {
     r[i] = AVAILABLE;
   }
   return r;
@@ -122,6 +122,8 @@ function buildM2kRohiniLayout() {
     name: 'M2K ROHINI',
     city: 'delhi',
     ticketPrice: 300,
+    goldPrice: 300,
+    silverPrice: 250,
     specialPrice: 480,
     layoutKey: 'm2k-venue',
     seatNumbering: 'rohini',

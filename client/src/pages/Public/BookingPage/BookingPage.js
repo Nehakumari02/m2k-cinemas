@@ -341,9 +341,15 @@ class BookingPage extends Component {
   getSelectedSeatsTicketTotal = () => {
     const { movie, cinema, selectedSeats } = this.props;
     if (!cinema || !selectedSeats.length) return 0;
+    const rowLabels = cinema.rowLabels || [];
+    const seatNumbering = cinema.seatNumbering;
     return selectedSeats.reduce((acc, [row, col]) => {
       const seatVal = cinema.seats[row][col];
-      return acc + getSeatTicketPrice(movie, cinema, seatVal);
+      const rowLabel = rowLabels[row];
+      return (
+        acc +
+        getSeatTicketPrice(movie, cinema, seatVal, rowLabel, seatNumbering)
+      );
     }, 0);
   };
 
@@ -1215,24 +1221,44 @@ class BookingPage extends Component {
                     String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura' ? 1 : 0
                   }
                   rowShiftRightLabels={
-                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
-                      ? ['B']
-                      : []
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['U']
+                      : String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
+                        ? ['B']
+                        : []
                   }
                   shiftRowLabelsRight={
                     String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
-                      ? ['U', 'T', 'S', 'R', 'Q', 'P', 'N', 'M', 'L']
-                      : []
+                      ? ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'T', 'R', 'Q', 'P', 'N', 'M', 'L']
+                      : String(cinema.name || '').trim().toLowerCase() === 'm2k rohini'
+                        ? ['A', 'B']
+                        : []
                   }
                   middleGapThreeRows={
-                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini'
                       ? ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U']
                       : []
                   }
+                  middleGapTwoRows={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K']
+                      : []
+                  }
+                  middleGapFourRows={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T']
+                      : []
+                  }
                   shiftRightPartRowsRight={
-                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini' ||
-                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini'
                       ? ['A']
+                      : String(cinema.name || '').trim().toLowerCase() === 'm2k rohini screen 2'
+                        ? ['A']
+                        : []
+                  }
+                  shiftRightPartRowsRightTwice={
+                    String(cinema.name || '').trim().toLowerCase() === 'm2k pitampura screen 2'
+                      ? ['S']
                       : []
                   }
                   centerAisle={
