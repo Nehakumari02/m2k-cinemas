@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Box, Typography, Button, TextField, MenuItem } from '@material-ui/core';
 import { calculateBookingTotals } from '../../../../../utils/bookingPricing';
+import { getCheckoutOffers, formatMembershipTiersLabel } from '../../../../../utils/offerEligibility';
 
 const useStyles = makeStyles(theme => ({
   checkoutBar: {
@@ -183,6 +184,11 @@ export default function BookingCheckout(props) {
   );
   const ticketsTotal =
     totalTicketsPrice !== undefined ? totalTicketsPrice : ticketPrice * selectedSeats;
+
+  const applicableOffers = useMemo(
+    () => getCheckoutOffers(offers, user, membershipPlans),
+    [offers, user, membershipPlans]
+  );
 
   const pricing = useMemo(
     () =>
@@ -373,9 +379,9 @@ export default function BookingCheckout(props) {
                     {isApplyingCoupon ? '...' : 'Apply'}
                   </Button>
                 </Box>
-                {offers && offers.length > 0 && (
+                {applicableOffers.length > 0 && (
                   <Box display="flex" flexWrap="wrap" gridGap={8}>
-                    {offers.filter(offer => offer.isActive && new Date(offer.validTill) > new Date()).map(offer => (
+                    {applicableOffers.map(offer => (
                       <Button
                         key={offer._id}
                         size="small"
@@ -386,9 +392,17 @@ export default function BookingCheckout(props) {
                         }}
                       >
                         {offer.code} ({offer.discountPercentage}% OFF)
+                        {offer.category === 'membership'
+                          ? ` · ${formatMembershipTiersLabel(offer.membershipTiers)}`
+                          : ''}
                       </Button>
                     ))}
                   </Box>
+                )}
+                {membershipName && applicableOffers.some(o => o.category === 'membership') && (
+                  <Typography variant="caption" style={{ color: '#b45309', fontWeight: 700 }}>
+                    Member exclusive codes are available for your {membershipName} plan.
+                  </Typography>
                 )}
               </Box>
             ) : (

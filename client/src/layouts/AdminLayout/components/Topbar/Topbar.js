@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import { logout } from '../../../../store/actions';
 import { withStyles } from '@material-ui/core/styles';
 import { Badge, Toolbar, IconButton } from '@material-ui/core';
@@ -62,8 +62,10 @@ class Topbar extends Component {
 
           <IconButton
             className={classes.notificationsButton}
-            onClick={() => console.log('Notification')}>
-            <Badge badgeContent={4} color="primary" variant="dot">
+            component={NavLink}
+            to="/admin/push-notifications"
+            aria-label="Push notifications">
+            <Badge badgeContent={0} color="primary" variant="dot">
               <NotificationsIcon />
             </Badge>
           </IconButton>
@@ -81,4 +83,4 @@ class Topbar extends Component {
 const mapStateToProps = state => ({
   auth: state.authState
 });
-export default connect(mapStateToProps, { logout })(withStyles(styles)(Topbar));
+export default connect(mapStateToProps, { logout })(withRouter(withStyles(styles)(Topbar)));

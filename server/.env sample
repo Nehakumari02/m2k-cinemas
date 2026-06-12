@@ -1,3 +1,8 @@
 GMAIL_USER = "user@gmail.com"
 GMAIL_PASSWORD = "password"
 MONGODB_URI = "mongodb://...."
+
+# Web Push (generate with: cd server && node -e "const w=require('web-push');console.log(w.generateVAPIDKeys())")
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_SUBJECT=mailto:support@m2kcinemas.com

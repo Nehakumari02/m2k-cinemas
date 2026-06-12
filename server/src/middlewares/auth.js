@@ -48,4 +48,4 @@ const staff = async (req, res, next) => {
   }
 };
 
-module.exports = { simple, enhance, staff };
+module.exports = { simple, enhance, staff, loadUserFromToken };

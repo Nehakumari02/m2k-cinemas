@@ -51,6 +51,7 @@ class AdminLayout extends Component {
           variant="persistent">
           <Sidebar className={classes.sidebar} />
         </Drawer>
+
         <main
           className={classnames({
             [classes.contentShift]: isOpen,

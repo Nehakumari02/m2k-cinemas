@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Typography, Button, Dialog, DialogContent, Slide, IconButton } from '@material-ui/core';
-import { Close, School } from '@material-ui/icons';
+import { Close, School, Star } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getOffers } from '../../../store/actions';
+import { getOffers, getMemberships } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import {
+  canUseOffer,
+  formatMembershipTiersLabel,
+  partitionOffers,
+} from '../../../utils/offerEligibility';
+import { getActiveMembership } from '../../../utils/bookingPricing';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -65,7 +71,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function OfferCard({ offer, classes, getOfferImage, formatValidTill, onSelect }) {
+function OfferCard({ offer, classes, getOfferImage, formatValidTill, onSelect, memberBadge }) {
   return (
     <div className={classes.cardContainer}>
       <div className={classes.cardInner}>
@@ -73,6 +79,22 @@ function OfferCard({ offer, classes, getOfferImage, formatValidTill, onSelect })
           <img className={classes.cardImage} src={getOfferImage(offer)} alt={offer.title} />
           <div className={classes.cardBody}>
             <div className={classes.cardBodyMain}>
+              {memberBadge ? (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginBottom: 8,
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    color: '#b45309',
+                    background: '#fff7ed',
+                    border: '1px solid #fed7aa',
+                  }}>
+                  {memberBadge}
+                </span>
+              ) : null}
               <span className={classes.codeBadge}>{offer.code}</span>
               <Typography className={classes.cardTitle}>{offer.title}</Typography>
             </div>
@@ -119,21 +141,22 @@ function OfferCard({ offer, classes, getOfferImage, formatValidTill, onSelect })
   );
 }
 
-function OffersPage({ offers: storeOffers, getOffers }) {
+function OffersPage({ offers: storeOffers, getOffers, user, membershipPlans }) {
   const classes = useStyles();
   const [selectedOffer, setSelectedOffer] = useState(null);
   const allOffers = storeOffers && storeOffers.length > 0 ? storeOffers : OFFERS;
+  const activeMembership = getActiveMembership(user, membershipPlans);
 
-  const { schoolOffers, standardOffers } = useMemo(() => {
-    const school = allOffers.filter(o => o.category === 'school_group');
-    const standard = allOffers.filter(o => o.category !== 'school_group');
-    return { schoolOffers: school, standardOffers: standard };
-  }, [allOffers]);
+  const { membershipOffers, schoolOffers, standardOffers } = useMemo(
+    () => partitionOffers(allOffers),
+    [allOffers]
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
     getOffers();
-  }, [getOffers]);
+    getMemberships();
+  }, [getOffers, getMemberships]);
 
   const getOfferImage = offer => {
     const fallback = '/images/offers/offer1.png';
@@ -154,6 +177,42 @@ function OffersPage({ offers: storeOffers, getOffers }) {
         <Typography className={classes.subtitle}>Exclusive deals to make your movie experience better</Typography>
         <div className={classes.titleAccent} />
       </div>
+
+      <div className={classes.schoolBanner} style={{ marginBottom: 24 }}>
+        <Star style={{ fontSize: 40, marginBottom: 8, color: '#f59e0b' }} />
+        <Typography className={classes.schoolBannerTitle}>M2K Membership Offers</Typography>
+        <Typography className={classes.schoolBannerText}>
+          Exclusive promo codes for Silver, Gold, and Platinum members — extra savings on top of your
+          member ticket and food discounts.
+        </Typography>
+        <Button
+          component={Link}
+          to="/membership"
+          className={classes.schoolBannerBtn}
+          variant="contained"
+          style={{ marginRight: 12 }}>
+          {activeMembership ? `You are a ${activeMembership.name} member` : 'Join membership'}
+        </Button>
+      </div>
+
+      {membershipOffers.length > 0 && (
+        <>
+          <Typography className={classes.sectionHeading}>Member exclusive offers</Typography>
+          <div className={classes.grid}>
+            {membershipOffers.map(offer => (
+              <OfferCard
+                key={offer._id || offer.id || offer.code}
+                offer={offer}
+                classes={classes}
+                getOfferImage={getOfferImage}
+                formatValidTill={formatValidTill}
+                onSelect={setSelectedOffer}
+                memberBadge={formatMembershipTiersLabel(offer.membershipTiers)}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       <div className={classes.schoolBanner}>
         <School style={{ fontSize: 40, marginBottom: 8 }} />
@@ -242,6 +301,15 @@ function OffersPage({ offers: storeOffers, getOffers }) {
                 </Typography>
               )}
 
+              {selectedOffer.category === 'membership' && (
+                <Typography variant="body2" style={{ marginBottom: 16, color: '#64748b' }}>
+                  For {formatMembershipTiersLabel(selectedOffer.membershipTiers)} only.
+                  {canUseOffer(selectedOffer, user, membershipPlans)
+                    ? ' You are eligible to use this code at checkout.'
+                    : ' Join or upgrade your M2K membership to unlock this offer.'}
+                </Typography>
+              )}
+
               <div className={classes.dialogCodeBox}>
                 <Typography className={classes.dialogCodeLabel}>Use Promo Code</Typography>
                 <Typography className={classes.dialogCodeValue}>{selectedOffer.code}</Typography>
@@ -256,6 +324,19 @@ function OffersPage({ offers: storeOffers, getOffers }) {
                   onClick={() => setSelectedOffer(null)}
                   style={{ marginBottom: 8 }}>
                   School group enquiry
+                </Button>
+              ) : null}
+
+              {selectedOffer.category === 'membership' &&
+              !canUseOffer(selectedOffer, user, membershipPlans) ? (
+                <Button
+                  fullWidth
+                  className={classes.dialogAction}
+                  component={Link}
+                  to="/membership"
+                  onClick={() => setSelectedOffer(null)}
+                  style={{ marginBottom: 8 }}>
+                  View membership plans
                 </Button>
               ) : null}
 
@@ -275,8 +356,10 @@ function OffersPage({ offers: storeOffers, getOffers }) {
   );
 }
 
-const mapStateToProps = ({ offerState }) => ({
+const mapStateToProps = ({ offerState, authState, membershipState }) => ({
   offers: offerState.offers,
+  user: authState.user,
+  membershipPlans: membershipState.memberships || [],
 });
 
-export default connect(mapStateToProps, { getOffers })(OffersPage);
+export default connect(mapStateToProps, { getOffers, getMemberships })(OffersPage);

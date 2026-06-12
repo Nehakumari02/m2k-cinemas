@@ -28,6 +28,7 @@ import SchoolIcon from '@material-ui/icons/School';
 import BusinessIcon from '@material-ui/icons/Business';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import HistoryIcon from '@material-ui/icons/History';
 // Component styles
 import styles from './styles';
@@ -257,6 +258,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Newsletter"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/push-notifications">
+            <ListItemIcon className={classes.listItemIcon}>
+              <NotificationsActiveIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Push Notifications"
             />
           </ListItem>
           <ListItem

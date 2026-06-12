@@ -38,8 +38,14 @@ const offerSchema = new Schema(
     },
     category: {
       type: String,
-      enum: ['standard', 'school_group'],
+      enum: ['standard', 'school_group', 'membership'],
       default: 'standard',
+    },
+    /** Silver / Gold / Platinum — required when category is membership */
+    membershipTiers: {
+      type: [String],
+      enum: ['Silver', 'Gold', 'Platinum'],
+      default: [],
     },
     minTickets: {
       type: Number,

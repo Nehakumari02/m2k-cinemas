@@ -25,6 +25,7 @@ const OrderList = lazy(() => import('./pages/Admin/OrderList'));
 const LoyaltySettings = lazy(() => import('./pages/Admin/LoyaltySettings/LoyaltySettings'));
 const HomeBannerSettings = lazy(() => import('./pages/Admin/HomeBannerSettings'));
 const NewsletterSubscribers = lazy(() => import('./pages/Admin/NewsletterSubscribers'));
+const PushNotifications = lazy(() => import('./pages/Admin/PushNotifications'));
 const ActivityLogs = lazy(() => import('./pages/Admin/ActivityLogs'));
 const RefundManagement = lazy(() => import('./pages/Admin/RefundManagement/RefundManagement'));
 const SchoolGroupInquiryList = lazy(() =>
@@ -414,6 +415,12 @@ const Routes = () => {
             path="/admin/newsletter-subscribers"
             layout={AdminLayout}
             component={NewsletterSubscribers}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/push-notifications"
+            layout={AdminLayout}
+            component={PushNotifications}
           />
           <ProtectedRoute
             exact

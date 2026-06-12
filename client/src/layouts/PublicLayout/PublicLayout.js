@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { logout } from '../../store/actions';
 import { Navbar, Footer, StickyFnBBar } from './components';
 import { SlideMenuShell } from './components/SlideMenu';
+import PushNotificationPrompt from '../../components/PushNotificationPrompt';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,6 +51,7 @@ function PublicLayout(props) {
         <div className={classes.content}>{children}</div>
         {withFooter && <Footer />}
         {!hideStickyFnB && <StickyFnBBar />}
+        <PushNotificationPrompt />
       </div>
     </SlideMenuShell>
   );

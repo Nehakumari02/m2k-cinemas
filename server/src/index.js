@@ -32,6 +32,7 @@ const corporateGroupInquiryRouter = require('./routes/corporateGroupInquiries');
 const membershipRouter = require('./routes/membership');
 const newsletterRouter = require('./routes/newsletter');
 const activityLogsRouter = require('./routes/activityLogs');
+const notificationsRouter = require('./routes/notifications');
 const guestLoginHandler = require('./handlers/guestLoginHandler');
 const adminAuditLog = require('./middlewares/adminAuditLog');
 
@@ -76,6 +77,7 @@ app.use(corporateGroupInquiryRouter);
 app.use(membershipRouter);
 app.use(newsletterRouter);
 app.use(activityLogsRouter);
+app.use(notificationsRouter);
 
 app.get('/health', (req, res) => {
   res.send({

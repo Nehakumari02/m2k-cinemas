@@ -2,6 +2,11 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const upload = require('../utils/multer');
 const Offer = require('../models/offer');
+const User = require('../models/user');
+const {
+  isEligibleForMembershipOffer,
+  normalizeMembershipTiers,
+} = require('../utils/membershipOffer');
 
 const router = new express.Router();
 
@@ -39,6 +44,17 @@ router.post('/offers/validate', auth.simple, async (req, res) => {
       return res.status(400).send({
         error: `This school group code requires at least ${offer.minTickets} tickets in your booking.`,
       });
+    }
+
+    if (offer.category === 'membership') {
+      const user = await User.findById(req.user._id).populate('membership');
+      if (!isEligibleForMembershipOffer(user, offer)) {
+        const tiers = normalizeMembershipTiers(offer.membershipTiers);
+        const tierLabel = tiers.length ? tiers.join(', ') : 'M2K membership';
+        return res.status(403).send({
+          error: `This offer is for ${tierLabel} members only. Join or upgrade your membership to use this code.`,
+        });
+      }
     }
 
     res.send({
@@ -87,7 +103,18 @@ router.get('/offers/:id', async (req, res) => {
 // POST create offer (admin)
 router.post('/offers', auth.enhance, async (req, res) => {
   try {
-    const offer = new Offer(req.body);
+    const payload = { ...req.body };
+    if (payload.category === 'membership') {
+      payload.membershipTiers = normalizeMembershipTiers(payload.membershipTiers);
+      if (!payload.membershipTiers.length) {
+        return res.status(400).send({
+          error: { message: 'Select at least one membership tier for member offers.' },
+        });
+      }
+    } else {
+      payload.membershipTiers = [];
+    }
+    const offer = new Offer(payload);
     await offer.save();
     res.status(201).send(offer);
   } catch (e) {
@@ -136,6 +163,7 @@ router.put('/offers/:id', auth.enhance, async (req, res) => {
     'category',
     'minTickets',
     'inquiryOnly',
+    'membershipTiers',
   ];
   const isValidOperation = updates.every(u => allowedUpdates.includes(u));
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
@@ -143,7 +171,21 @@ router.put('/offers/:id', auth.enhance, async (req, res) => {
   try {
     const offer = await Offer.findById(_id);
     if (!offer) return res.sendStatus(404);
-    updates.forEach(u => (offer[u] = req.body[u]));
+    updates.forEach(u => {
+      if (u === 'membershipTiers') {
+        offer.membershipTiers = normalizeMembershipTiers(req.body.membershipTiers);
+        return;
+      }
+      offer[u] = req.body[u];
+    });
+    if (offer.category === 'membership' && !offer.membershipTiers.length) {
+      return res.status(400).send({
+        error: { message: 'Select at least one membership tier for member offers.' },
+      });
+    }
+    if (offer.category !== 'membership') {
+      offer.membershipTiers = [];
+    }
     await offer.save();
     res.send(offer);
   } catch (e) {

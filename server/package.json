@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "generate:vapid": "node -e \"const w=require('web-push');console.log(w.generateVAPIDKeys())\"",
     "seed:pitampura": "node src/db/seedM2kPitampura.js",
     "seed:rohini": "node src/db/seedM2kRohini.js",
     "seed:rohini-screen2": "node src/db/seedM2kRohiniScreen2.js",
@@ -26,7 +27,8 @@
     "nodemailer": "^6.3.1",
     "nodemon": "^1.18.11",
     "qrcode": "^1.4.4",
-    "validator": "^10.11.0"
+    "validator": "^10.11.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "dotenv": "^8.6.0"

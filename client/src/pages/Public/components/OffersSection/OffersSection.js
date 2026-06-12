@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getOffers } from '../../../../store/actions';
 import { normalizeImage } from '../../../../utils/imageUrl';
+import { formatMembershipTiersLabel, isMembershipOffer } from '../../../../utils/offerEligibility';
 
 const useStyles = makeStyles(theme => ({
   '@keyframes pulse': {
@@ -407,6 +408,22 @@ function OffersSection({ offers: storeOffers, getOffers }) {
                     />
                     <div className={classes.cardBody}>
                       <div className={classes.cardBodyMain}>
+                        {isMembershipOffer(offer) ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              marginBottom: 8,
+                              padding: '2px 8px',
+                              borderRadius: 6,
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              color: '#b45309',
+                              background: '#fff7ed',
+                              border: '1px solid #fed7aa',
+                            }}>
+                            {formatMembershipTiersLabel(offer.membershipTiers)}
+                          </span>
+                        ) : null}
                         <span className={classes.codeBadge}>{offer.code}</span>
                         <Typography className={classes.cardTitle}>{offer.title}</Typography>
                       </div>
@@ -441,6 +458,22 @@ function OffersSection({ offers: storeOffers, getOffers }) {
                     />
                     <div className={classes.cardBody}>
                       <div className={classes.cardBodyMain}>
+                        {isMembershipOffer(offer) ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              marginBottom: 8,
+                              padding: '2px 8px',
+                              borderRadius: 6,
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              color: '#b45309',
+                              background: '#fff7ed',
+                              border: '1px solid #fed7aa',
+                            }}>
+                            {formatMembershipTiersLabel(offer.membershipTiers)}
+                          </span>
+                        ) : null}
                         <span className={classes.codeBadge}>{offer.code}</span>
                         <Typography className={classes.cardTitle}>{offer.title}</Typography>
                       </div>
@@ -479,6 +512,12 @@ function OffersSection({ offers: storeOffers, getOffers }) {
             <DialogContent className={classes.dialogContent}>
               <Typography className={classes.dialogTitle}>{selectedOffer.title}</Typography>
               <Typography className={classes.dialogDesc}>{selectedOffer.description}</Typography>
+
+              {isMembershipOffer(selectedOffer) && (
+                <Typography variant="body2" style={{ marginBottom: 16, color: '#64748b' }}>
+                  Exclusive for {formatMembershipTiersLabel(selectedOffer.membershipTiers)}.
+                </Typography>
+              )}
 
               <div className={classes.dialogCodeBox}>
                 <Typography className={classes.dialogCodeLabel}>Use Promo Code</Typography>

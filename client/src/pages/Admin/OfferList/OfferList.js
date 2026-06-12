@@ -24,6 +24,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormGroup,
+  Checkbox,
+  FormHelperText,
 } from '@material-ui/core';
 import { Add, Edit, Delete, LocalOffer, PhotoCamera } from '@material-ui/icons';
 import {
@@ -34,6 +37,7 @@ import {
   removeOffer,
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import { MEMBERSHIP_TIERS } from '../../../utils/offerEligibility';
 
 const styles = theme => ({
   root: {
@@ -211,6 +215,7 @@ const EMPTY_FORM = {
   discountPercentage: 10,
   minTickets: 0,
   inquiryOnly: false,
+  membershipTiers: [],
 };
 
 class OfferList extends Component {
@@ -252,6 +257,7 @@ class OfferList extends Component {
         discountPercentage: offer.discountPercentage ?? 10,
         minTickets: offer.minTickets ?? 0,
         inquiryOnly: Boolean(offer.inquiryOnly),
+        membershipTiers: offer.membershipTiers || [],
       },
       imageFile: null,
       imagePreview: offer.image || null,
@@ -266,8 +272,25 @@ class OfferList extends Component {
   handleChange = e => {
     const { name, value, type, checked } = e.target;
     this.setState(prev => ({
-      form: { ...prev.form, [name]: type === 'checkbox' ? checked : value },
+      form: {
+        ...prev.form,
+        [name]: type === 'checkbox' ? checked : value,
+        ...(name === 'category' && value !== 'membership' ? { membershipTiers: [] } : {}),
+        ...(name === 'category' && value === 'membership' && !prev.form.membershipTiers.length
+          ? { membershipTiers: ['Silver'] }
+          : {}),
+      },
     }));
+  };
+
+  handleMembershipTierToggle = tier => {
+    this.setState(prev => {
+      const current = prev.form.membershipTiers || [];
+      const next = current.includes(tier)
+        ? current.filter(t => t !== tier)
+        : [...current, tier];
+      return { form: { ...prev.form, membershipTiers: next } };
+    });
   };
 
   handleImage = e => {
@@ -288,6 +311,7 @@ class OfferList extends Component {
       ...form,
       discountPercentage: Number(form.discountPercentage) || 0,
       minTickets: Number(form.minTickets) || 0,
+      membershipTiers: form.category === 'membership' ? form.membershipTiers || [] : [],
     };
     let result;
     if (isEditing) {
@@ -361,6 +385,23 @@ class OfferList extends Component {
                         variant="outlined"
                       />
                     </div>
+                    {offer.category === 'membership' && (
+                      <Chip
+                        label={
+                          offer.membershipTiers?.length
+                            ? `${offer.membershipTiers.join(', ')} members`
+                            : 'Membership'
+                        }
+                        size="small"
+                        style={{
+                          marginBottom: 8,
+                          color: '#f59e0b',
+                          borderColor: 'rgba(245,158,11,0.4)',
+                          backgroundColor: 'rgba(245,158,11,0.1)',
+                        }}
+                        variant="outlined"
+                      />
+                    )}
                     {offer.category === 'school_group' && (
                       <Chip
                         label="School group"
@@ -467,8 +508,34 @@ class OfferList extends Component {
                 label="Offer type">
                 <MenuItem value="standard">Standard (checkout coupon)</MenuItem>
                 <MenuItem value="school_group">School group booking</MenuItem>
+                <MenuItem value="membership">Membership exclusive</MenuItem>
               </Select>
             </FormControl>
+            {form.category === 'membership' && (
+              <FormControl component="fieldset" className={classes.input}>
+                <Typography variant="subtitle2" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 8 }}>
+                  Eligible membership tiers *
+                </Typography>
+                <FormGroup row>
+                  {MEMBERSHIP_TIERS.map(tier => (
+                    <FormControlLabel
+                      key={tier}
+                      control={
+                        <Checkbox
+                          checked={(form.membershipTiers || []).includes(tier)}
+                          onChange={() => this.handleMembershipTierToggle(tier)}
+                          color="primary"
+                        />
+                      }
+                      label={<span className={classes.toggleLabel}>{tier}</span>}
+                    />
+                  ))}
+                </FormGroup>
+                <FormHelperText style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Only active members in the selected tiers can apply this code at checkout.
+                </FormHelperText>
+              </FormControl>
+            )}
             <TextField
               label="Discount %"
               name="discountPercentage"
@@ -540,7 +607,13 @@ class OfferList extends Component {
             <Button
               onClick={this.handleSave}
               className={classes.saveBtn}
-              disabled={saving || !form.title || !form.code || !form.validTill}
+              disabled={
+                saving ||
+                !form.title ||
+                !form.code ||
+                !form.validTill ||
+                (form.category === 'membership' && !(form.membershipTiers || []).length)
+              }
               variant="contained">
               {saving ? <CircularProgress size={20} color="inherit" /> : isEditing ? 'Save Changes' : 'Create Offer'}
             </Button>

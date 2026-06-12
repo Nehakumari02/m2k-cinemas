@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  Divider, 
-  Typography, 
-  Grid, 
-  Container, 
-  TextField, 
-  Button, 
+import {
+  Divider,
+  Typography,
+  Grid,
+  Container,
+  TextField,
+  Button,
   Box,
   IconButton
 } from '@material-ui/core';
@@ -186,7 +186,7 @@ export default function Footer() {
                   <TextField
                     variant="outlined"
                     placeholder="Mobile Number"
-                    size="small" 
+                    size="small"
                     fullWidth
                     type="tel"
                     value={mobile}
