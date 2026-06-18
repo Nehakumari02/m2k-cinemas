@@ -6,14 +6,14 @@ export default (theme) => ({
   },
   hero: {
     position: 'relative',
-    height: '500px',
+    height: 'auto',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     textAlign: 'center',
     color: '#fff',
+    marginTop: theme.spacing(10),
     marginBottom: theme.spacing(6),
-    overflow: 'hidden'
   },
   videoBackground: {
     position: 'absolute',
@@ -64,7 +64,7 @@ export default (theme) => ({
     }
   },
   container: {
-    marginTop: theme.spacing(-10),
+    marginTop: theme.spacing(4),
     position: 'relative',
     zIndex: 2
   },

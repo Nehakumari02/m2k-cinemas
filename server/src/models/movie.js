@@ -11,6 +11,12 @@ const movieSchema = new Schema({
   image: {
     type: String,
   },
+  trailerUrl: {
+    type: String,
+    required: false,
+    trim: true,
+    default: '',
+  },
   backdropImages: [
     {
       type: String,

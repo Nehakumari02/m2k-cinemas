@@ -157,6 +157,9 @@ export default function Footer() {
               <li style={{ marginBottom: 6 }}>
                 <Link to="/privacy-policy" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</Link>
               </li>
+              <li style={{ marginBottom: 6 }}>
+                <Link to="/feedback" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem' }}>Feedback</Link>
+              </li>
             </ul>
           </Grid>
 

@@ -6,7 +6,7 @@ const upload = require('../utils/multer');
 const router = new express.Router();
 
 // Upload food image
-router.post('/food/upload', auth.enhance, upload('food').single('image'), async (req, res) => {
+router.post('/food/upload', auth.staff, upload('food').single('image'), async (req, res) => {
   try {
     const url = `/uploads/food/${req.file.filename}`;
     res.send({ url });
@@ -16,7 +16,7 @@ router.post('/food/upload', auth.enhance, upload('food').single('image'), async 
 });
 
 // Create food
-router.post('/food', auth.enhance, async (req, res) => {
+router.post('/food', auth.staff, async (req, res) => {
   const food = new Food(req.body);
   try {
     await food.save();
@@ -49,7 +49,7 @@ router.get('/food/:id', async (req, res) => {
 });
 
 // Update food
-router.patch('/food/:id', auth.enhance, async (req, res) => {
+router.patch('/food/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'category', 'description', 'price', 'image', 'type', 'isWeeklyOffer', 'isMonthlyOffer'];
@@ -69,7 +69,7 @@ router.patch('/food/:id', auth.enhance, async (req, res) => {
 });
 
 // Delete food
-router.delete('/food/:id', auth.enhance, async (req, res) => {
+router.delete('/food/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   try {
     const food = await Food.findByIdAndDelete(_id);

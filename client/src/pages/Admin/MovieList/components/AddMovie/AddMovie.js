@@ -61,7 +61,8 @@ class AddMovie extends Component {
     isPublished: true,
     format: '2D',
     certificate: '',
-    languages: ''
+    languages: '',
+    trailerUrl: ''
   };
 
   componentDidMount() {
@@ -84,7 +85,8 @@ class AddMovie extends Component {
         isPublished,
         format,
         certificate,
-        languages
+        languages,
+        trailerUrl
       } = this.props.edit;
       const castMembers = Array.isArray(castCrew)
         ? castCrew.filter(item => String(item.role || '').toLowerCase() === 'cast')
@@ -111,6 +113,7 @@ class AddMovie extends Component {
         format: format || '2D',
         certificate: certificate || '',
         languages: languages || '',
+        trailerUrl: trailerUrl || '',
         releaseDate: releaseDate || new Date(),
         backdropImages: Array.isArray(this.props.edit.backdropImages)
           ? this.props.edit.backdropImages
@@ -162,6 +165,7 @@ class AddMovie extends Component {
       format,
       certificate,
       languages,
+      trailerUrl,
       image
     } = this.state;
     const castCrew = [
@@ -188,7 +192,8 @@ class AddMovie extends Component {
       isPublished,
       format,
       certificate,
-      languages
+      languages,
+      trailerUrl
     };
     this.props.addMovie(image, movie, backdropFiles, [...castFiles, ...crewFiles]);
   };
@@ -217,6 +222,7 @@ class AddMovie extends Component {
       format,
       certificate,
       languages,
+      trailerUrl,
       backdropImages,
       image
     } = this.state;
@@ -252,7 +258,8 @@ class AddMovie extends Component {
       isPublished,
       format,
       certificate,
-      languages
+      languages,
+      trailerUrl
     };
     this.props.updateMovie(
       this.props.edit._id,
@@ -342,7 +349,8 @@ class AddMovie extends Component {
       isPublished,
       format,
       certificate,
-      languages
+      languages,
+      trailerUrl
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
@@ -552,6 +560,17 @@ class AddMovie extends Component {
                   size="small"
                   value={contentWarning}
                   onChange={e => this.handleFieldChange('contentWarning', e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Trailer URL (Optional)"
+                  placeholder="e.g. YouTube link or .mp4 URL"
+                  variant="outlined"
+                  size="small"
+                  value={trailerUrl}
+                  onChange={e => this.handleFieldChange('trailerUrl', e.target.value)}
                 />
               </Grid>
             </Grid>

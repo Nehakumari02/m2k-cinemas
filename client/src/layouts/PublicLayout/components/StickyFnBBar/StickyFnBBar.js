@@ -6,6 +6,7 @@ import FastfoodIcon from '@material-ui/icons/Fastfood';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import { MovieBookingModals } from '../../../../components';
 import useMovieBookingFlow from '../../../../hooks/useMovieBookingFlow';
+import foodBg from '../../../../assets/food-bg.png';
 
 const useStyles = makeStyles(theme => ({
   wrap: {
@@ -35,16 +36,27 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     textDecoration: 'none',
     position: 'relative',
-    background: 'linear-gradient(180deg, #bc70a3 0%, #7d1c5d 100%)',
+    background: `url(${foodBg}) center center / cover no-repeat`,
     padding: theme.spacing(1.75, 2),
     transition: 'filter 0.2s ease, transform 0.15s ease',
+    overflow: 'hidden',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay for text readability
+      transition: 'background-color 0.2s ease',
+      zIndex: 1,
+    },
     '&:hover': {
-      filter: 'brightness(1.05)',
       transform: 'scale(1.02)',
+      '&::before': {
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Lighten on hover
+      },
     },
   },
   fnbLabel: {
-    color: '#0f172a',
+    color: '#ffffff',
     fontWeight: 800,
     fontSize: '0.82rem',
     letterSpacing: '0.04em',
@@ -52,6 +64,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     gap: 6,
+    position: 'relative',
+    zIndex: 2,
   },
   secondaryLink: {
     flex: 1,
@@ -111,15 +125,10 @@ function StickyFnBBar({ foodCartCount, selectedMovie }) {
   return (
     <div className={classes.wrap} role="navigation" aria-label="Quick actions">
       <Link to="/food-combos" className={classes.fnbLink}>
-        <Badge
-          badgeContent={itemCount > 0 ? itemCount : null}
-          className={classes.cartBadge}
-          overlap="rectangular">
-          <span className={classes.fnbLabel}>
-            <FastfoodIcon fontSize="small" />
-            Order F&amp;B
-          </span>
-        </Badge>
+        <span className={classes.fnbLabel}>
+          <FastfoodIcon fontSize="small" />
+          Order F&amp;B
+        </span>
       </Link>
       {isMoviePage ? (
         <Button 

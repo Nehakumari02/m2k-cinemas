@@ -197,6 +197,7 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'format',
     'certificate',
     'languages',
+    'trailerUrl',
   ];
   const sanitizedBody = Object.keys(req.body || {}).reduce((acc, key) => {
     if (allowedUpdates.includes(key)) {

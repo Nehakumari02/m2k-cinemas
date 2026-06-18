@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Banner Manager – M2K Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0e0e14;
+      color: #fff;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+    p.sub { color: rgba(255,255,255,0.45); font-size: 0.9rem; margin-bottom: 32px; }
+    .card {
+      background: #1a1a24;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 900px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: #b72429; color: #fff; }
+    .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+    .msg {
+      display: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+    .msg.success { background: rgba(34,197,94,0.12); border: 1px solid #22c55e; color: #22c55e; display:block; }
+    .msg.error   { background: rgba(239,68,68,0.12);  border: 1px solid #ef4444; color: #ef4444;  display:block; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+      gap: 14px;
+    }
+    .slide {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .slide img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+    .slide .label {
+      background: rgba(0,0,0,0.55);
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.55);
+    }
+    .del-btn {
+      position: absolute;
+      top: 6px; right: 6px;
+      background: rgba(0,0,0,0.75);
+      color: #ef4444;
+      border: none;
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.9rem;
+    }
+    a.back { color: rgba(255,255,255,0.4); font-size: 0.85rem; text-decoration: none; display:inline-block; margin-bottom: 24px; }
+    a.back:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<a href="javascript:history.back()" class="back">← Back to Admin</a>
+<h1>📸 Food Page Banners</h1>
+<p class="sub">Images uploaded here will appear as a sliding banner on the public Food &amp; Combos page.</p>
+
+<div class="card">
+  <div id="msg" class="msg"></div>
+
+  <div class="toolbar">
+    <label>
+      <button class="btn-outline" onclick="document.getElementById('fileInput').click()">⬆ Upload Images</button>
+    </label>
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleUpload(this)" />
+    <button class="btn-primary" id="saveBtn" onclick="handleSave()">💾 Save Banners</button>
+    <span id="uploadStatus" style="color:rgba(255,255,255,0.4); font-size:0.85rem;"></span>
+  </div>
+
+  <div id="grid" class="grid"><div class="empty">No banners yet. Upload images above.</div></div>
+</div>
+
+<script>
+  let banners = [];
+
+  // Load existing banners
+  fetch('/food-banners')
+    .then(r => r.json())
+    .then(d => {
+      banners = Array.isArray(d.banners) ? d.banners : [];
+      renderGrid();
+    })
+    .catch(() => renderGrid());
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    if (banners.length === 0) {
+      grid.innerHTML = '<div class="empty">No banners yet. Upload images above.</div>';
+      return;
+    }
+    grid.innerHTML = banners.map((b, i) => `
+      <div class="slide">
+        <img src="${b.imageUrl}" alt="Slide ${i+1}" />
+        <div class="label">Slide ${i+1}</div>
+        <button class="del-btn" onclick="deleteBanner(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function deleteBanner(idx) {
+    banners.splice(idx, 1);
+    renderGrid();
+    showMsg('', '');
+  }
+
+  async function handleUpload(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    document.getElementById('uploadStatus').textContent = 'Uploading…';
+
+    for (const file of files) {
+      const form = new FormData();
+      form.append('image', file);
+      try {
+        const res = await fetch('/food-banners/upload', { method: 'POST', body: form });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          banners.push({ imageUrl: data.url });
+        } else {
+          showMsg('error', 'Upload failed: ' + (data.error || res.statusText));
+        }
+      } catch (e) {
+        showMsg('error', 'Upload error: ' + e.message);
+      }
+    }
+
+    document.getElementById('uploadStatus').textContent = '';
+    input.value = '';
+    renderGrid();
+  }
+
+  async function handleSave() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    showMsg('', '');
+
+    try {
+      const res = await fetch('/food-banners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banners })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg('success', '✓ Saved! ' + data.count + ' banner(s) are now live on the Food & Combos page.');
+      } else {
+        showMsg('error', 'Save failed: ' + (data.error || res.statusText));
+      }
+    } catch (e) {
+      showMsg('error', 'Error: ' + e.message);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '💾 Save Banners';
+  }
+
+  function showMsg(type, text) {
+    const el = document.getElementById('msg');
+    el.className = 'msg ' + type;
+    el.textContent = text;
+    if (!type) el.style.display = 'none';
+  }
+</script>
+</body>
+</html>

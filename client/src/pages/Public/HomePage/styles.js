@@ -15,7 +15,7 @@ export default theme => ({
     }
   },
   customHero: {
-    minHeight: '68vh',
+    minHeight: '45vh',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
@@ -62,6 +62,28 @@ export default theme => ({
     borderRadius: 10,
     padding: '10px 18px',
     fontWeight: 700,
+  },
+  trailerVideoWrapper: {
+    position: 'absolute',
+    right: '8%',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    zIndex: 3,
+    width: 400,
+    height: 225,
+    borderRadius: '16px',
+    overflow: 'hidden',
+    boxShadow: '0 25px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)',
+    border: '2px solid rgba(255,255,255,0.06)',
+    background: '#000',
+    transition: 'transform 0.4s ease, box-shadow 0.4s ease',
+    '&:hover': {
+      transform: 'translateY(-50%) scale(1.03)',
+      boxShadow: '0 30px 70px rgba(0,0,0,0.8), 0 0 30px rgba(183,36,41,0.15)',
+    },
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
+    },
   },
 
   /* ── Section Tabs ─────────────────────────── */

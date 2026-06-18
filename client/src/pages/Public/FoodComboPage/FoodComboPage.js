@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import { makeStyles } from '@material-ui/styles';
 import {
   Typography,
@@ -26,6 +29,7 @@ const useStyles = makeStyles(styles);
 const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoodCartQuantity }) => {
   const classes = useStyles();
   const [activeCategory, setActiveCategory] = React.useState('All');
+  const [banners, setBanners] = React.useState([]);
   const { food, loading } = foodState;
 
   const today = new Date();
@@ -38,6 +42,15 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
   useEffect(() => {
     window.scrollTo(0, 0);
     getFood();
+
+    fetch('/food-banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data.banners)) {
+          setBanners(data.banners);
+        }
+      })
+      .catch(err => console.error('Error fetching food banners', err));
   }, [getFood]);
 
   const getQty = itemId => {
@@ -60,15 +73,40 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
   return (
     <div className={classes.root}>
       <div className={classes.hero}>
-        <video autoPlay loop muted playsInline className={classes.videoBackground}>
-          <source src="/videos/food-banner.mp4" type="video/mp4" />
-        </video>
-        <div className={classes.heroOverlay} />
-        <div className={classes.heroContent}>
-          <Container maxWidth="md">
-
-          </Container>
-        </div>
+        {banners.length > 0 ? (
+          <Slider
+            autoplay
+            autoplaySpeed={3500}
+            infinite
+            arrows={false}
+            dots
+            style={{ width: '100%', height: 'auto' }}
+          >
+            {banners.map((banner, idx) => (
+              <div key={idx} style={{ outline: 'none' }}>
+                <img
+                  src={normalizeImage(banner.imageUrl)}
+                  alt={`Banner ${idx}`}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: '300px',
+              background: 'linear-gradient(135deg, #1a0a0a 0%, #2d0e0e 40%, #1a1a24 100%)',
+            }}
+          />
+        )}
+        <div className={classes.heroOverlay} style={{ pointerEvents: 'none', backgroundColor: 'transparent' }} />
       </div>
 
       <Container maxWidth="lg" className={classes.container} style={{ paddingBottom: cartCount > 0 ? 100 : undefined }}>
@@ -110,7 +148,7 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
               .map(item => {
                 const qty = getQty(item._id);
                 return (
-                  <Grid item key={item._id} xs={12} sm={6} md={4}>
+                  <Grid item key={item._id} xs={12} sm={6} md={3}>
                     <Card className={classes.card}>
                       <div
                         className={classes.media}

@@ -34,6 +34,7 @@ const SchoolGroupInquiryList = lazy(() =>
 const CorporateGroupInquiryList = lazy(() =>
   import('./pages/Admin/CorporateGroupInquiryList')
 );
+const FeedbackList = lazy(() => import('./pages/Admin/FeedbackList/FeedbackList'));
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -72,6 +73,7 @@ const TermsConditionsPage = lazy(() => import('./pages/Public/TermsConditionsPag
 const ShopPage = lazy(() => import('./pages/Public/ShopPage'));
 const CartPage = lazy(() => import('./pages/Public/CartPage'));
 const MerchCheckoutPage = lazy(() => import('./pages/Public/MerchCheckoutPage'));
+const FeedbackPage = lazy(() => import('./pages/Public/FeedbackPage/FeedbackPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
 const WishlistPage = lazy(() => import('./pages/Public/WishlistPage/WishlistPage'));
@@ -145,6 +147,12 @@ const Routes = () => {
             path="/showtimings"
             layout={PublicLayout}
             component={ShowtimingsPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/feedback"
+            layout={PublicLayout}
+            component={FeedbackPage}
           />
           <WithLayoutRoute
             exact
@@ -439,6 +447,12 @@ const Routes = () => {
             path="/admin/refunds"
             layout={AdminLayout}
             component={RefundManagement}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/feedbacks"
+            layout={AdminLayout}
+            component={FeedbackList}
           />
           <Route path="*" component={() => '404 NOT FOUND'} />
         </Switch>

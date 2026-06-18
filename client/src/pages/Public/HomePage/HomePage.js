@@ -23,6 +23,7 @@ import { filterPrimaryCinemas } from '../../../utils/cinemaListing';
 import styles from './styles';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import ReactPlayer from 'react-player';
 
 class HomePage extends Component {
   state = { activeTab: 'nowShowing', homeBanner: null };
@@ -123,43 +124,63 @@ class HomePage extends Component {
       <Fragment>
         {/* ── Hero Banner ── */}
         <div className={classes.heroCarousel}>
-          {homeBanner && homeBanner.enabled && homeBanner.imageUrl ? (
-            <div className={classes.customHero}>
-              <div
-                className={classes.customHeroBackdrop}
-                style={{ backgroundImage: `url("${homeBanner.imageUrl}")` }}
-              />
-              <div className={classes.customHeroOverlay} />
-              <div className={classes.customHeroContent}>
-                <Typography className={classes.customHeroTitle} variant="h2">
-                  {homeBanner.title || 'Welcome to M2K Cinemas'}
-                </Typography>
-                {!!homeBanner.subtitle && (
-                  <Typography className={classes.customHeroSubtitle} variant="body1">
-                    {homeBanner.subtitle}
-                  </Typography>
-                )}
-                {!!homeBanner.ctaText && !!homeBanner.ctaLink && (
-                  <Link className={classes.customHeroCta} to={homeBanner.ctaLink}>
-                    {homeBanner.ctaText}
-                  </Link>
-                )}
-              </div>
-            </div>
+          {homeBanner && homeBanner.enabled && homeBanner.banners && homeBanner.banners.length ? (
+            <Slider {...heroSettings}>
+              {homeBanner.banners.map((banner, idx) => (
+                <div key={idx}>
+                  <div className={classes.customHero}>
+                    <div
+                      className={classes.customHeroBackdrop}
+                      style={{ backgroundImage: `url("${banner.imageUrl}")` }}
+                    />
+                    <div className={classes.customHeroOverlay} />
+                    <div className={classes.customHeroContent}>
+                      <Typography className={classes.customHeroTitle} variant="h2">
+                        {banner.title || 'Welcome to M2K Cinemas'}
+                      </Typography>
+                      {!!banner.subtitle && (
+                        <Typography className={classes.customHeroSubtitle} variant="body1">
+                          {banner.subtitle}
+                        </Typography>
+                      )}
+                      {!!banner.ctaText && !!banner.ctaLink && (
+                        <Link className={classes.customHeroCta} to={banner.ctaLink}>
+                          {banner.ctaText}
+                        </Link>
+                      )}
+                    </div>
+                    {banner.videoUrl && (
+                      <div className={classes.trailerVideoWrapper}>
+                        <ReactPlayer
+                          url={banner.videoUrl}
+                          playing={true}
+                          muted={true}
+                          loop={true}
+                          controls={false}
+                          width="100%"
+                          height="100%"
+                          style={{ pointerEvents: 'none' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </Slider>
           ) : heroItems.length ? (
             <Slider {...heroSettings}>
               {heroItems.map((item, idx) => (
                 <div key={item.data._id || idx}>
                   {item.type === 'movie' ? (
-                    <MovieBanner movie={item.data} height="68vh" />
+                    <MovieBanner movie={item.data} height="45vh" />
                   ) : (
-                    <OfferBanner offer={item.data} height="68vh" />
+                    <OfferBanner offer={item.data} height="45vh" />
                   )}
                 </div>
               ))}
             </Slider>
           ) : (
-            <MovieBanner movie={randomMovie} height="68vh" />
+            <MovieBanner movie={randomMovie} height="45vh" />
           )}
         </div>
 

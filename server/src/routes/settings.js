@@ -26,12 +26,13 @@ router.get('/settings/:key', async (req, res) => {
 });
 
 // UPDATE or CREATE setting (Admin only)
-router.post('/settings', auth.enhance, async (req, res) => {
+router.post('/settings', auth.staff, async (req, res) => {
   const { key, value } = req.body;
   try {
     let setting = await Setting.findOne({ key });
     if (setting) {
       setting.value = value;
+      setting.markModified('value');
     } else {
       setting = new Setting({ key, value });
     }
@@ -45,7 +46,7 @@ router.post('/settings', auth.enhance, async (req, res) => {
 // Upload home page banner image (Admin only)
 router.post(
   '/settings/home-banner/upload',
-  auth.enhance,
+  auth.staff,
   upload('settings').single('file'),
   async (req, res) => {
     try {

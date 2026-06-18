@@ -20,11 +20,15 @@ import {
   MenuItem,
   Chip,
   FormControlLabel,
-  Switch
+  Switch,
+  Collapse,
+  Box,
+  Paper
 } from '@material-ui/core';
-import { Add, Edit, Delete, Fastfood } from '@material-ui/icons';
+import { Add, Edit, Delete, Fastfood, CloudUpload as CloudUploadIcon, ExpandLess, ExpandMore, Delete as DeleteIcon } from '@material-ui/icons';
 import { getFood, addFood, removeFood, updateFood, uploadFoodImage } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 
 const styles = theme => ({
   root: {
@@ -37,7 +41,7 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing(4),
+    marginBottom: theme.spacing(3),
   },
   titleBlock: {
     display: 'flex',
@@ -60,6 +64,33 @@ const styles = theme => ({
     borderRadius: '10px',
     padding: '10px 24px',
     '&:hover': { backgroundColor: '#9a1e22' },
+  },
+  manageBannersBtn: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: '#fff',
+    fontWeight: 700,
+    borderRadius: '10px',
+    padding: '10px 24px',
+    marginRight: theme.spacing(2),
+    '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' },
+  },
+  bannerPanel: {
+    backgroundColor: '#1a1a24',
+    borderRadius: 14,
+    border: '1px solid rgba(255,255,255,0.09)',
+    marginBottom: theme.spacing(3),
+    overflow: 'hidden',
+  },
+  bannerPanelHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 20px',
+    cursor: 'pointer',
+    borderBottom: '1px solid rgba(255,255,255,0.07)',
+  },
+  bannerPanelBody: {
+    padding: '20px',
   },
   card: {
     backgroundColor: '#1a1a24',
@@ -179,13 +210,21 @@ class FoodList extends Component {
     selectedId: null,
     saving: false,
     uploading: false,
-    deleteConfirm: null
+    deleteConfirm: null,
+    // Banner panel state (inline, no dialog)
+    bannerPanelOpen: false,
+    banners: [],
+    bannerLoading: false,
+    bannerSaving: false,
+    bannerUploading: false,
+    bannerStatus: null,
   };
 
   componentDidMount() {
     this.props.getFood();
   }
 
+  // ─── Food item methods ───────────────────────────────────────────────────────
   openAdd = () => {
     this.setState({ dialogOpen: true, form: EMPTY_FORM, isEdit: false, selectedId: null });
   };
@@ -222,7 +261,6 @@ class FoodList extends Component {
   handleFileChange = async e => {
     const file = e.target.files[0];
     if (!file) return;
-
     this.setState({ uploading: true });
     const result = await this.props.uploadFoodImage(file);
     if (result && result.status === 'success') {
@@ -238,14 +276,12 @@ class FoodList extends Component {
   handleSave = async () => {
     const { form, isEdit, selectedId } = this.state;
     this.setState({ saving: true });
-    
     let result;
     if (isEdit) {
       result = await this.props.updateFood(selectedId, form);
     } else {
       result = await this.props.addFood(form);
     }
-
     this.setState({ saving: false });
     if (result && result.status === 'success') this.closeDialog();
   };
@@ -255,9 +291,85 @@ class FoodList extends Component {
     this.setState({ deleteConfirm: null });
   };
 
+  // ─── Banner panel methods ────────────────────────────────────────────────────
+  toggleBannerPanel = async () => {
+    const opening = !this.state.bannerPanelOpen;
+    this.setState({ bannerPanelOpen: opening, bannerStatus: null });
+    if (opening && this.state.banners.length === 0) {
+      this.setState({ bannerLoading: true });
+      try {
+        const res = await fetch('/food-banners');
+        const data = await res.json();
+        this.setState({ banners: Array.isArray(data.banners) ? data.banners : [] });
+      } catch (e) {
+        this.setState({ banners: [] });
+      } finally {
+        this.setState({ bannerLoading: false });
+      }
+    }
+  };
+
+  handleBannerUpload = async e => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    this.setState({ bannerUploading: true, bannerStatus: null });
+    const uploaded = [];
+    for (const file of files) {
+      const form = new FormData();
+      form.append('image', file);
+      try {
+        const res = await fetch('/food-banners/upload', { method: 'POST', body: form });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          uploaded.push({ imageUrl: data.url });
+        } else {
+          this.setState({ bannerStatus: { type: 'error', msg: `Upload failed: ${data.error || res.statusText}` } });
+        }
+      } catch (err) {
+        this.setState({ bannerStatus: { type: 'error', msg: `Upload error: ${err.message}` } });
+      }
+    }
+    this.setState(prev => ({
+      banners: [...prev.banners, ...uploaded],
+      bannerUploading: false,
+    }));
+    e.target.value = '';
+  };
+
+  handleBannerDelete = idx => {
+    this.setState(prev => ({
+      banners: prev.banners.filter((_, i) => i !== idx),
+      bannerStatus: null,
+    }));
+  };
+
+  handleBannerSave = async () => {
+    this.setState({ bannerSaving: true, bannerStatus: null });
+    try {
+      const res = await fetch('/food-banners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banners: this.state.banners }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        this.setState({ bannerStatus: { type: 'success', msg: `✓ Saved! ${data.count} banner(s) are now live.` } });
+      } else {
+        this.setState({ bannerStatus: { type: 'error', msg: `Save failed: ${data.error || res.statusText}` } });
+      }
+    } catch (err) {
+      this.setState({ bannerStatus: { type: 'error', msg: `Error: ${err.message}` } });
+    } finally {
+      this.setState({ bannerSaving: false });
+    }
+  };
+
   render() {
     const { classes, food } = this.props;
-    const { dialogOpen, form, saving, uploading, isEdit, deleteConfirm } = this.state;
+    const {
+      dialogOpen, form, saving, uploading, isEdit, deleteConfirm,
+      bannerPanelOpen, banners, bannerLoading, bannerSaving, bannerUploading, bannerStatus,
+    } = this.state;
 
     return (
       <div className={classes.root}>
@@ -266,11 +378,142 @@ class FoodList extends Component {
             <Fastfood className={classes.titleIcon} />
             <Typography className={classes.pageTitle}>Manage Food & Combos</Typography>
           </div>
-          <Button className={classes.addBtn} startIcon={<Add />} onClick={this.openAdd}>
-            Add Food Item
-          </Button>
+          <div>
+            <Button
+              className={classes.manageBannersBtn}
+              startIcon={<PhotoLibraryIcon />}
+              onClick={this.toggleBannerPanel}
+              endIcon={bannerPanelOpen ? <ExpandLess /> : <ExpandMore />}
+            >
+              Manage Banners
+            </Button>
+            <Button className={classes.addBtn} startIcon={<Add />} onClick={this.openAdd}>
+              Add Food Item
+            </Button>
+          </div>
         </div>
 
+        {/* ── Inline Banner Panel ── */}
+        <Collapse in={bannerPanelOpen}>
+          <Paper className={classes.bannerPanel} elevation={0}>
+            <div className={classes.bannerPanelHeader} onClick={this.toggleBannerPanel}>
+              <Typography style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
+                📸 Food Page Banner Slides
+              </Typography>
+              {bannerPanelOpen ? <ExpandLess style={{ color: 'rgba(255,255,255,0.5)' }} /> : <ExpandMore style={{ color: 'rgba(255,255,255,0.5)' }} />}
+            </div>
+
+            <div className={classes.bannerPanelBody}>
+              {bannerLoading ? (
+                <Box display="flex" justifyContent="center" py={4}>
+                  <CircularProgress style={{ color: '#b72429' }} />
+                </Box>
+              ) : (
+                <>
+                  {bannerStatus && (
+                    <Box
+                      mb={2} p={1.5}
+                      style={{
+                        borderRadius: 8,
+                        backgroundColor: bannerStatus.type === 'success' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+                        border: `1px solid ${bannerStatus.type === 'success' ? '#22c55e' : '#ef4444'}`,
+                      }}
+                    >
+                      <Typography style={{ color: bannerStatus.type === 'success' ? '#22c55e' : '#ef4444', fontSize: '0.85rem' }}>
+                        {bannerStatus.msg}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.83rem' }}>
+                      Upload images to show as sliding banners on the Food &amp; Combos page.
+                    </span>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <label style={{ cursor: 'pointer' }}>
+                        <input
+                          accept="image/*"
+                          type="file"
+                          multiple
+                          style={{ display: 'none' }}
+                          onChange={this.handleBannerUpload}
+                        />
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '8px 18px',
+                          border: '1px solid rgba(255,255,255,0.3)',
+                          borderRadius: 8,
+                          color: '#fff',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          cursor: bannerUploading ? 'not-allowed' : 'pointer',
+                          opacity: bannerUploading ? 0.5 : 1,
+                          userSelect: 'none',
+                        }}>
+                          {bannerUploading ? 'Uploading…' : '⬆ Upload Images'}
+                        </span>
+                      </label>
+
+                      <button
+                        type="button"
+                        disabled={bannerSaving}
+                        onClick={this.handleBannerSave}
+                        style={{
+                          padding: '8px 20px',
+                          backgroundColor: bannerSaving ? '#7a1519' : '#b72429',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 8,
+                          fontSize: '0.875rem',
+                          fontWeight: 700,
+                          cursor: bannerSaving ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        {bannerSaving ? 'Saving…' : '💾 Save Banners'}
+                      </button>
+                    </div>
+                  </div>
+
+
+                  {banners.length === 0 ? (
+                    <Box textAlign="center" py={5}>
+                      <CloudUploadIcon style={{ fontSize: 48, color: 'rgba(255,255,255,0.12)', marginBottom: 10 }} />
+                      <Typography style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        No banners uploaded yet. Upload images above, then click Save Banners.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Grid container spacing={2}>
+                      {banners.map((banner, idx) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+                          <Box position="relative" style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <img
+                              src={normalizeImage(banner.imageUrl)}
+                              alt={`Slide ${idx + 1}`}
+                              style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block' }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => this.handleBannerDelete(idx)}
+                              style={{ position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(0,0,0,0.7)', color: '#ef4444' }}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                            <Box style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.55)', padding: '3px 8px' }}>
+                              <Typography style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.68rem' }}>Slide {idx + 1}</Typography>
+                            </Box>
+                          </Box>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </>
+              )}
+            </div>
+          </Paper>
+        </Collapse>
+
+        {/* ── Food Items Grid ── */}
         {!food ? (
           <div className={classes.progressWrapper}><CircularProgress style={{ color: '#b72429' }} /></div>
         ) : food.length === 0 ? (
@@ -285,9 +528,9 @@ class FoodList extends Component {
                 <Card className={classes.card} elevation={0}>
                   <CardMedia component="img" className={classes.cardMedia} image={normalizeImage(item.image)} alt={item.name} />
                   <CardContent className={classes.cardContent}>
-                    <Chip 
-                      label={item.type.toUpperCase()} 
-                      className={classes.typeChip} 
+                    <Chip
+                      label={item.type.toUpperCase()}
+                      className={classes.typeChip}
                       style={{ backgroundColor: item.type === 'veg' ? '#2e7d32' : '#c62828', color: '#fff' }}
                     />
                     <Typography className={classes.cardTitle}>{item.name}</Typography>
@@ -312,6 +555,7 @@ class FoodList extends Component {
           </Grid>
         )}
 
+        {/* ── Add/Edit Dialog ── */}
         <Dialog open={dialogOpen} onClose={this.closeDialog} classes={{ paper: classes.dialogPaper }}>
           <DialogTitle className={classes.dialogTitle}>{isEdit ? 'Edit Food Item' : 'Add New Food Item'}</DialogTitle>
           <DialogContent style={{ paddingTop: 20 }}>
@@ -321,7 +565,6 @@ class FoodList extends Component {
             </TextField>
             <TextField label="Description *" name="description" value={form.description} onChange={this.handleChange} fullWidth variant="outlined" multiline rows={3} className={classes.input} />
             <TextField label="Price (₹) *" name="price" type="number" value={form.price} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} />
-            
             <div className={classes.fileInput}>
               <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>
                 Food Image (Upload or URL)
@@ -331,53 +574,24 @@ class FoodList extends Component {
                   {uploading ? <CircularProgress size={20} color="inherit" /> : 'Upload File'}
                   <input type="file" hidden accept="image/*" onChange={this.handleFileChange} />
                 </Button>
-                <TextField 
-                  label="Image URL" 
-                  name="image" 
-                  value={form.image} 
-                  onChange={this.handleChange} 
-                  fullWidth 
-                  variant="outlined" 
-                  className={classes.input} 
-                  style={{ marginBottom: 0 }}
-                />
+                <TextField label="Image URL" name="image" value={form.image} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} style={{ marginBottom: 0 }} />
               </div>
             </div>
-
             <TextField label="Type *" name="type" value={form.type} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} select>
               <MenuItem value="veg">Veg</MenuItem>
               <MenuItem value="non-veg">Non-Veg</MenuItem>
             </TextField>
-
             <Grid container spacing={2} style={{ marginTop: 8 }}>
               <Grid item xs={6}>
                 <FormControlLabel
-                  control={
-                    <Switch
-                      checked={form.isWeeklyOffer}
-                      onChange={this.handleChange}
-                      name="isWeeklyOffer"
-                      color="secondary"
-                      type="checkbox"
-                    />
-                  }
-                  label="Weekly Offer"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                  control={<Switch checked={form.isWeeklyOffer} onChange={this.handleChange} name="isWeeklyOffer" color="secondary" type="checkbox" />}
+                  label="Weekly Offer" style={{ color: 'rgba(255,255,255,0.7)' }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <FormControlLabel
-                  control={
-                    <Switch
-                      checked={form.isMonthlyOffer}
-                      onChange={this.handleChange}
-                      name="isMonthlyOffer"
-                      color="secondary"
-                      type="checkbox"
-                    />
-                  }
-                  label="Monthly Offer"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                  control={<Switch checked={form.isMonthlyOffer} onChange={this.handleChange} name="isMonthlyOffer" color="secondary" type="checkbox" />}
+                  label="Monthly Offer" style={{ color: 'rgba(255,255,255,0.7)' }}
                 />
               </Grid>
             </Grid>
@@ -390,6 +604,7 @@ class FoodList extends Component {
           </DialogActions>
         </Dialog>
 
+        {/* ── Delete Confirm Dialog ── */}
         <Dialog open={Boolean(deleteConfirm)} onClose={() => this.setState({ deleteConfirm: null })} classes={{ paper: classes.dialogPaper }}>
           <DialogTitle className={classes.dialogTitle}>Delete Item?</DialogTitle>
           <DialogContent style={{ paddingTop: 16 }}>
