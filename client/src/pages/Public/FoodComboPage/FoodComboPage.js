@@ -37,7 +37,7 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
   const isMonthlyDealTime = today.getDate() <= 7;
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const cartTotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const cartTotal = cartItems.reduce((acc, item) => acc + (item.offerPrice > 0 ? item.offerPrice : item.price) * item.quantity, 0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -188,10 +188,14 @@ const FoodComboPage = ({ getFood, foodState, cartItems, addToFoodCart, updateFoo
                         </Typography>
                         <div className={classes.footer}>
                           <Typography variant="h6" className={classes.price}>
-                            {(item.category === 'Combos' || item.isWeeklyOffer || item.isMonthlyOffer) && (
-                              <span className={classes.originalPrice}>₹{Math.round(item.price * 1.2)}</span>
+                            {item.offerPrice > 0 ? (
+                              <>
+                                <span className={classes.originalPrice}>₹{item.price}</span>
+                                ₹{item.offerPrice}
+                              </>
+                            ) : (
+                              <>₹{item.price}</>
                             )}
-                            ₹{item.price}
                           </Typography>
                           {qty > 0 ? (
                             <div className={classes.quantityControls}>

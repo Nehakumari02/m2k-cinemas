@@ -2,7 +2,9 @@ import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { withStyles, Grid, Typography } from '@material-ui/core';
+import { withStyles, Grid, Typography, Dialog, Zoom, IconButton } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Slider from 'react-slick';
 import {
   getMovies,
@@ -26,7 +28,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import ReactPlayer from 'react-player';
 
 class HomePage extends Component {
-  state = { activeTab: 'nowShowing', homeBanner: null };
+  state = { activeTab: 'nowShowing', homeBanner: null, trailerModalOpen: false, activeTrailerUrl: null };
 
   componentDidMount() {
     const {
@@ -76,6 +78,14 @@ class HomePage extends Component {
     this.setState({ activeTab: id });
   };
 
+  handleOpenTrailer = (url) => {
+    this.setState({ trailerModalOpen: true, activeTrailerUrl: url });
+  };
+
+  handleCloseTrailer = () => {
+    this.setState({ trailerModalOpen: false, activeTrailerUrl: null });
+  };
+
   render() {
     const {
       classes,
@@ -87,7 +97,7 @@ class HomePage extends Component {
       suggested,
       offers
     } = this.props;
-    const { activeTab, homeBanner } = this.state;
+    const { activeTab, homeBanner, trailerModalOpen, activeTrailerUrl } = this.state;
     const heroMovies = (nowShowing && nowShowing.length ? nowShowing : movies).slice(0, 3);
 
     // Combine movies and top 2 offers for the banner
@@ -149,18 +159,32 @@ class HomePage extends Component {
                         </Link>
                       )}
                     </div>
-                    {banner.videoUrl && (
+                    {(banner.videoUrl || banner.trailerPosterUrl) && (
                       <div className={classes.trailerVideoWrapper}>
-                        <ReactPlayer
-                          url={banner.videoUrl}
-                          playing={true}
-                          muted={true}
-                          loop={true}
-                          controls={false}
-                          width="100%"
-                          height="100%"
-                          style={{ pointerEvents: 'none' }}
-                        />
+                        {banner.videoUrl && (
+                          <div 
+                            className={classes.trailerOverlayClick}
+                            onClick={() => this.handleOpenTrailer(banner.videoUrl)}
+                            title="Play Trailer"
+                          >
+                            <PlayArrowIcon className={classes.playIcon} />
+                          </div>
+                        )}
+                        {banner.trailerPosterUrl ? (
+                          <img 
+                            src={banner.trailerPosterUrl} 
+                            alt="Trailer Poster"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          />
+                        ) : (
+                          <ReactPlayer
+                            url={banner.videoUrl}
+                            light={true}
+                            width="100%"
+                            height="100%"
+                            style={{ pointerEvents: 'none' }}
+                          />
+                        )}
                       </div>
                     )}
                   </div>
@@ -172,15 +196,15 @@ class HomePage extends Component {
               {heroItems.map((item, idx) => (
                 <div key={item.data._id || idx}>
                   {item.type === 'movie' ? (
-                    <MovieBanner movie={item.data} height="45vh" />
+                    <MovieBanner movie={item.data} height="51vh" />
                   ) : (
-                    <OfferBanner offer={item.data} height="45vh" />
+                    <OfferBanner offer={item.data} height="51vh" />
                   )}
                 </div>
               ))}
             </Slider>
           ) : (
-            <MovieBanner movie={randomMovie} height="45vh" />
+            <MovieBanner movie={randomMovie} height="51vh" />
           )}
         </div>
 
@@ -280,6 +304,40 @@ class HomePage extends Component {
         </div>
 
         {/* Footer is handled by PublicLayout */}
+        
+        {/* ── Trailer Modal ── */}
+        <Dialog
+          open={trailerModalOpen}
+          onClose={this.handleCloseTrailer}
+          TransitionComponent={Zoom}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            style: {
+              backgroundColor: '#000',
+              boxShadow: 'none',
+              overflow: 'hidden',
+              borderRadius: 16,
+            }
+          }}
+        >
+          <IconButton 
+            onClick={this.handleCloseTrailer} 
+            style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, color: '#fff', background: 'rgba(0,0,0,0.5)' }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <div style={{ position: 'relative', paddingTop: '56.25%', width: '100%' }}>
+            <ReactPlayer
+              url={activeTrailerUrl}
+              playing={trailerModalOpen}
+              controls={true}
+              width="100%"
+              height="100%"
+              style={{ position: 'absolute', top: 0, left: 0 }}
+            />
+          </div>
+        </Dialog>
       </Fragment>
     );
   }

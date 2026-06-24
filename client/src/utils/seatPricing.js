@@ -24,6 +24,15 @@ export function getSeatTicketPrice(movie, cinema, seatValue, rowLabel, seatNumbe
     base = rowLabel === 'A' || rowLabel === 'B' ? gold : silver;
   }
 
+  if (seatNumbering === 'pitampura-screen2' && rowLabel && rowLabel !== 'WAY') {
+    const platinum = Number(cinema && cinema.platinumPrice) || 330;
+    const gold = Number(cinema && cinema.goldPrice) || 180;
+    const silver = Number(cinema && cinema.silverPrice) || 150;
+    if (rowLabel === 'U') base = platinum;
+    else if (rowLabel === 'T' || rowLabel === 'S') base = gold;
+    else base = silver;
+  }
+
   const isPitampuraNGold =
     seatNumbering === 'pitampura' || seatNumbering === 'pitampura-screen3';
   if (isPitampuraNGold && rowLabel && rowLabel !== 'WAY') {

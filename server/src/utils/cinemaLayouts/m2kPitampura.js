@@ -4,6 +4,7 @@
  */
 const EMPTY = -1;
 const AVAILABLE = 0;
+const UNAVAILABLE = 1;
 
 const GRID_WIDTH = 19;
 
@@ -18,7 +19,7 @@ function buildLowerBlockRow() {
   return r;
 }
 
-/** Rows E–L: cols 1–4 gap, cols 5–17 seats 1–13, cols 18–19 gap. */
+/** Rows E–K: cols 1–4 gap, cols 5–17 seats 1–13, cols 18–19 gap. */
 function buildMiddleSectionRow() {
   const r = row();
   for (let i = 4; i < 17; i += 1) {
@@ -27,12 +28,25 @@ function buildMiddleSectionRow() {
   return r;
 }
 
-/** Row M: cols 1–3 gap (entry side), cols 4–18 seats 1–15, col 19 gap. */
-function buildRowM() {
-  return buildLowerBlockRow();
+/** Row L: 13 seats total. */
+function buildRowL() {
+  const r = row();
+  for (let i = 4; i < 17; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
 }
 
-/** Row N: col 1 gap, cols 2–18 seats 1–17, col 19 gap. */
+/** Row M: 15 seats total. */
+function buildRowM() {
+  const r = row();
+  for (let i = 3; i < 18; i += 1) {
+    r[i] = AVAILABLE;
+  }
+  return r;
+}
+
+/** Row N: 17 seats total. */
 function buildRowN() {
   const r = row();
   for (let i = 1; i < 18; i += 1) {
@@ -67,7 +81,7 @@ function buildM2kPitampuraLayout() {
     buildMiddleSectionRow(), // H
     buildMiddleSectionRow(), // J
     buildMiddleSectionRow(), // K
-    buildMiddleSectionRow(), // L
+    buildRowL(), // L
     buildRowM(), // M
     buildRowN() // N
   ];
@@ -92,9 +106,9 @@ function buildM2kPitampuraLayout() {
   return {
     name: 'M2K PITAMPURA',
     city: 'delhi',
-    ticketPrice: 280,
-    goldPrice: 300,
-    silverPrice: 250,
+    ticketPrice: 150,
+    goldPrice: 180,
+    silverPrice: 150,
     specialPrice: 450,
     layoutKey: 'm2k-venue',
     seatNumbering: 'pitampura',

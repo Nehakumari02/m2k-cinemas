@@ -6,9 +6,9 @@ import { getSeatNumberFromLeft } from '../../../../../utils/venueSeatFromLeft';
 import { getSeatTicketPrice } from '../../../../../utils/seatPricing';
 
 const SEAT_COLORS = {
-  available: '#3a3a4a',
-  reserved: '#1e1e26',
-  selected: '#b72429',
+  available: '#ffffff',
+  reserved: '#e2e8f0',
+  selected: '#4ade80',
   suggested: '#00bcd4',
   special: '#FFD700'
 };
@@ -26,27 +26,28 @@ const useStyles = makeStyles(theme => ({
 
   /* ── Screen ── */
   screenWrapper: {
-    width: '82%',
-    marginBottom: theme.spacing(5),
+    width: '100%',
+    maxWidth: '400px',
+    marginBottom: theme.spacing(6),
+    marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
   },
   screenCurve: {
     width: '100%',
-    height: '10px',
-    background:
-      'linear-gradient(90deg, transparent, #b72429 20%, #b72429 80%, transparent)',
-    borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-    boxShadow: '0 -4px 28px rgba(183,36,41,0.45)',
-    marginBottom: '4px'
+    height: '18px',
+    background: '#e0f2fe',
+    border: '1px solid #bae6fd',
+    borderRadius: '4px',
+    transform: 'perspective(120px) rotateX(15deg)',
+    marginBottom: '10px'
   },
   screenLabel: {
-    fontSize: '0.7rem',
-    color: 'rgba(183,36,41,0.7)',
-    letterSpacing: '0.35em',
-    textTransform: 'uppercase',
-    fontWeight: 700
+    fontSize: '0.65rem',
+    color: '#64748b',
+    fontWeight: 500,
+    textTransform: 'none'
   },
 
   /* ── Category Band ── */
@@ -54,9 +55,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     width: '100%',
-    alignSelf: 'stretch',
-    margin: '10px 0 2px',
-    gap: '8px'
+    maxWidth: '600px',
+    margin: '16px auto',
+    gap: '12px'
   },
   categoryBandShiftRight: {
     paddingLeft: 44,
@@ -65,15 +66,12 @@ const useStyles = makeStyles(theme => ({
   categoryLine: {
     flex: 1,
     height: '1px',
-    opacity: 0.3
+    background: '#e2e8f0'
   },
   categoryLabel: {
-    fontSize: '0.65rem',
+    fontSize: '0.7rem',
     fontWeight: 800,
-    letterSpacing: '0.18em',
-    textTransform: 'uppercase',
-    padding: '2px 12px',
-    borderRadius: '12px',
+    color: '#334155',
     whiteSpace: 'nowrap'
   },
 
@@ -106,44 +104,39 @@ const useStyles = makeStyles(theme => ({
 
   /* ── Seat ── */
   seat: {
-    width: '26px',
+    width: '24px',
     height: '24px',
-    borderRadius: '6px 6px 2px 2px',
-    border: 'none',
+    borderRadius: '4px',
+    border: '1px solid #4ade80',
     cursor: 'pointer',
     position: 'relative',
-    transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+    transition: 'all 0.2s ease',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '0.55rem',
+    fontSize: '0.6rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: '#4ade80',
+    backgroundColor: '#fff',
     outline: 'none',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      bottom: '-4px',
-      left: '2px',
-      right: '2px',
-      height: '4px',
-      borderRadius: '0 0 3px 3px',
-      backgroundColor: 'inherit',
-      filter: 'brightness(0.6)'
-    },
     '&:hover:not($seatReserved)': {
-      transform: 'scale(1.15) translateY(-2px)',
-      boxShadow: '0 4px 14px rgba(183,36,41,0.45)'
+      backgroundColor: '#4ade80 !important',
+      color: '#fff !important',
     }
   },
   seatReserved: {
+    backgroundColor: '#e2e8f0 !important',
+    borderColor: '#e2e8f0 !important',
+    color: '#fff !important',
     cursor: 'not-allowed',
-    opacity: 0.4,
+    opacity: 1,
     '&:hover': { transform: 'none', boxShadow: 'none' }
   },
   seatSelected: {
-    boxShadow: '0 0 10px rgba(183,36,41,0.6)',
-    color: '#fff'
+    backgroundColor: '#4ade80 !important',
+    borderColor: '#4ade80 !important',
+    color: '#fff !important',
+    boxShadow: '0 2px 8px rgba(74, 222, 128, 0.4)'
   },
   seatSpecial: {
     boxShadow: '0 0 10px rgba(255, 215, 0, 0.4)',
@@ -169,17 +162,8 @@ const useStyles = makeStyles(theme => ({
     }
   },
   walkwayRow: {
-    width: '82%',
-    margin: '14px 0 18px',
-    padding: '8px 0',
-    textAlign: 'center',
-    fontSize: '0.7rem',
-    fontWeight: 800,
-    letterSpacing: '0.35em',
-    color: '#64748b',
-    borderTop: '1px dashed rgba(100,116,139,0.45)',
-    borderBottom: '1px dashed rgba(100,116,139,0.45)',
-    userSelect: 'none'
+    width: '100%',
+    height: '24px'
   },
 
   /* ── Legend ── */
@@ -204,9 +188,10 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 500
   },
   legendSeat: {
-    width: '18px',
-    height: '16px',
-    borderRadius: '4px 4px 2px 2px',
+    width: '20px',
+    height: '20px',
+    borderRadius: '4px',
+    border: '1px solid #e2e8f0',
     flexShrink: 0
   },
   selectedSeatPriceBar: {
@@ -345,10 +330,9 @@ function getSeatBgColor(seatValue, category) {
   if (seatValue === 1) return SEAT_COLORS.reserved;
   if (seatValue === 2) return SEAT_COLORS.selected;
   if (seatValue === 3) return SEAT_COLORS.suggested;
-  if (seatValue === 5) return SEAT_COLORS.special; // special, unselected
-  if (seatValue === 6) return '#FFB800';            // special, selected (deeper gold)
-  // Use a visible version of category color for available seats
-  return category.color + '33'; // 20% opacity hex
+  if (seatValue === 5) return SEAT_COLORS.special;
+  if (seatValue === 6) return SEAT_COLORS.selected;
+  return SEAT_COLORS.available;
 }
 
 const EMPTY_SEAT = -1;
@@ -440,24 +424,24 @@ export default function BookingSeats({
           getRowLabel(originalRowIndex),
           seatNumbering
         );
-        const previousCategory =
-          displayRowIndex > 0
-            ? getCategory(
-                renderRows[displayRowIndex - 1].originalRowIndex,
-                totalRows,
-                getRowLabel(renderRows[displayRowIndex - 1].originalRowIndex),
-                seatNumbering
-              )
-            : null;
-        const showBand = displayRowIndex === 0 || previousCategory.key !== category.key;
+        let previousCategory = null;
+        for (let i = displayRowIndex - 1; i >= 0; i--) {
+          const prevRowLabel = getRowLabel(renderRows[i].originalRowIndex);
+          if (prevRowLabel !== 'WAY') {
+            previousCategory = getCategory(
+              renderRows[i].originalRowIndex,
+              totalRows,
+              prevRowLabel,
+              seatNumbering
+            );
+            break;
+          }
+        }
+        const showBand = displayRowIndex === 0 || (previousCategory && previousCategory.key !== category.key);
         const rowLetter = getRowLabel(originalRowIndex);
 
         if (rowLetter === 'WAY') {
-          return (
-            <div key={originalRowIndex} className={classes.walkwayRow}>
-              WAY
-            </div>
-          );
+          return <div key={originalRowIndex} className={classes.walkwayRow} />;
         }
 
         let seatNumber = 0;
@@ -590,23 +574,11 @@ export default function BookingSeats({
                   classes.categoryBandFullWidth,
                   cinema && cinema.layoutKey === 'm2k-venue' && classes.categoryBandShiftRight
                 )}>
-                <div
-                  className={classes.categoryLine}
-                  style={{ background: category.color }}
-                />
-                <span
-                  className={classes.categoryLabel}
-                  style={{
-                    color: category.color,
-                    background: category.bg,
-                    border: `1px solid ${category.color}`
-                  }}>
-                  {category.label}
+                <div className={classes.categoryLine} />
+                <span className={classes.categoryLabel}>
+                  {getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering) ? `₹${getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering)} ` : ''}{category.label}
                 </span>
-                <div
-                  className={classes.categoryLine}
-                  style={{ background: category.color }}
-                />
+                <div className={classes.categoryLine} />
               </div>
             )}
 
@@ -668,18 +640,26 @@ export default function BookingSeats({
                   );
                 })}
               </div>
-              <span className={classes.rowLabel}>{rowLetter}</span>
             </div>
           </Fragment>
         );
       })}
+
+      {screenAtBottom && (
+        <div className={classes.screenWrapper}>
+          <div className={classes.screenCurve} />
+          <span className={classes.screenLabel}>
+            All Eyes This Way Please!
+          </span>
+        </div>
+      )}
 
       {/* ── Legend ── */}
       <div className={classes.legend}>
         <div className={classes.legendItem}>
           <div
             className={classes.legendSeat}
-            style={{ backgroundColor: '#42a5f533' }}
+            style={{ backgroundColor: SEAT_COLORS.available, borderColor: SEAT_COLORS.selected }}
           />
           Available
         </div>
@@ -728,14 +708,6 @@ export default function BookingSeats({
         </div>
       )}
 
-      {screenAtBottom && (
-        <div className={classes.screenWrapper}>
-          <div className={classes.screenCurve} />
-          <span className={classes.screenLabel}>
-            All Eyes This Way Please!
-          </span>
-        </div>
-      )}
     </div>
   );
 }

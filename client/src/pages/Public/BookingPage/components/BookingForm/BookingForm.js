@@ -101,28 +101,29 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 600,
   },
   hint: {
-    color: '#64748b',
-    marginBottom: theme.spacing(1),
+    color: '#475569',
+    marginBottom: theme.spacing(1.5),
     fontWeight: 600,
+    fontSize: '1rem',
   },
   legendRow: {
     display: 'flex',
-    gap: theme.spacing(2),
+    gap: theme.spacing(2.5),
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: theme.spacing(1.2),
+    marginBottom: theme.spacing(2),
   },
   legendItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(0.7),
-    color: '#475569',
-    fontSize: '0.78rem',
+    gap: theme.spacing(0.8),
+    color: '#334155',
+    fontSize: '0.95rem',
     fontWeight: 600,
   },
   legendDot: {
-    width: 9,
-    height: 9,
+    width: 12,
+    height: 12,
     borderRadius: '50%',
     display: 'inline-block',
   },
@@ -228,7 +229,8 @@ export default function BookingForm(props) {
     onChangeDate,
     selectedTime,
     onChangeTime,
-    onProceedToSeats
+    onProceedToSeats,
+    reservations = []
   } = props;
 
   const dateOptions = useMemo(() => {
@@ -341,7 +343,7 @@ export default function BookingForm(props) {
 
           <div className={classes.legendRow}>
             <div className={classes.legendItem}>
-              <span className={classes.legendDot} style={{ background: '#16a34a' }} />
+              <span className={classes.legendDot} style={{ background: '#22c55e' }} />
               Available
             </div>
             <div className={classes.legendItem}>
@@ -375,6 +377,22 @@ export default function BookingForm(props) {
                           {item.slots.map(time => {
                             const active =
                               selectedCinema === item.cinema._id && selectedTime === time;
+                            // Live status logic
+                            const targetDateStr = selectedDate ? new Date(selectedDate).toDateString() : '';
+                            const bookedSeats = reservations
+                              .filter(res => 
+                                res.cinemaId === item.cinema._id && 
+                                res.startAt === time && 
+                                new Date(res.date).toDateString() === targetDateStr
+                              )
+                              .reduce((sum, res) => sum + (res.seats ? res.seats.length : 0), 0);
+                            
+                            const totalSeats = item.cinema.seatsAvailable || 100;
+                            
+                            let statusColor = '#22c55e'; // default green (Available)
+                            if (bookedSeats >= totalSeats) statusColor = '#ef4444'; // Red (Sold Out)
+                            else if (bookedSeats > totalSeats / 2) statusColor = '#f59e0b'; // Orange (Filling Fast)
+
                             return (
                               <Button
                                 key={`${item.cinema._id}-${time}`}
@@ -389,6 +407,15 @@ export default function BookingForm(props) {
                                   }
                                 }}
                               >
+                                <span 
+                                  className={classes.legendDot} 
+                                  style={{ 
+                                    background: statusColor, 
+                                    width: 8, 
+                                    height: 8, 
+                                    marginRight: 6 
+                                  }} 
+                                />
                                 {time}
                               </Button>
                             );

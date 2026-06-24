@@ -15,7 +15,7 @@ export default theme => ({
     }
   },
   customHero: {
-    minHeight: '45vh',
+    minHeight: '51vh',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
@@ -65,12 +65,12 @@ export default theme => ({
   },
   trailerVideoWrapper: {
     position: 'absolute',
-    right: '8%',
+    right: '10%',
     top: '50%',
     transform: 'translateY(-50%)',
     zIndex: 3,
-    width: 400,
-    height: 225,
+    width: 200,
+    height: 300,
     borderRadius: '16px',
     overflow: 'hidden',
     boxShadow: '0 25px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)',
@@ -78,12 +78,36 @@ export default theme => ({
     background: '#000',
     transition: 'transform 0.4s ease, box-shadow 0.4s ease',
     '&:hover': {
-      transform: 'translateY(-50%) scale(1.03)',
-      boxShadow: '0 30px 70px rgba(0,0,0,0.8), 0 0 30px rgba(183,36,41,0.15)',
+      transform: 'translateY(-50%) scale(1.05)',
+      boxShadow: '0 30px 70px rgba(0,0,0,0.8), 0 0 30px rgba(183,36,41,0.25)',
+      '& $playIcon': {
+        transform: 'scale(1.2)',
+        color: '#b72429',
+      }
     },
     [theme.breakpoints.down('md')]: {
       display: 'none',
     },
+  },
+  trailerOverlayClick: {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 10,
+    cursor: 'pointer',
+    background: 'rgba(0,0,0,0.3)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.3s ease',
+    '&:hover': {
+      background: 'rgba(0,0,0,0.1)',
+    }
+  },
+  playIcon: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: '4rem',
+    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))',
+    transition: 'transform 0.3s ease, color 0.3s ease',
   },
 
   /* ── Section Tabs ─────────────────────────── */

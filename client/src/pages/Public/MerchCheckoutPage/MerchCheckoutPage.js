@@ -78,7 +78,7 @@ const MerchCheckoutPage = ({
 
   const [paymentMethod, setPaymentMethod] = useState('Card');
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.offerPrice > 0 ? item.offerPrice : item.price) * item.quantity, 0);
   const pricing = useMemo(
     () =>
       calculateCartTotals({

@@ -22,6 +22,10 @@ const foodSchema = new Schema({
     type: Number,
     required: true
   },
+  offerPrice: {
+    type: Number,
+    default: 0
+  },
   image: {
     type: String,
     required: true

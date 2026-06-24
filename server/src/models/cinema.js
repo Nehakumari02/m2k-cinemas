@@ -22,6 +22,11 @@ const cinemaSchema = new Schema({
     type: Number,
     required: false,
   },
+  /** VIP rows (PLATINUM). */
+  platinumPrice: {
+    type: Number,
+    required: false,
+  },
   /** Extra ₹ added to the movie base price for premium/special seats (not the full seat price). */
   specialPrice: {
     type: Number,

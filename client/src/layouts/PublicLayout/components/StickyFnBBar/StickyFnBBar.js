@@ -44,14 +44,14 @@ const useStyles = makeStyles(theme => ({
       content: '""',
       position: 'absolute',
       inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay for text readability
+      backgroundColor: 'rgba(0, 0, 0, 0.2)', // Lightened overlay for better image visibility
       transition: 'background-color 0.2s ease',
       zIndex: 1,
     },
     '&:hover': {
       transform: 'scale(1.02)',
       '&::before': {
-        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Lighten on hover
+        backgroundColor: 'rgba(0, 0, 0, 0.1)', // Even lighter on hover
       },
     },
   },
@@ -66,6 +66,7 @@ const useStyles = makeStyles(theme => ({
     gap: 6,
     position: 'relative',
     zIndex: 2,
+    textShadow: '0px 2px 4px rgba(0,0,0,0.6)', // Added text shadow for readability on lighter background
   },
   secondaryLink: {
     flex: 1,

@@ -80,6 +80,7 @@ const useStyles = makeStyles(theme => ({
 const DEFAULT_BANNER = {
   imageUrl: '',
   videoUrl: '',
+  trailerPosterUrl: '',
   title: '',
   subtitle: '',
   ctaText: '',
@@ -217,6 +218,40 @@ export default function HomeBannerSettings() {
     }
   };
 
+  const onUploadTrailerPoster = async (e, index) => {
+    const target = e.target;
+    const file = target.files && target.files[0];
+    if (!file) return;
+    setUploadingIndex(`trailer-${index}`);
+    setMessage({ text: '', type: '' });
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch('/settings/home-banner/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.imageUrl) {
+        setForm(prev => {
+          const newBanners = [...prev.banners];
+          newBanners[index] = { ...newBanners[index], trailerPosterUrl: data.imageUrl };
+          return { ...prev, banners: newBanners };
+        });
+        setMessage({ text: 'Trailer poster uploaded successfully.', type: 'success' });
+      } else {
+        setMessage({ text: data?.error?.message || 'Failed to upload image', type: 'error' });
+      }
+    } catch (err) {
+      setMessage({ text: 'Upload failed', type: 'error' });
+    } finally {
+      setUploadingIndex(null);
+      target.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="300px">
@@ -299,6 +334,35 @@ export default function HomeBannerSettings() {
                     onChange={onBannerChange(index, 'videoUrl')}
                     helperText="If provided, this video will play inside a floating card on the banner."
                   />
+                  <Box mt={2}>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      label="Trailer Poster URL (Optional)"
+                      value={banner.trailerPosterUrl || ''}
+                      onChange={onBannerChange(index, 'trailerPosterUrl')}
+                      helperText="Optional vertical poster to show before the video is clicked. If empty, the YouTube thumbnail will be used."
+                    />
+                    <Box mt={1}>
+                      <input
+                        id={`trailer-poster-upload-${index}`}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => onUploadTrailerPoster(e, index)}
+                      />
+                      <label htmlFor={`trailer-poster-upload-${index}`}>
+                        <Button
+                          component="span"
+                          variant="outlined"
+                          startIcon={<CloudUploadIcon />}
+                          disabled={uploadingIndex === `trailer-${index}`}
+                        >
+                          {uploadingIndex === `trailer-${index}` ? 'Uploading...' : 'Upload Trailer Poster'}
+                        </Button>
+                      </label>
+                    </Box>
+                  </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField

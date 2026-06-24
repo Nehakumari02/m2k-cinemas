@@ -1008,6 +1008,7 @@ class BookingPage extends Component {
                 cinemas={uniqueCinemas}
                 times={uniqueTimes}
                 showtimes={showtimes}
+                reservations={this.props.reservations}
                 selectedCinema={selectedCinema}
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
@@ -1212,7 +1213,7 @@ class BookingPage extends Component {
                   cinema={cinema}
                   screenAtBottom={
                     String(cinema.name || '').trim().toLowerCase().startsWith('m2k pitampura') ||
-                    String(cinema.name || '').trim().toLowerCase() === 'm2k rohini'
+                    String(cinema.name || '').trim().toLowerCase().startsWith('m2k rohini')
                   }
                   reverseRows={
                     String(cinema.name || '').trim().toLowerCase().startsWith('m2k pitampura')

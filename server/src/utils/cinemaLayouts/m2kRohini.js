@@ -121,9 +121,9 @@ function buildM2kRohiniLayout() {
   return {
     name: 'M2K ROHINI',
     city: 'delhi',
-    ticketPrice: 300,
-    goldPrice: 300,
-    silverPrice: 250,
+    ticketPrice: 150,
+    goldPrice: 200,
+    silverPrice: 150,
     specialPrice: 480,
     layoutKey: 'm2k-venue',
     seatNumbering: 'rohini',

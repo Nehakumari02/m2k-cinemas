@@ -196,6 +196,7 @@ const EMPTY_FORM = {
   category: '',
   description: '',
   price: '',
+  offerPrice: '',
   image: '',
   type: 'veg',
   isWeeklyOffer: false,
@@ -237,6 +238,7 @@ class FoodList extends Component {
         category: item.category,
         description: item.description,
         price: item.price,
+        offerPrice: item.offerPrice || '',
         image: item.image,
         type: item.type,
         isWeeklyOffer: item.isWeeklyOffer || false,
@@ -276,11 +278,20 @@ class FoodList extends Component {
   handleSave = async () => {
     const { form, isEdit, selectedId } = this.state;
     this.setState({ saving: true });
+
+    const payload = { ...form };
+    if (!payload.offerPrice || payload.offerPrice === '') {
+      payload.offerPrice = 0;
+    } else {
+      payload.offerPrice = Number(payload.offerPrice);
+    }
+    payload.price = Number(payload.price);
+
     let result;
     if (isEdit) {
-      result = await this.props.updateFood(selectedId, form);
+      result = await this.props.updateFood(selectedId, payload);
     } else {
-      result = await this.props.addFood(form);
+      result = await this.props.addFood(payload);
     }
     this.setState({ saving: false });
     if (result && result.status === 'success') this.closeDialog();
@@ -535,7 +546,16 @@ class FoodList extends Component {
                     />
                     <Typography className={classes.cardTitle}>{item.name}</Typography>
                     <Typography className={classes.cardDesc}>{item.description}</Typography>
-                    <Typography className={classes.priceBadge}>₹{item.price}</Typography>
+                    <Box display="flex" alignItems="center" gap="8px" mt={1}>
+                      {item.offerPrice > 0 ? (
+                        <>
+                          <Typography className={classes.priceBadge} style={{ textDecoration: 'line-through', opacity: 0.7, fontSize: '0.85rem' }}>₹{item.price}</Typography>
+                          <Typography className={classes.priceBadge}>₹{item.offerPrice}</Typography>
+                        </>
+                      ) : (
+                        <Typography className={classes.priceBadge}>₹{item.price}</Typography>
+                      )}
+                    </Box>
                   </CardContent>
                   <CardActions className={classes.cardActions}>
                     <Tooltip title="Edit">
@@ -564,7 +584,14 @@ class FoodList extends Component {
               {['Popcorn', 'Combos', 'Snacks', 'Beverages'].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
             </TextField>
             <TextField label="Description *" name="description" value={form.description} onChange={this.handleChange} fullWidth variant="outlined" multiline rows={3} className={classes.input} />
-            <TextField label="Price (₹) *" name="price" type="number" value={form.price} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} />
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField label="Price (₹) *" name="price" type="number" value={form.price} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField label="Offer Price (₹)" name="offerPrice" type="number" value={form.offerPrice} onChange={this.handleChange} fullWidth variant="outlined" className={classes.input} helperText="Leave 0 or empty if no offer" />
+              </Grid>
+            </Grid>
             <div className={classes.fileInput}>
               <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>
                 Food Image (Upload or URL)

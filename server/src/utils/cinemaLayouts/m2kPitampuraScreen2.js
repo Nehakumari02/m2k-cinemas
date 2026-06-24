@@ -129,8 +129,11 @@ function buildM2kPitampuraScreen2Layout() {
   return {
     name: 'M2K PITAMPURA SCREEN 2',
     city: 'delhi',
-    ticketPrice: 290,
-    specialPrice: 460,
+    ticketPrice: 150,
+    platinumPrice: 330,
+    goldPrice: 180,
+    silverPrice: 150,
+    specialPrice: 450,
     layoutKey: 'm2k-venue',
     seatNumbering: 'pitampura-screen2',
     seats,
