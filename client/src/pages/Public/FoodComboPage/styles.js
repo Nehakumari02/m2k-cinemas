@@ -119,7 +119,7 @@ export default (theme) => ({
     overflow: 'hidden',
     transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease',
     border: 'none',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06)',
+    boxShadow: '0 12px 35px rgba(0,0,0,0.15), 0 5px 15px rgba(0,0,0,0.08)',
     '&:hover': {
       transform: 'translateY(-12px) scale(1.02)',
       boxShadow: '0 25px 50px rgba(0,0,0,0.2)'
@@ -183,7 +183,9 @@ export default (theme) => ({
     }
   },
   content: {
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
+    backgroundColor: '#ffffff',
+    borderTop: '2px solid #cbd5e1'
   },
   category: {
     color: '#b72429',
