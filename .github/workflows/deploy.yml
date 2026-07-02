@@ -25,17 +25,15 @@ jobs:
           npm install
           CI=false npm run build
 
-      - name: Sync files to Hostinger
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Cleanup node_modules before SFTP
+        run: rm -rf client/node_modules
+
+      - name: Sync files to Hostinger via SFTP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          server-dir: /m2k-cinemas/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            client/node_modules/**
-            server/node_modules/**
+          port: 65002
+          source: "./"
+          target: "/m2k-cinemas/"
