@@ -34,6 +34,6 @@ jobs:
           host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 65002
+          port: 22
           source: "./"
           target: "/m2k-cinemas/"
