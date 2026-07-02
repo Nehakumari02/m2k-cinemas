@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     width: '100%',
     maxWidth: '600px',
-    margin: '16px auto',
+    margin: '6px auto',
     gap: '12px'
   },
   categoryBandShiftRight: {

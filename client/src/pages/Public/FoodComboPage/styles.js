@@ -117,12 +117,12 @@ export default (theme) => ({
     height: '100%',
     borderRadius: '16px',
     overflow: 'hidden',
-    transition: 'transform 0.3s ease, boxShadow 0.3s ease',
-    border: '1px solid #e5e7eb',
-    boxShadow: 'none',
+    transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease',
+    border: 'none',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06)',
     '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+      transform: 'translateY(-12px) scale(1.02)',
+      boxShadow: '0 25px 50px rgba(0,0,0,0.2)'
     }
   },
   imageWrapper: {

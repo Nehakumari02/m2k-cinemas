@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_URI, {
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://m2k-cinemas:Cinemas123@cluster0.qwtyea6.mongodb.net/pvrcinemas?retryWrites=true&w=majority';
+
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useCreateIndex: true,
 });

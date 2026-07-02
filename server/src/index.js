@@ -2,9 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: path.join(__dirname, '../.env') });
-}
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const mongoose = require('mongoose');
 require('./db/mongoose');
@@ -42,7 +40,7 @@ const app = express();
 app.disable('x-powered-by');
 const port = process.env.PORT || 8080;
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader(
@@ -153,3 +151,17 @@ app.listen(port, () => {
     );
   }
 });
+
+
+
+// has a feature called Git Version Control.
+
+// You go to this tool in cPanel and connect it to your GitHub repository.
+// Whenever you want to update your live site, you push your code to GitHub.
+// Then, you click a single "Pull" button in cPanel. It instantly downloads all your changes from GitHub straight into your m2k-backend folder. (You still have to manually run npm run build for the frontend though, unless you set up deployment hooks).
+// Method 2: GitHub Actions (Fully Automated & Professional) This is the ultimate setup. You create a special file in your project (like .github/workflows/deploy.yml). When you push code to GitHub, GitHub's servers automatically spin up a temporary computer and follow a script you wrote:
+
+// It connects to your Hostinger server via FTP or SSH.
+// It automatically uploads only the files that changed.
+// It automatically runs npm install and npm run build for you.
+// It restarts your Application Manager server.

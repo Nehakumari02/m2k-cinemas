@@ -1,0 +1,40 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  web-deploy:
+    name: Deploy to Hostinger FTP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build the React App
+        run: |
+          cd client
+          npm install
+          npm run build
+
+      - name: Sync files to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /m2k-cinemas/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            client/node_modules/**
+            server/node_modules/**

@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     textDecoration: 'none',
     position: 'relative',
-    background: `url(${foodBg}) center center / cover no-repeat`,
+    background: `url(${foodBg}) right 35% / cover no-repeat`,
     padding: theme.spacing(1.75, 2),
     transition: 'filter 0.2s ease, transform 0.15s ease',
     overflow: 'hidden',
