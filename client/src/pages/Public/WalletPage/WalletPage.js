@@ -20,23 +20,41 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import HistoryIcon from '@material-ui/icons/History';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
-import { getWalletData, addWalletMoney } from '../../../store/actions';
+import { getWalletData, addWalletMoney, setAlert } from '../../../store/actions';
 
 class WalletPage extends Component {
   state = {
-    amount: ''
+    amount: '',
+    isProcessingPayment: false
   };
 
   componentDidMount() {
     this.props.getWalletData();
+    
+    // Check for ICICI redirect status
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'success') {
+      this.props.setAlert('Successfully added money to wallet via ICICI', 'success');
+    } else if (paymentStatus) {
+      this.props.setAlert(`Payment failed or cancelled (${paymentStatus})`, 'error');
+    }
+    
+    // Clean up URL
+    if (paymentStatus) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }
 
   onAddMoney = (e) => {
     e.preventDefault();
     const { amount } = this.state;
     if (amount > 0) {
+      this.setState({ isProcessingPayment: true });
       this.props.addWalletMoney(amount);
-      this.setState({ amount: '' });
+      // Let the redirect handle the rest. Reset state just in case.
+      setTimeout(() => this.setState({ isProcessingPayment: false, amount: '' }), 5000);
     }
   };
 
@@ -96,8 +114,8 @@ class WalletPage extends Component {
                   color="primary"
                   size="large"
                   type="submit"
-                  disabled={!amount || amount <= 0}
-                  startIcon={<AddCircleIcon />}
+                  disabled={!amount || amount <= 0 || this.state.isProcessingPayment}
+                  startIcon={this.state.isProcessingPayment ? <CircularProgress size={20} color="inherit" /> : <AddCircleIcon />}
                   style={{ 
                     borderRadius: 12, 
                     padding: '12px', 
@@ -105,7 +123,7 @@ class WalletPage extends Component {
                     background: '#b72429' 
                   }}
                 >
-                  Proceed to Pay
+                  {this.state.isProcessingPayment ? 'Redirecting to ICICI...' : 'Proceed to Pay'}
                 </Button>
               </form>
               <Typography variant="caption" style={{ display: 'block', textAlign: 'center', marginTop: 16, color: '#94a3b8' }}>
@@ -215,7 +233,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   getWalletData,
-  addWalletMoney
+  addWalletMoney,
+  setAlert
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletPage);

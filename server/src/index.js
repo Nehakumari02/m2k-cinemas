@@ -53,6 +53,7 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(adminAuditLog);
 app.post('/users/login/guest', guestLoginHandler);
 app.use(userRouter);

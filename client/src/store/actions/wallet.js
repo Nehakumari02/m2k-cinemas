@@ -23,7 +23,8 @@ export const getWalletData = () => async dispatch => {
 
 export const addWalletMoney = (amount) => async dispatch => {
   try {
-    const response = await fetch('/wallet/add', {
+    // 1. Get the payload from the backend
+    const response = await fetch('/wallet/icici/initiate', {
       method: 'POST',
       headers: {
         ...setAuthHeaders(),
@@ -32,14 +33,14 @@ export const addWalletMoney = (amount) => async dispatch => {
       body: JSON.stringify({ amount })
     });
     const data = await response.json();
-    if (response.ok) {
-      dispatch({ type: ADD_WALLET_MONEY, payload: data });
-      dispatch(setAlert(`Successfully added ₹${amount} to wallet`, 'success'));
-      dispatch(getWalletData());
+    
+    if (response.ok && data.paymentUrl) {
+      // 2. Redirect to ICICI Payment URL
+      window.location.href = data.paymentUrl;
     } else {
-      dispatch(setAlert(data.error || 'Error adding money', 'error'));
+      dispatch(setAlert(data.error || 'Error initiating payment', 'error'));
     }
   } catch (e) {
-    dispatch(setAlert('Server Error', 'error'));
+    dispatch(setAlert('Server Error during checkout', 'error'));
   }
 };
