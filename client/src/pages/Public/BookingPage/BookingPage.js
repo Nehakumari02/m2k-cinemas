@@ -9,7 +9,16 @@ import {
   Button,
   Paper,
   Chip,
-  Box
+  Box,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@material-ui/core';
 import { Rating } from '@material-ui/lab';
 import { Star as StarIcon } from '@material-ui/icons';
@@ -41,6 +50,8 @@ import {
   loadUser,
   getMemberships,
   clearSelectedFood,
+  setFoodDeliveryTime,
+  setFoodDeliveryMethod
 } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { calculateBookingTotals } from '../../../utils/bookingPricing';
@@ -88,7 +99,9 @@ class BookingPage extends Component {
     timeLeft: 420, // 7 minutes
     showPaymentSection: false,
     loginResumePayment: false,
-    completedWithoutFood: false
+    completedWithoutFood: false,
+    showDeliveryTimePopup: false,
+    deliveryTimePopupCompleted: false
   };
   timer = null;
 
@@ -396,7 +409,7 @@ class BookingPage extends Component {
   };
 
   onSelectSeat = (row, seat) => {
-    const { cinema, setSelectedSeats } = this.props;
+    const { cinema, setSelectedSeats, selectedSeats } = this.props;
     const seats = [...cinema.seats];
     const val = seats[row][seat];
 
@@ -405,20 +418,30 @@ class BookingPage extends Component {
     } else if (val === 2) {
       // De-select normal seat
       seats[row][seat] = 0;
+      setSelectedSeats([row, seat]);
     } else if (val === 6) {
       // De-select special seat — restore to 5
       seats[row][seat] = 5;
-    } else if (val === 3) {
-      // Suggested seat → select
-      seats[row][seat] = 2;
-    } else if (val === 5) {
-      // Special seat → selected special (value 6)
-      seats[row][seat] = 6;
+      setSelectedSeats([row, seat]);
     } else {
-      // Normal available seat → select
-      seats[row][seat] = 2;
+      // Trying to select a seat
+      if (selectedSeats.length >= 10) {
+        this.props.setAlert('You can only book a maximum of 10 tickets.', 'error', 3000);
+        return;
+      }
+      
+      if (val === 3) {
+        // Suggested seat → select
+        seats[row][seat] = 2;
+      } else if (val === 5) {
+        // Special seat → selected special (value 6)
+        seats[row][seat] = 6;
+      } else {
+        // Normal available seat → select
+        seats[row][seat] = 2;
+      }
+      setSelectedSeats([row, seat]);
     }
-    setSelectedSeats([row, seat]);
   };
 
   async checkout() {
@@ -436,7 +459,9 @@ class BookingPage extends Component {
       showInvitationForm,
       setQRCode,
       pendingReservationId,
-      confirmReservation
+      confirmReservation,
+      foodDeliveryTime,
+      foodDeliveryMethod
     } = this.props;
     const { paymentMethod, paymentDetails, pointsUsed } = this.state;
 
@@ -547,6 +572,8 @@ class BookingPage extends Component {
           total: afterDiscountTotal,
           pointsUsed: pointsUsed,
           foodItems,
+          foodDeliveryTime,
+          foodDeliveryMethod,
           appliedFirstGstBenefit,
         })
       : await addReservation({
@@ -557,6 +584,8 @@ class BookingPage extends Component {
           total: afterDiscountTotal,
           pointsUsed: pointsUsed,
           foodItems,
+          foodDeliveryTime,
+          foodDeliveryMethod,
           movieId: movie._id,
           cinemaId: cinema._id,
           username: user.username,
@@ -620,18 +649,48 @@ class BookingPage extends Component {
     await this.onContinueToPayment();
   };
 
+  createPendingReservation = async () => {
+    const {
+      addReservation,
+      selectedDate,
+      selectedTime,
+      movie,
+      cinema,
+      user,
+      setPendingReservation,
+      selectedFood,
+      foodDeliveryTime,
+      foodDeliveryMethod
+    } = this.props;
+    const res = await addReservation({
+      date: selectedDate,
+      startAt: selectedTime,
+      seats: this.bookSeats(),
+      ticketPrice: getMovieBaseTicketPrice(movie, cinema),
+      total: Number(this.getSelectedSeatsTicketTotal()),
+      foodItems: Object.values(selectedFood || {}).map(f => ({ foodId: f._id, name: f.name, price: f.price, quantity: f.quantity })),
+      movieId: movie._id,
+      cinemaId: cinema._id,
+      username: user.username,
+      phone: user.phone,
+      foodDeliveryTime,
+      foodDeliveryMethod,
+      status: 'Pending'
+    });
+
+    if (res.status === 'success') {
+      setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
+      this.startTimer();
+      if (user) this.props.getWalletData();
+    }
+  };
+
   onContinueToPayment = async () => {
     const {
       selectedSeats,
       isAuth,
       toggleLoginPopup,
-      addReservation,
-      selectedDate,
-      selectedTime,
-      cinema,
-      movie,
-      user,
-      setPendingReservation
+      selectedFood
     } = this.props;
 
     if (selectedSeats.length === 0) return;
@@ -641,30 +700,28 @@ class BookingPage extends Component {
       return toggleLoginPopup();
     }
 
-    if (needsRegistration(user)) {
+    if (needsRegistration(this.props.user)) {
       return this.props.setAlert(REGISTRATION_REQUIRED_MSG, 'error', 6000);
     }
 
-    const res = await addReservation({
-      date: selectedDate,
-      startAt: selectedTime,
-      seats: this.bookSeats(),
-      ticketPrice: getMovieBaseTicketPrice(movie, cinema),
-      total: Number(this.getSelectedSeatsTicketTotal()),
-      foodItems: [],
-      movieId: movie._id,
-      cinemaId: cinema._id,
-      username: user.username,
-      phone: user.phone,
-      status: 'Pending'
-    });
-
-    if (res.status === 'success') {
-      setPendingReservation(res.data.reservation._id, res.data.reservation.expiresAt);
-      this.startTimer();
-      this.setState({ showPaymentSection: true });
-      if (user) this.props.getWalletData();
+    if (Object.keys(selectedFood || {}).length > 0 && !this.state.deliveryTimePopupCompleted) {
+      this.setState({ showDeliveryTimePopup: true });
+      return;
     }
+
+    if (!this.state.showPaymentSection) {
+      this.setState({ showPaymentSection: true });
+    }
+
+    if (!this.props.pendingReservationId) {
+      this.createPendingReservation();
+    }
+  };
+
+  handleDeliveryPopupContinue = () => {
+    this.setState({ showDeliveryTimePopup: false, deliveryTimePopupCompleted: true }, () => {
+      this.onContinueToPayment();
+    });
   };
 
   onChangePaymentMethod = event =>
@@ -885,7 +942,9 @@ class BookingPage extends Component {
       cinema,
       selectedDate,
       selectedTime,
-      invitations
+      invitations,
+      selectedFood,
+      foodDeliveryTime
     } = this.props;
 
     const invArray = Object.keys(invitations)
@@ -930,6 +989,10 @@ class BookingPage extends Component {
       suggestedSeats,
       suggestedSeat,
       location,
+      setFoodDeliveryTime,
+      foodDeliveryTime,
+      setFoodDeliveryMethod,
+      foodDeliveryMethod
     } = this.props;
     const isSeatsStep = location.pathname.endsWith('/seats');
     const isPaymentStep = location.pathname.endsWith('/payment');
@@ -937,7 +1000,8 @@ class BookingPage extends Component {
       paymentMethod,
       paymentDetails,
       reviews,
-      loadingReviews
+      loadingReviews,
+      showDeliveryTimePopup
     } = this.state;
     const castCrew = Array.isArray(movie && movie.castCrew) ? movie.castCrew : [];
     const castMembers = castCrew.filter(
@@ -1347,6 +1411,43 @@ class BookingPage extends Component {
             )}
           </Grid>
         </Grid>
+        <Dialog open={showDeliveryTimePopup} onClose={() => this.setState({ showDeliveryTimePopup: false })} maxWidth="xs" fullWidth>
+          <DialogTitle style={{ textAlign: 'center', fontWeight: 600 }}>Preferred F&B Delivery Time</DialogTitle>
+          <DialogContent>
+            <Box textAlign="center" mb={2}>
+              <p style={{ margin: 0, color: '#666', fontStyle: 'italic', fontSize: '0.9rem' }}>
+                "Skip the queues and avoid the chaos! Choose your preferred time below for seamless seat delivery or quick pick-up."
+              </p>
+            </Box>
+            <FormControl component="fieldset" style={{ width: '100%', marginTop: '16px' }}>
+              <RadioGroup
+                name="deliveryTime"
+                value={foodDeliveryTime || 'At Interval'}
+                onChange={(e) => setFoodDeliveryTime(e.target.value)}
+              >
+                <FormControlLabel value="Before Interval" control={<Radio color="primary" />} label="Before Interval" />
+                <FormControlLabel value="At Interval" control={<Radio color="primary" />} label="At Interval" />
+                <FormControlLabel value="After Interval" control={<Radio color="primary" />} label="After Interval" />
+              </RadioGroup>
+            </FormControl>
+            <FormControl component="fieldset" style={{ width: '100%', marginTop: '16px' }}>
+              <legend style={{ fontWeight: 600, color: '#333', marginBottom: '8px' }}>How would you like to receive your food?</legend>
+              <RadioGroup
+                name="deliveryMethod"
+                value={foodDeliveryMethod || 'Seat Delivery'}
+                onChange={(e) => setFoodDeliveryMethod(e.target.value)}
+              >
+                <FormControlLabel value="Seat Delivery" control={<Radio color="primary" />} label="Seat Delivery" />
+                <FormControlLabel value="Pick Up" control={<Radio color="primary" />} label="Pick Up" />
+              </RadioGroup>
+            </FormControl>
+          </DialogContent>
+          <DialogActions style={{ padding: '16px 24px' }}>
+            <Button onClick={this.handleDeliveryPopupContinue} color="primary" variant="contained" fullWidth>
+              Continue to Payment
+            </Button>
+          </DialogActions>
+        </Dialog>
         <ResponsiveDialog
           id="Edit-cinema"
           open={showLoginPopup}
@@ -1414,6 +1515,8 @@ const mapStateToProps = (
   invitations: checkoutState.invitations,
   QRCode: checkoutState.QRCode,
   selectedFood: checkoutState.selectedFood,
+  foodDeliveryTime: checkoutState.foodDeliveryTime,
+  foodDeliveryMethod: checkoutState.foodDeliveryMethod,
   pendingReservationId: checkoutState.pendingReservationId,
   reservationExpiresAt: checkoutState.reservationExpiresAt,
   suggestedSeats: reservationState.suggestedSeats,
@@ -1451,6 +1554,8 @@ const mapDispatchToProps = {
   loadUser,
   getMemberships,
   clearSelectedFood,
+  setFoodDeliveryTime,
+  setFoodDeliveryMethod
 };
 
 export default connect(

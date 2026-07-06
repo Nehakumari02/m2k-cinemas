@@ -56,6 +56,7 @@ const useStyles = makeStyles(theme => ({
     color: '#0f172a',
     fontSize: '0.72rem',
     fontWeight: 700,
+    textTransform: 'capitalize',
   },
   details: { padding: theme.spacing(2.2, 2.2, 1.4) },
   name: {
@@ -96,10 +97,15 @@ const useStyles = makeStyles(theme => ({
     fontSize: '0.82rem',
     fontWeight: 600,
   },
-  cta: {
+  ctaContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     margin: theme.spacing(0, 2.2, 2.2),
     borderTop: '1px solid rgba(15,23,42,0.08)',
     paddingTop: theme.spacing(1.2),
+  },
+  cta: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
@@ -107,6 +113,22 @@ const useStyles = makeStyles(theme => ({
     fontSize: '0.82rem',
     fontWeight: 700,
     letterSpacing: '0.01em',
+  },
+  mapBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    color: '#0f172a',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    textDecoration: 'none',
+    backgroundColor: '#f1f5f9',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    transition: 'background-color 0.2s',
+    '&:hover': {
+      backgroundColor: '#e2e8f0',
+    }
   },
 }));
 
@@ -136,42 +158,24 @@ function CinemaCard(props) {
           {venueAddress || cinema.city}
         </Typography>
       </div>
-      <div className={classes.statsWrap}>
-        {admin ? (
-          <>
-            <Typography className={classes.eventText} variant="body2">
-              Ticket price is set per movie (Movies admin)
-            </Typography>
-            {premiumLabel && (
-              <Typography className={classes.eventText} variant="body2">
-                {premiumLabel}
-              </Typography>
-            )}
-          </>
-        ) : (
-          <>
-            <Typography className={classes.eventText} variant="body2">
-              {minMoviePrice > 0
-                ? `From ₹${minMoviePrice} per ticket (by movie)`
-                : 'Ticket price varies by movie'}
-            </Typography>
-            {premiumLabel && (
-              <Typography className={classes.eventText} variant="body2">
-                {premiumLabel}
-              </Typography>
-            )}
-          </>
-        )}
-        <div className={classes.stats}>
-          <EventSeat className={classes.eventIcon} />
-          <Typography className={classes.eventText} variant="body2">
-            {cinema.seatsAvailable} total seats
-          </Typography>
+
+      <div className={classes.ctaContainer}>
+        <div className={classes.cta}>
+          View Showtimings
+          <ArrowForward style={{ fontSize: 16 }} />
         </div>
-      </div>
-      <div className={classes.cta}>
-        View Showtimings
-        <ArrowForward style={{ fontSize: 16 }} />
+        {(cinema.name && (cinema.name.toLowerCase().includes('rohini') || cinema.name.toLowerCase().includes('pitampura'))) && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=M2K+Cinemas+${cinema.name.toLowerCase().includes('rohini') ? 'Rohini' : 'Pitampura'}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={classes.mapBtn}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <LocationOn style={{ fontSize: 14 }} />
+            Map
+          </a>
+        )}
       </div>
     </Paper>
   );

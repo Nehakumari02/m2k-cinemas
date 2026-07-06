@@ -101,6 +101,14 @@ function CinemasPage(props) {
     return prices.length ? Math.min(...prices) : 0;
   }, [movies]);
 
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+    import('../../../utils/geolocation').then(({ getUserLocation }) => {
+      getUserLocation().then(loc => setUserLocation(loc)).catch(() => {});
+    });
+  }, []);
+
   const cityOptions = useMemo(() => {
     const cities = listingCinemas
       .map(cinema => cinema.city)
@@ -109,9 +117,24 @@ function CinemasPage(props) {
     return ['all', ...Array.from(new Set(cities)).sort((a, b) => a.localeCompare(b))];
   }, [listingCinemas]);
 
+  const sortedCinemas = useMemo(() => {
+    if (!userLocation) return listingCinemas;
+    const { getCinemaCoordinates, calculateDistance } = require('../../../utils/distance');
+    
+    return [...listingCinemas].map(cinema => {
+      const coords = getCinemaCoordinates(cinema);
+      if (coords) {
+        cinema.distance = calculateDistance(userLocation.latitude, userLocation.longitude, coords.latitude, coords.longitude);
+      } else {
+        cinema.distance = Infinity;
+      }
+      return cinema;
+    }).sort((a, b) => a.distance - b.distance);
+  }, [listingCinemas, userLocation]);
+
   const filteredCinemas = useMemo(() => {
     const term = normalize(search);
-    return listingCinemas.filter(cinema => {
+    return sortedCinemas.filter(cinema => {
       const cinemaName = normalize(cinema.name);
       const cinemaCity = normalize(cinema.city);
       const combined = `${cinemaName} ${cinemaCity}`.trim();
@@ -125,7 +148,7 @@ function CinemasPage(props) {
         combined.includes(term);
       return cityPass && searchPass;
     });
-  }, [listingCinemas, search, selectedCity]);
+  }, [sortedCinemas, search, selectedCity]);
 
   return (
     <Container maxWidth="lg" className={classes.page}>
@@ -141,17 +164,18 @@ function CinemasPage(props) {
           <TextField
             className={classes.filterField}
             variant="outlined"
-            label="Search cinema"
+            select
+            label="Select cinema"
             value={search}
             onChange={event => setSearch(event.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search fontSize="small" style={{ color: '#64748b' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
+          >
+            <MenuItem value="">All Cinemas</MenuItem>
+            {listingCinemas.map(cinema => (
+              <MenuItem key={cinema._id} value={cinema.name}>
+                {cinema.name}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             className={classes.filterField}
             variant="outlined"
@@ -179,7 +203,12 @@ function CinemasPage(props) {
       <Grid container spacing={2}>
         {filteredCinemas.length ? (
           filteredCinemas.map(cinema => (
-            <Grid key={cinema._id} item xs={12} sm={6} md={4}>
+            <Grid key={cinema._id} item xs={12} sm={6} md={4} style={{ position: 'relative' }}>
+              {cinema.distance && cinema.distance !== Infinity && cinema.distance === Math.min(...filteredCinemas.map(c => c.distance)) && (
+                <div style={{ position: 'absolute', top: 4, right: 16, zIndex: 10, background: '#b72429', color: '#fff', padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  📍 Nearest to you ({cinema.distance.toFixed(1)} km)
+                </div>
+              )}
               <CinemaCard cinema={cinema} linkToDetails minMoviePrice={minMoviePrice} />
             </Grid>
           ))

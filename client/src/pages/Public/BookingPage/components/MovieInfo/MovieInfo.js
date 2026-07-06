@@ -121,9 +121,14 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(0, 2.5, 2.5),
     width: '100%',
   },
+  infoGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: theme.spacing(1.5),
+    marginBottom: theme.spacing(1.5),
+  },
   infoBox: {
     color: '#0f172a',
-    marginBottom: theme.spacing(1.5),
   },
   infoLabel: {
     fontSize: '0.66rem',
@@ -146,6 +151,26 @@ const useStyles = makeStyles(theme => ({
     fontSize: '0.8rem',
     color: '#41556f',
     lineHeight: 1.45,
+  },
+  facilitiesBox: {
+    marginTop: theme.spacing(2),
+    paddingTop: theme.spacing(2),
+    borderTop: '1px dashed #d8e2f0',
+  },
+  facilitiesRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+    marginTop: '6px',
+  },
+  facilityChip: {
+    backgroundColor: '#f1f5f9',
+    color: '#334155',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    padding: '4px 10px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
   },
   [theme.breakpoints.down('md')]: {
     movieInfos: { minHeight: '30vh', borderRadius: '10px' },
@@ -208,64 +233,66 @@ export default function MovieInfo(props) {
               ))}
         </div>
         <div className={classes.info}>
-          {!!runtimeWithCert && (
+          <div className={classes.infoGrid}>
+            {!!runtimeWithCert && (
+              <div className={classes.infoBox}>
+                <Typography className={classes.infoLabel}>
+                  Duration
+                </Typography>
+                <Typography className={classes.infoValue}>
+                  {runtimeWithCert}
+                </Typography>
+              </div>
+            )}
+            {!!genreDisplay && (
+              <div className={classes.infoBox}>
+                <Typography className={classes.infoLabel}>
+                  Genre
+                </Typography>
+                <Typography className={classes.infoValue}>
+                  {genreDisplay}
+                </Typography>
+              </div>
+            )}
+            {!!releaseDisplay && (
+              <div className={classes.infoBox}>
+                <Typography className={classes.infoLabel}>
+                  Release Date
+                </Typography>
+                <Typography className={classes.infoValue}>
+                  {releaseDisplay}
+                </Typography>
+              </div>
+            )}
+            {!!languagesDisplay && (
+              <div className={classes.infoBox}>
+                <Typography className={classes.infoLabel}>
+                  Languages
+                </Typography>
+                <Typography className={classes.infoValue}>
+                  {languagesDisplay}
+                </Typography>
+              </div>
+            )}
             <div className={classes.infoBox}>
               <Typography className={classes.infoLabel}>
-                Duration
+                Formats
               </Typography>
               <Typography className={classes.infoValue}>
-                {runtimeWithCert}
+                {formatDisplay}
               </Typography>
             </div>
-          )}
-          {!!genreDisplay && (
-            <div className={classes.infoBox}>
-              <Typography className={classes.infoLabel}>
-                Genre
-              </Typography>
-              <Typography className={classes.infoValue}>
-                {genreDisplay}
-              </Typography>
-            </div>
-          )}
-          {!!releaseDisplay && (
-            <div className={classes.infoBox}>
-              <Typography className={classes.infoLabel}>
-                Release Date
-              </Typography>
-              <Typography className={classes.infoValue}>
-                {releaseDisplay}
-              </Typography>
-            </div>
-          )}
-          {!!languagesDisplay && (
-            <div className={classes.infoBox}>
-              <Typography className={classes.infoLabel}>
-                Languages
-              </Typography>
-              <Typography className={classes.infoValue}>
-                {languagesDisplay}
-              </Typography>
-            </div>
-          )}
-          <div className={classes.infoBox}>
-            <Typography className={classes.infoLabel}>
-              Formats
-            </Typography>
-            <Typography className={classes.infoValue}>
-              {formatDisplay}
-            </Typography>
+            {movie.director && (
+              <div className={classes.infoBox}>
+                <Typography className={classes.infoLabel}>
+                  Director
+                </Typography>
+                <Typography className={classes.infoValue}>
+                  {movie.director}
+                </Typography>
+              </div>
+            )}
           </div>
-          {movie.director && (
-            <div className={classes.infoBox}>
-              <Typography className={classes.infoLabel}>
-                Director
-              </Typography>
-              <Typography className={classes.infoValue}>
-                {movie.director}
-              </Typography>
-            </div>
-          )}
           {movie.cast && (
             <div className={classes.infoBox}>
               <Typography className={classes.infoLabel}>
@@ -286,6 +313,17 @@ export default function MovieInfo(props) {
               </Typography>
             </div>
           )}
+          <div className={classes.facilitiesBox}>
+            <Typography className={classes.infoLabel}>
+              Available Facilities
+            </Typography>
+            <div className={classes.facilitiesRow}>
+              <span className={classes.facilityChip}>🎮 Game Zone</span>
+              <span className={classes.facilityChip}>🍔 Food Court</span>
+              <span className={classes.facilityChip}>🚗 Parking</span>
+              <span className={classes.facilityChip}>💺 Recliners</span>
+            </div>
+          </div>
         </div>
       </div>
     </Grid>

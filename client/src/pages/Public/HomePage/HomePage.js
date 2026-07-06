@@ -51,6 +51,7 @@ class HomePage extends Component {
       if (!suggested.length) getMovieSuggestion(user.username);
     }
     this.fetchHomeBannerSetting();
+    this.fetchUserLocation();
   }
 
   fetchHomeBannerSetting = async () => {
@@ -65,10 +66,52 @@ class HomePage extends Component {
     }
   };
 
+  fetchUserLocation = async () => {
+    try {
+      const { getUserLocation } = await import('../../../utils/geolocation');
+      const { getCinemaCoordinates, calculateDistance } = await import('../../../utils/distance');
+      
+      const location = await getUserLocation();
+      this.setState({ userLocation: location });
+      
+      // Calculate nearest cinema when cinemas are available
+      this.calculateNearestCinema(location);
+    } catch (error) {
+      console.log('Location access denied or unavailable', error);
+    }
+  };
+
+  calculateNearestCinema = (location = this.state.userLocation) => {
+    if (!location || !this.props.cinemas.length) return;
+    
+    let nearest = null;
+    let minDistance = Infinity;
+    
+    const { getCinemaCoordinates, calculateDistance } = require('../../../utils/distance');
+    
+    this.props.cinemas.forEach(cinema => {
+      const coords = getCinemaCoordinates(cinema);
+      if (coords) {
+        const dist = calculateDistance(location.latitude, location.longitude, coords.latitude, coords.longitude);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearest = { ...cinema, distance: dist.toFixed(1) };
+        }
+      }
+    });
+    
+    if (nearest) {
+      this.setState({ nearestCinema: nearest });
+    }
+  };
+
   componentDidUpdate(prevProps) {
     if (this.props.user !== prevProps.user) {
       this.props.user &&
         this.props.getMovieSuggestion(this.props.user.username);
+    }
+    if (this.props.cinemas !== prevProps.cinemas && this.state.userLocation) {
+      this.calculateNearestCinema();
     }
   }
 
@@ -97,7 +140,7 @@ class HomePage extends Component {
       suggested,
       offers
     } = this.props;
-    const { activeTab, homeBanner, trailerModalOpen, activeTrailerUrl } = this.state;
+    const { activeTab, homeBanner, trailerModalOpen, activeTrailerUrl, nearestCinema } = this.state;
     const heroMovies = (nowShowing && nowShowing.length ? nowShowing : movies).slice(0, 3);
 
     // Combine movies and top 2 offers for the banner
@@ -124,8 +167,8 @@ class HomePage extends Component {
 
     const TABS = [
       { id: 'nowShowing', label: '🎬 Now Showing' },
+      { id: 'suggested', label: 'Next Change' },
       { id: 'comingSoon', label: '🗓 Coming Soon' },
-      { id: 'suggested', label: '⭐ Suggested' },
       { id: 'allMovies', label: '🎥 All Movies' },
       { id: 'cinemas', label: '🏛 Cinemas' },
     ];
@@ -196,17 +239,28 @@ class HomePage extends Component {
               {heroItems.map((item, idx) => (
                 <div key={item.data._id || idx}>
                   {item.type === 'movie' ? (
-                    <MovieBanner movie={item.data} height="51vh" />
+                    <MovieBanner movie={item.data} height="65vh" />
                   ) : (
-                    <OfferBanner offer={item.data} height="51vh" />
+                    <OfferBanner offer={item.data} height="65vh" />
                   )}
                 </div>
               ))}
             </Slider>
           ) : (
-            <MovieBanner movie={randomMovie} height="51vh" />
+            <MovieBanner movie={randomMovie} height="65vh" />
           )}
         </div>
+
+        {nearestCinema && (
+          <div style={{ backgroundColor: '#111', padding: '12px 20px', textAlign: 'center', borderBottom: '1px solid #333' }}>
+            <Typography variant="body1" style={{ color: '#fff', fontWeight: 500 }}>
+              <span style={{ color: '#b72429', marginRight: 4 }}>📍 Nearest to you:</span> 
+              <Link to={`/cinemas`} style={{ color: '#fff', textDecoration: 'underline' }}>
+                {nearestCinema.name} ({nearestCinema.distance} km away)
+              </Link>
+            </Typography>
+          </div>
+        )}
 
         {/* ── Quick Book Bar ── */}
         <QuickBookBar movies={movies} cinemas={primaryCinemas} />
@@ -238,6 +292,17 @@ class HomePage extends Component {
           </div>
         )}
 
+        {/* ── Suggested / Next Change ── */}
+        {!!(suggested && suggested.length) && (
+          <div id="suggested" className={classes.sectionWrapper}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="Next Change"
+              movies={suggested}
+            />
+          </div>
+        )}
+
         {/* ── Coming Soon ── */}
         {!!(comingSoon && comingSoon.length) && (
           <div id="comingSoon" className={classes.sectionWrapper}>
@@ -248,17 +313,6 @@ class HomePage extends Component {
               autoScroll
               autoScrollSpeed={3600}
               movies={comingSoon}
-            />
-          </div>
-        )}
-
-        {/* ── Suggested ── */}
-        {!!(suggested && suggested.length) && (
-          <div id="suggested" className={classes.sectionWrapper}>
-            <MovieCarousel
-              carouselClass={classes.carousel}
-              title="Suggested for You"
-              movies={suggested}
             />
           </div>
         )}

@@ -34,6 +34,7 @@ const SchoolGroupInquiryList = lazy(() =>
 const CorporateGroupInquiryList = lazy(() =>
   import('./pages/Admin/CorporateGroupInquiryList')
 );
+const PartyInquiryList = lazy(() => import('./pages/Admin/PartyInquiryList'));
 const FeedbackList = lazy(() => import('./pages/Admin/FeedbackList/FeedbackList'));
 
 // Register - Login
@@ -194,6 +195,7 @@ const Routes = () => {
             exact
             path="/contact-us"
             layout={PublicLayout}
+            layoutProps={{ withFooter: false }}
             component={ContactUsPage}
           />
           <WithLayoutRoute
@@ -369,6 +371,12 @@ const Routes = () => {
             path="/admin/corporate-bookings"
             layout={AdminLayout}
             component={CorporateGroupInquiryList}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/party-inquiries"
+            layout={AdminLayout}
+            component={PartyInquiryList}
           />
           <ProtectedRoute
             exact

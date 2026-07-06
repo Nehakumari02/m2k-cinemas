@@ -7,7 +7,7 @@ import { getCinema, getShowtimes, getMovies } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import { MovieBookingModals } from '../../../components';
 import useMovieBookingFlow from '../../../hooks/useMovieBookingFlow';
-import { formatCinemaAddress } from '../../../constants/m2kAddresses';
+import { formatCinemaAddress, formatCinemaPhone } from '../../../constants/m2kAddresses';
 import { formatPremiumSeatLabel, getMovieBaseTicketPrice } from '../../../utils/seatPricing';
 
 const useStyles = makeStyles(theme => ({
@@ -223,6 +223,11 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
               {formatCinemaAddress(cinema)}
             </Typography>
           )}
+          {formatCinemaPhone(cinema) && (
+            <Typography variant="body2" className={classes.address} style={{ marginTop: 4 }}>
+              {cinema.name}: {formatCinemaPhone(cinema)}
+            </Typography>
+          )}
           <Box mt={1}>
             <Chip
               className={classes.chip}
@@ -310,6 +315,51 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
           </Grid>
         )}
       </Grid>
+      {(cinema && cinema.name && (cinema.name.toLowerCase().includes('rohini') || cinema.name.toLowerCase().includes('pitampura'))) && (
+        <div style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h5" className={classes.sectionTitle} style={{ margin: 0 }}>
+              Location Map
+            </Typography>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              href={`https://www.google.com/maps/search/?api=1&query=M2K+Cinemas+${cinema.name.toLowerCase().includes('rohini') ? 'Rohini' : 'Pitampura'}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontWeight: 600, borderRadius: '8px', textTransform: 'none' }}
+            >
+              Open in Google Maps
+            </Button>
+          </div>
+          <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #d8e2f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            {cinema.name.toLowerCase().includes('rohini') ? (
+              <iframe 
+                title="M2K Cinemas Rohini Map"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3558.856222318864!2d77.11439427550334!3d28.70107457562746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e378699241%3A0xb90fd0c6d8997cbc!2sM2K%20Cinemas%20Rohini!5e1!3m2!1sen!2sin!4v1783311501337!5m2!1sen!2sin" 
+                width="100%" 
+                height="450" 
+                style={{ border: 0, display: 'block' }} 
+                allowFullScreen="" 
+                loading="lazy" 
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <iframe 
+                title="M2K Cinemas Pitampura Map"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.2584451769276!2d77.13068007550288!3d28.689244975633898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03c69adf85c3%3A0x1e6c0303dc3364e3!2sM2K%20Cinema!5e1!3m2!1sen!2sin!4v1783311537146!5m2!1sen!2sin" 
+                width="100%" 
+                height="450" 
+                style={{ border: 0, display: 'block' }} 
+                allowFullScreen="" 
+                loading="lazy" 
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            )}
+          </div>
+        </div>
+      )}
       <MovieBookingModals flow={bookingFlow} />
     </Container>
   );

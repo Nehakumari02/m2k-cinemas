@@ -31,6 +31,12 @@ import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import HistoryIcon from '@material-ui/icons/History';
 import FeedbackOutlinedIcon from '@material-ui/icons/FeedbackOutlined';
+import {
+  EmojiEvents as EmojiEventsIcon,
+  Group as GroupIcon,
+  Feedback as FeedbackIcon,
+  Cake as CakeIcon
+} from '@material-ui/icons';
 // Component styles
 import styles from './styles';
 
@@ -142,6 +148,19 @@ class Sidebar extends Component {
             <ListItemText
               classes={{ primary: classes.listItemText }}
               primary="Corporate Bookings"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/party-inquiries">
+            <ListItemIcon className={classes.listItemIcon}>
+              <CakeIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Party Inquiries"
             />
           </ListItem>
           <ListItem

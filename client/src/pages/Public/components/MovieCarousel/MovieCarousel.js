@@ -158,8 +158,6 @@ function MovieCarousel({
       </div>
 
       <div className={classes.trackWrap}>
-        <div className={classes.edgeFadeLeft} aria-hidden />
-        <div className={classes.edgeFadeRight} aria-hidden />
         <Slider {...settings}>
           {movies.map(movie => (
             <div key={movie._id} className={classes.slide}>

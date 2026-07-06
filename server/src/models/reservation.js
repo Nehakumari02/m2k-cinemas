@@ -53,6 +53,20 @@ const reservationSchema = new Schema({
       quantity: Number,
     },
   ],
+  foodDeliveryTime: {
+    type: String,
+    enum: ['Before Interval', 'At Interval', 'After Interval'],
+    default: 'At Interval'
+  },
+  foodDeliveryMethod: {
+    type: String,
+    enum: ['Seat Delivery', 'Pick Up'],
+    default: 'Seat Delivery'
+  },
+  foodOrderCompleted: {
+    type: Boolean,
+    default: false
+  },
   QRCode: {
     type: String,
     default: '',

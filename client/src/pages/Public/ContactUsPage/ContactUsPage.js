@@ -94,8 +94,8 @@ const ContactUsPage = () => {
         <Grid container spacing={6}>
           <Grid item xs={12} md={7}>
             <Paper className={classes.formPaper}>
-              <Box display="flex" alignItems="center" gap={1} marginBottom={4}>
-                <Send style={{ color: '#b72429' }} />
+              <Box display="flex" alignItems="center" marginBottom={4}>
+                <Send style={{ color: '#b72429', marginRight: '12px' }} />
                 <Typography variant="h5" style={{ fontWeight: 800 }}>Send us a Message</Typography>
               </Box>
               <form noValidate autoComplete="off">
@@ -144,6 +144,8 @@ const ContactUsPage = () => {
                     M2K Mall, 16, Mangalam Place District Centre,
                     <br />
                     Sector 3, Rohini, New Delhi - 110085, India.
+                    <br />
+                    <strong>Phone:</strong> {M2K_ROHINI_VENUE.phone}
                   </Typography>
                 </div>
               </div>
@@ -156,6 +158,8 @@ const ContactUsPage = () => {
                     M2K Mall, Plot No 4, Community Centre,
                     <br />
                     Road No. 44, Pitampura, New Delhi, Delhi 110034
+                    <br />
+                    <strong>Phone:</strong> {M2K_PITAMPURA_VENUE.phone}
                   </Typography>
                 </div>
               </div>
@@ -164,9 +168,11 @@ const ContactUsPage = () => {
                 <div className={classes.iconBox}><Email /></div>
                 <div>
                   <Typography variant="h6" style={{ fontWeight: 800 }}>Email Us</Typography>
-                  <Typography variant="body1" style={{ color: '#64748b' }}>
-                    support@m2kcinemas.com<br />
-                    info@m2kgroup.com
+                  <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
+                    <strong>For Feedback, School/Corporate Bookings, Kitty & Birthday Parties:</strong><br />
+                    <a href="mailto:customercare@m2kcinemas.com" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 600 }}>customercare@m2kcinemas.com</a><br /><br />
+                    <strong>General Support:</strong><br />
+                    <a href="mailto:support@m2kcinemas.com" style={{ color: '#64748b', textDecoration: 'none' }}>support@m2kcinemas.com</a>
                   </Typography>
                 </div>
               </div>
@@ -175,9 +181,9 @@ const ContactUsPage = () => {
                 <div className={classes.iconBox}><Phone /></div>
                 <div>
                   <Typography variant="h6" style={{ fontWeight: 800 }}>Call Us</Typography>
-                  <Typography variant="body1" style={{ color: '#64748b' }}>
-                    +91 11 4750 1234<br />
-                    +91 11 4750 5678
+                  <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
+                    Rohini: {M2K_ROHINI_VENUE.phone}<br />
+                    Pitampura: {M2K_PITAMPURA_VENUE.phone}
                   </Typography>
                 </div>
               </div>

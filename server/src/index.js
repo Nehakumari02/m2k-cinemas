@@ -28,11 +28,13 @@ const foodBannersRouter = require('./routes/foodBanners');
 const refundRouter = require('./routes/refunds');
 const schoolGroupInquiryRouter = require('./routes/schoolGroupInquiries');
 const corporateGroupInquiryRouter = require('./routes/corporateGroupInquiries');
+const partyInquiryRouter = require('./routes/partyInquiries');
 const membershipRouter = require('./routes/membership');
 const newsletterRouter = require('./routes/newsletter');
 const activityLogsRouter = require('./routes/activityLogs');
 const notificationsRouter = require('./routes/notifications');
 const feedbackRouter = require('./routes/feedback');
+const chatbotRouter = require('./routes/chatbot');
 const guestLoginHandler = require('./handlers/guestLoginHandler');
 const adminAuditLog = require('./middlewares/adminAuditLog');
 
@@ -76,11 +78,13 @@ app.use(foodBannersRouter);
 app.use(refundRouter);
 app.use(schoolGroupInquiryRouter);
 app.use(corporateGroupInquiryRouter);
+app.use(partyInquiryRouter);
 app.use(membershipRouter);
 app.use(newsletterRouter);
 app.use(activityLogsRouter);
 app.use(notificationsRouter);
 app.use(feedbackRouter);
+app.use(chatbotRouter);
 
 app.get('/health', (req, res) => {
   res.send({

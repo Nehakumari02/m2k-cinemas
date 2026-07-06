@@ -1,4 +1,4 @@
-import { GET_MOVIES, SELECT_MOVIE,GET_SUGGESTIONS } from '../types';
+import { GET_MOVIES, SELECT_MOVIE, GET_SUGGESTIONS, TOGGLE_MOVIE_INTEREST } from '../types';
 
 const initialState = {
   movies: [],
@@ -55,6 +55,14 @@ export default (state = initialState, action) => {
       return onSelectMovie(state, payload);
     case GET_SUGGESTIONS:
       return getMovieSuggestions(state, payload);
+    case TOGGLE_MOVIE_INTEREST:
+      return {
+        ...state,
+        movies: state.movies.map(movie => movie._id === payload._id ? payload : movie),
+        comingSoon: state.comingSoon.map(movie => movie._id === payload._id ? payload : movie),
+        nowShowing: state.nowShowing.map(movie => movie._id === payload._id ? payload : movie),
+        selectedMovie: state.selectedMovie && state.selectedMovie._id === payload._id ? payload : state.selectedMovie
+      };
     default:
       return state;
   }

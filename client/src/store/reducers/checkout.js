@@ -11,7 +11,9 @@ import {
   SET_QR_CODE,
   SET_SELECTED_FOOD,
   CLEAR_SELECTED_FOOD,
-  SET_PENDING_RESERVATION
+  SET_PENDING_RESERVATION,
+  SET_FOOD_DELIVERY_TIME,
+  SET_FOOD_DELIVERY_METHOD
 } from '../types';
 
 const initialState = {
@@ -25,6 +27,7 @@ const initialState = {
   invitations: {},
   QRCode: '',
   selectedFood: {},
+  foodDeliveryTime: 'At Interval',
   pendingReservationId: null,
   reservationExpiresAt: null
 };
@@ -112,6 +115,14 @@ const showInvitationForm = state => ({
   ...state,
   showInvitation: !state.showInvitation
 });
+const setFoodDeliveryTime = (state, foodDeliveryTime) => ({
+  ...state,
+  foodDeliveryTime
+});
+const setFoodDeliveryMethod = (state, foodDeliveryMethod) => ({
+  ...state,
+  foodDeliveryMethod
+});
 const resetCheckout = () => initialState;
 
 export default function(state = initialState, action) {
@@ -141,6 +152,10 @@ export default function(state = initialState, action) {
       return { ...state, selectedFood: {} };
     case SET_PENDING_RESERVATION:
       return setPendingReservation(state, payload);
+    case SET_FOOD_DELIVERY_TIME:
+      return setFoodDeliveryTime(state, payload);
+    case SET_FOOD_DELIVERY_METHOD:
+      return setFoodDeliveryMethod(state, payload);
     case RESET_CHECKOUT:
       return resetCheckout();
     default:

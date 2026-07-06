@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 import FacebookIcon from '@material-ui/icons/Facebook';
 import InstagramIcon from '@material-ui/icons/Instagram';
-import TwitterIcon from '@material-ui/icons/Twitter';
+import { XIcon } from '../../../../components';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 import useStyles from './styles';
 import {
@@ -103,7 +103,7 @@ export default function Footer() {
             <Box display="flex" gap={1} mt={1}>
               <IconButton size="small" style={{ color: '#1877F2', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><FacebookIcon /></IconButton>
               <IconButton size="small" style={{ color: '#E1306C', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><InstagramIcon /></IconButton>
-              <IconButton size="small" style={{ color: '#1DA1F2', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><TwitterIcon /></IconButton>
+              <IconButton size="small" style={{ color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '8px' }}><XIcon /></IconButton>
               <IconButton size="small" style={{ color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.05)' }}><YouTubeIcon /></IconButton>
             </Box>
           </Grid>

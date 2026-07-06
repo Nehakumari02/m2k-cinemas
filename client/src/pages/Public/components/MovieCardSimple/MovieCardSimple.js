@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
+import { Typography, Dialog, Box } from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/styles';
 import Card from '@material-ui/core/Card';
@@ -10,8 +10,12 @@ import IconButton from '@material-ui/core/IconButton';
 import StarIcon from '@material-ui/icons/Star';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import CloseIcon from '@material-ui/icons/Close';
+import ReactPlayer from 'react-player';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../../../store/actions/wishlist';
+import { toggleMovieInterest } from '../../../../store/actions/movies';
 import { normalizeImage } from '../../../../utils/imageUrl';
 import { MovieBookingModals } from '../../../../components';
 import useMovieBookingFlow from '../../../../hooks/useMovieBookingFlow';
@@ -95,23 +99,46 @@ const useStyles = makeStyles(theme => ({
     zIndex: 5,
   },
   bookOverlay: {
+    marginTop: '16px',
+    width: '100%',
+  },
+  bookBtn: {
+    width: '100%',
+    padding: '12px 0',
+    backgroundColor: '#0f172a',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: 8,
+    fontWeight: 700,
+    fontSize: '0.9rem',
+    cursor: 'pointer',
+    transition: 'background-color .25s ease',
+    '&:hover': {
+      backgroundColor: '#1e293b',
+    },
+  },
+  playOverlay: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: '10px',
-  },
-  bookBtn: {
-    background: 'linear-gradient(90deg, #b72429, #8b1c20)',
+    width: '50px',
+    height: '50px',
     color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '9px 0',
-    width: '100%',
-    fontSize: '0.8rem',
-    fontWeight: 800,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
     cursor: 'pointer',
+    transition: 'transform .2s ease, background-color .2s ease',
+    '&:hover': {
+      transform: 'translate(-50%, -50%) scale(1.1)',
+      backgroundColor: 'rgba(0,0,0,0.7)',
+    },
+    '& svg': {
+      fontSize: '2.5rem',
+    }
   },
   h5: {
     textTransform: 'capitalize',
@@ -190,8 +217,11 @@ const MovieCardSimple = props => {
   const wishlist = useSelector(state => state.wishlistState?.wishlist || []);
   const user = useSelector(state => state.authState?.user);
   const bookingFlow = useMovieBookingFlow();
+  const [trailerOpen, setTrailerOpen] = useState(false);
   
   const isWishlisted = wishlist.some(w => (w._id || w) === movie._id);
+  const isComingSoon = new Date(movie.releaseDate) > new Date();
+  const isInterested = user && movie.interestedUsers && movie.interestedUsers.includes(user._id);
 
   const handleWishlistToggle = (e) => {
     e.preventDefault();
@@ -215,8 +245,26 @@ const MovieCardSimple = props => {
     bookingFlow.startBooking(movie);
   };
 
-  const onCardClick = () => {
-    history.push(`/movie/${movie._id}`);
+  const onWatchTrailer = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    setTrailerOpen(true);
+  };
+
+  const onShowInterest = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!user) {
+      alert('Please log in to show interest.');
+      return;
+    }
+    dispatch(toggleMovieInterest(movie._id));
+  };
+
+  const onCardClick = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    bookingFlow.startBooking(movie);
   };
 
   return (
@@ -225,6 +273,11 @@ const MovieCardSimple = props => {
         <CardActionArea component="div" onClick={onCardClick}>
           <div className={classes.mediaWrapper}>
             <img className={classes.mediaImage} src={imageUrl} alt={movie.title} />
+            {movie.trailerUrl && (
+              <div className={classes.playOverlay} onClick={onWatchTrailer}>
+                <PlayCircleOutlineIcon />
+              </div>
+            )}
             {movie.language && (
               <span className={classes.langBadge}>{movie.language}</span>
             )}
@@ -257,13 +310,54 @@ const MovieCardSimple = props => {
               {movie.title}
             </Typography>
             <div className={classes.bookOverlay}>
-              <button className={classes.bookBtn} onClick={onBookTickets}>
-                Book Tickets
-              </button>
+              {isComingSoon ? (
+                <button 
+                  className={classes.bookBtn} 
+                  style={{ backgroundColor: isInterested ? '#475569' : '#0f172a' }}
+                  onClick={onShowInterest}
+                >
+                  {isInterested ? 'Interested' : 'Show Interest'}
+                </button>
+              ) : (
+                <button className={classes.bookBtn} onClick={onBookTickets}>
+                  Book Tickets
+                </button>
+              )}
             </div>
           </CardContent>
         </CardActionArea>
       </Card>
+
+      <Dialog
+        open={trailerOpen}
+        onClose={() => setTrailerOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: '#000',
+            boxShadow: 'none',
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <Box display="flex" justifyContent="flex-end" position="absolute" right={8} top={8} zIndex={1}>
+          <IconButton onClick={() => setTrailerOpen(false)} style={{ color: '#fff' }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Box style={{ paddingTop: '56.25%', position: 'relative' }}>
+          <ReactPlayer
+            url={movie.trailerUrl}
+            playing={trailerOpen}
+            controls
+            width="100%"
+            height="100%"
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          />
+        </Box>
+      </Dialog>
+
       <MovieBookingModals flow={bookingFlow} />
     </div>
   );

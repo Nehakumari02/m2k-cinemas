@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { withStyles, CircularProgress } from '@material-ui/core';
 import styles from './styles';
 import { ReservationsToolbar, ReservationsTable } from './components';
-import { getReservations, getMovies, getCinemas } from '../../../store/actions';
+import { getReservations, getMovies, getCinemas, updateReservation } from '../../../store/actions';
 import ReservationsCalendar from './components/ReservationsCalendar/ReservationsCalendar';
 import { match } from '../../../utils';
 
@@ -66,6 +66,8 @@ class ReservationList extends Component {
               reservations={filteredReservations}
               movies={movies}
               cinemas={cinemas}
+              onUpdateReservation={this.props.updateReservation}
+              getReservations={this.props.getReservations}
             />
           ) : (
             <ReservationsCalendar
@@ -89,7 +91,8 @@ const mapStateToProps = ({ reservationState, movieState, cinemaState }) => ({
 const mapDispatchToProps = {
   getReservations,
   getMovies,
-  getCinemas
+  getCinemas,
+  updateReservation
 };
 export default connect(
   mapStateToProps,

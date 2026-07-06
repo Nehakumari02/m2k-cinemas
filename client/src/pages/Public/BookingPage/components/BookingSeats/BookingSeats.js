@@ -63,6 +63,7 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 44,
     boxSizing: 'border-box'
   },
+
   categoryLine: {
     flex: 1,
     height: '1px',
@@ -676,29 +677,6 @@ export default function BookingSeats({
             style={{ backgroundColor: SEAT_COLORS.selected }}
           />
           Selected
-        </div>
-        <div className={classes.legendItem}>
-          <div
-            className={classes.legendSeat}
-            style={{ backgroundColor: SEAT_COLORS.suggested }}
-          />
-          Suggested
-        </div>
-        <div className={classes.legendItem}>
-          <div
-            className={classes.legendSeat}
-            style={{ backgroundColor: SEAT_COLORS.special }}
-          />
-          Special (Diamond)
-        </div>
-        <div className={classes.legendItem}>
-          <span style={{ color: '#42a5f5', fontWeight: 700 }}>●</span> SILVER
-        </div>
-        <div className={classes.legendItem}>
-          <span style={{ color: '#b72429', fontWeight: 700 }}>●</span> GOLD
-        </div>
-        <div className={classes.legendItem}>
-          <span style={{ color: '#e040fb', fontWeight: 700 }}>●</span> PLATINUM
         </div>
       </div>
 

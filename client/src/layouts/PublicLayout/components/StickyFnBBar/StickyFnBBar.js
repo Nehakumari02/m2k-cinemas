@@ -15,15 +15,17 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 1100,
-    width: 'min(300px, calc(100% - 32px))',
+    width: 'min(360px, calc(100% - 32px))',
     display: 'flex',
     alignItems: 'stretch',
-    borderRadius: 14,
-    overflow: 'hidden',
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    padding: '8px',
+    gap: '8px',
     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.22), 0 2px 8px rgba(0,0,0,0.12)',
     border: '1px solid rgba(255,255,255,0.25)',
     [theme.breakpoints.down('xs')]: {
-      width: 'min(300px, calc(100% - 20px))',
+      width: 'min(360px, calc(100% - 20px))',
       bottom: theme.spacing(1.5),
     },
   },
@@ -38,6 +40,7 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     background: `url(${foodBg}) center 30% / cover no-repeat`,
     padding: theme.spacing(1.75, 2),
+    borderRadius: 8,
     transition: 'filter 0.2s ease, transform 0.15s ease',
     overflow: 'hidden',
     '&::before': {
@@ -83,6 +86,7 @@ const useStyles = makeStyles(theme => ({
     letterSpacing: '0.04em',
     textTransform: 'uppercase',
     padding: theme.spacing(1.75, 2),
+    borderRadius: 8,
     whiteSpace: 'nowrap',
     transition: 'filter 0.2s ease, transform 0.15s ease',
     '&:hover': {
@@ -135,7 +139,7 @@ function StickyFnBBar({ foodCartCount, selectedMovie }) {
         <Button 
           className={classes.secondaryLink} 
           onClick={() => bookingFlow.startBooking(selectedMovie)}
-          style={{ padding: 0, borderRadius: 0, border: 'none', cursor: 'pointer' }}
+          style={{ padding: 0, border: 'none', cursor: 'pointer' }}
         >
           <MovieFilterIcon style={{ fontSize: 20 }} />
           Book tickets
@@ -143,7 +147,7 @@ function StickyFnBBar({ foodCartCount, selectedMovie }) {
       ) : (
         <Link to="/showtimings" className={classes.secondaryLink}>
           <MovieFilterIcon style={{ fontSize: 20 }} />
-          Book tickets
+          Curated Shows
         </Link>
       )}
       <MovieBookingModals flow={bookingFlow} />

@@ -1,4 +1,4 @@
-import { GET_MOVIES, SELECT_MOVIE,GET_SUGGESTIONS } from '../types';
+import { GET_MOVIES, SELECT_MOVIE, GET_SUGGESTIONS, TOGGLE_MOVIE_INTEREST } from '../types';
 import { setAlert } from './alert';
 
 export const uploadMovieImage = (id, image) => async dispatch => {
@@ -273,5 +273,26 @@ export const removeMovie = movieId => async dispatch => {
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+  }
+};
+
+export const toggleMovieInterest = (id) => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const url = '/movies/' + id + '/interest';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const movie = await response.json();
+    if (response.ok) {
+      dispatch({ type: TOGGLE_MOVIE_INTEREST, payload: movie });
+    } else {
+      dispatch(setAlert(movie.error || 'Please login to show interest', 'error', 5000));
+    }
+  } catch (error) {
+    console.log(error);
   }
 };

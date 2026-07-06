@@ -14,7 +14,7 @@ import {
   Snackbar,
   SnackbarContent,
 } from '@material-ui/core';
-import { School, Business, Group, LocalOffer, Send } from '@material-ui/icons';
+import { School, Business, Group, LocalOffer, Send, Cake, EmojiFoodBeverage } from '@material-ui/icons';
 import { getOffers } from '../../../store/actions';
 import { normalizeImage } from '../../../utils/imageUrl';
 import apiUrl from '../../../utils/apiUrl';
@@ -202,6 +202,32 @@ const FALLBACK_OFFERS = {
       validTill: new Date('2026-12-31'),
       image: '/images/offers/offer2.png',
     }
+  ],
+  birthday: [
+    {
+      _id: 'birthday-fallback-1',
+      title: 'Birthday Party Extravaganza',
+      description: 'Celebrate your birthday with a movie! Special decorations, food combos, and a dedicated host for groups of 10 or more.',
+      code: 'BDAYPARTY',
+      category: 'birthday_group',
+      minTickets: 10,
+      discountPercentage: 20,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer5.png',
+    }
+  ],
+  kitty: [
+    {
+      _id: 'kitty-fallback-1',
+      title: 'Kitty Party Special',
+      description: 'Host your kitty party with us! Enjoy premium seating, specialized food menus, and relaxing lounges for groups of 10 or more.',
+      code: 'KITTYPARTY',
+      category: 'kitty_group',
+      minTickets: 10,
+      discountPercentage: 20,
+      validTill: new Date('2026-12-31'),
+      image: '/images/offers/offer1.png',
+    }
   ]
 };
 
@@ -223,15 +249,17 @@ function GroupBookingPage({ offers, getOffers }) {
   const classes = useStyles();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const queryType = searchParams.get('type') === 'corporate' ? 'corporate' : 'school';
+  const qType = searchParams.get('type');
+  const queryType = ['school', 'corporate', 'birthday', 'kitty'].includes(qType) ? qType : 'school';
 
-  const [type, setType] = useState(queryType); // 'school' | 'corporate'
+  const [type, setType] = useState(queryType); // 'school' | 'corporate' | 'birthday' | 'kitty'
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    const newType = searchParams.get('type') === 'corporate' ? 'corporate' : 'school';
+    const qType = searchParams.get('type');
+    const newType = ['school', 'corporate', 'birthday', 'kitty'].includes(qType) ? qType : 'school';
     setType(newType);
   }, [location.search]);
 
@@ -269,13 +297,22 @@ function GroupBookingPage({ offers, getOffers }) {
           studentCount: Number(form.peopleCount),
           gradeOrClass: form.subUnit,
         };
-      } else {
+      } else if (type === 'corporate') {
         endpoint = '/corporate-group-inquiries';
         payload = {
           ...form,
           companyName: form.orgName,
           employeeCount: Number(form.peopleCount),
           department: form.subUnit,
+        };
+      } else {
+        endpoint = '/party-inquiries';
+        payload = {
+          ...form,
+          partyType: type,
+          partyName: form.orgName,
+          guestCount: Number(form.peopleCount),
+          ageGroup: form.subUnit,
         };
       }
 
@@ -324,48 +361,52 @@ function GroupBookingPage({ offers, getOffers }) {
   return (
     <div className={classes.root}>
       <div className={classes.hero}>
-        {type === 'school' ? (
-          <School style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />
-        ) : (
-          <Business style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />
-        )}
+        {type === 'school' && <School style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />}
+        {type === 'corporate' && <Business style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />}
+        {type === 'birthday' && <Cake style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />}
+        {type === 'kitty' && <EmojiFoodBeverage style={{ fontSize: 48, color: '#b72429', marginBottom: 8 }} />}
+        
         <Typography className={classes.title}>Group Booking</Typography>
         <Typography className={classes.subtitle}>
           Exclusive offers for groups. Plan a private screening or block-book seats at special rates — our team will confirm availability and pricing.
         </Typography>
 
         <div className={classes.toggleContainer}>
-          <ButtonGroup variant="outlined" style={{ borderColor: '#b72429' }}>
+          <ButtonGroup variant="outlined" style={{ borderColor: '#b72429', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Button
               onClick={() => setType('school')}
               style={type === 'school' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
             >
-              School Booking
+              School
             </Button>
             <Button
               onClick={() => setType('corporate')}
               style={type === 'corporate' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
             >
-              Corporate Booking
+              Corporate
+            </Button>
+            <Button
+              onClick={() => setType('birthday')}
+              style={type === 'birthday' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
+            >
+              Birthday Party
+            </Button>
+            <Button
+              onClick={() => setType('kitty')}
+              style={type === 'kitty' ? { backgroundColor: '#b72429', color: '#fff', fontWeight: 700, borderColor: '#b72429' } : { color: '#b72429', fontWeight: 700, borderColor: '#b72429' }}
+            >
+              Kitty Party
             </Button>
           </ButtonGroup>
         </div>
 
-        <div className={classes.accent} />
-        <div className={classes.perks}>
-          <Chip icon={<Group />} label={`30+ ${type === 'school' ? 'students' : 'employees'}`} className={classes.perkChip} />
-          <Chip icon={<LocalOffer />} label="Dedicated promo codes" className={classes.perkChip} />
-          <Chip label="Coordinator support" className={classes.perkChip} />
-        </div>
-        <Link to="/offers" className={classes.offersLink}>
-          View all offers →
-        </Link>
       </div>
 
       <div className={classes.section}>
-        <Typography className={classes.sectionTitle}>
-          <LocalOffer /> {type === 'school' ? 'School' : 'Corporate'} group offers
-        </Typography>
+          <Typography className={classes.sectionTitle}>
+            <LocalOffer style={{ verticalAlign: 'middle', marginRight: 8, color: '#b72429' }} />
+            {type === 'school' ? 'School group offers' : type === 'corporate' ? 'Corporate group offers' : type === 'birthday' ? 'Birthday party offers' : 'Kitty party offers'}
+          </Typography>
         <Grid container spacing={3}>
           {groupOffers.map(offer => (
             <Grid item xs={12} sm={6} md={4} key={offer._id || offer.code}>
@@ -381,7 +422,7 @@ function GroupBookingPage({ offers, getOffers }) {
                   <Typography className={classes.offerDesc}>{offer.description}</Typography>
                   {offer.minTickets > 0 && (
                     <Typography variant="caption" color="textSecondary" style={{ marginBottom: 8 }}>
-                      Min. {offer.minTickets} {type === 'school' ? 'students' : 'employees'}
+                      Min. {offer.minTickets} {type === 'school' ? 'students' : type === 'corporate' ? 'employees' : 'guests'}
                       {offer.discountPercentage ? ` · ${offer.discountPercentage}% off` : ''}
                       {offer.inquiryOnly ? ' · Enquiry only' : ''}
                     </Typography>
@@ -413,7 +454,7 @@ function GroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={6}>
                 <TextField
                   className={classes.input}
-                  label={type === 'school' ? "School name *" : "Company name *"}
+                  label={type === 'school' ? 'School name *' : type === 'corporate' ? 'Company name *' : 'Party name / Host name *'}
                   name="orgName"
                   value={form.orgName}
                   onChange={handleChange}
@@ -425,7 +466,7 @@ function GroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={6}>
                 <TextField
                   className={classes.input}
-                  label="Coordinator name *"
+                  label={type === 'school' ? 'Coordinator name *' : 'Contact name *'}
                   name="contactName"
                   value={form.contactName}
                   onChange={handleChange}
@@ -462,7 +503,7 @@ function GroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={4}>
                 <TextField
                   className={classes.input}
-                  label={type === 'school' ? "Number of students *" : "Number of employees *"}
+                  label={type === 'school' ? 'Number of students *' : type === 'corporate' ? 'Number of employees *' : 'Number of guests *'}
                   name="peopleCount"
                   type="number"
                   inputProps={{ min: 1 }}
@@ -476,7 +517,7 @@ function GroupBookingPage({ offers, getOffers }) {
               <Grid item xs={12} sm={4}>
                 <TextField
                   className={classes.input}
-                  label={type === 'school' ? "Grade/Class" : "Department"}
+                  label={type === 'school' ? 'Grade/Class' : type === 'corporate' ? 'Department' : 'Age group (e.g. 5-10)'}
                   name="subUnit"
                   value={form.subUnit}
                   onChange={handleChange}

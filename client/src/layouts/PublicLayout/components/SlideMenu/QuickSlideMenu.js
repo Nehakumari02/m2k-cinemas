@@ -58,19 +58,21 @@ const useStyles = makeStyles({
     justifyContent: 'center',
   },
   moreBtn: {
-    display: 'block',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     width: '100%',
-    padding: '13px 8px',
-    textAlign: 'center',
+    padding: '13px 16px 13px 20px',
+    textAlign: 'left',
     cursor: 'pointer',
-    color: '#e2e8f0',
+    color: '#ffffff',
     fontSize: '0.78rem',
-    fontWeight: 500,
+    fontWeight: 700,
     border: 'none',
-    background: 'none',
-    transition: 'background 0.15s ease',
+    background: 'linear-gradient(180deg, rgba(183,36,41,0.6) 0%, rgba(183,36,41,0.9) 100%)',
+    transition: 'background 0.15s ease, filter 0.15s ease',
     '&:hover': {
-      background: 'rgba(255, 255, 255, 0.1)',
+      filter: 'brightness(1.15)',
     },
   },
 });
@@ -96,9 +98,10 @@ export default function QuickSlideMenu({ onNavigate, onOpenFullMenu }) {
             close();
             onOpenFullMenu();
           }}>
-          <Typography component="span" variant="body2" style={{ fontSize: 'inherit', fontWeight: 'inherit' }}>
-            Show more
+          <Typography component="div" variant="body2" style={{ fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 1.3 }}>
+            Show<br/>more
           </Typography>
+          <ChevronRightIcon style={{ fontSize: '1.2rem', marginBottom: '-1px' }} />
         </button>
       </div>
     </nav>

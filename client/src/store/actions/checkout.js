@@ -11,7 +11,9 @@ import {
   SET_QR_CODE,
   SET_SELECTED_FOOD,
   CLEAR_SELECTED_FOOD,
-  SET_PENDING_RESERVATION
+  SET_PENDING_RESERVATION,
+  SET_FOOD_DELIVERY_TIME,
+  SET_FOOD_DELIVERY_METHOD
 } from '../types';
 
 export const setSelectedFood = (item, quantity) => ({
@@ -20,6 +22,16 @@ export const setSelectedFood = (item, quantity) => ({
 });
 
 export const clearSelectedFood = () => ({ type: CLEAR_SELECTED_FOOD });
+
+export const setFoodDeliveryTime = time => ({
+  type: SET_FOOD_DELIVERY_TIME,
+  payload: time
+});
+
+export const setFoodDeliveryMethod = method => ({
+  type: SET_FOOD_DELIVERY_METHOD,
+  payload: method
+});
 
 export const setSelectedSeats = seats => ({
   type: SET_SELECTED_SEATS,

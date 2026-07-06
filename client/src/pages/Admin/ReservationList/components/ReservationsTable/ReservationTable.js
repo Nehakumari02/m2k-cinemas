@@ -8,8 +8,10 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TablePagination
+  TablePagination,
+  Switch
 } from '@material-ui/core';
+import moment from 'moment';
 
 import { Portlet, PortletContent } from '../../../../../components';
 import styles from './styles';
@@ -25,6 +27,8 @@ class ReservationsTable extends Component {
     classes: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
     onShowDetails: PropTypes.func,
+    onUpdateReservation: PropTypes.func,
+    getReservations: PropTypes.func,
     reservations: PropTypes.array.isRequired,
     movies: PropTypes.array.isRequired,
     cinemas: PropTypes.array.isRequired
@@ -35,7 +39,8 @@ class ReservationsTable extends Component {
     movies: [],
     cinemas: [],
     onSelect: () => {},
-    onShowDetails: () => {}
+    onShowDetails: () => {},
+    onUpdateReservation: () => {}
   };
 
   handleChangePage = (event, page) => {
@@ -51,6 +56,13 @@ class ReservationsTable extends Component {
     return item ? item[attr] : `Not ${attr} Found`;
   };
 
+  handleToggleFoodOrder = async (id, currentStatus) => {
+    await this.props.onUpdateReservation({ foodOrderCompleted: !currentStatus }, id);
+    if (this.props.getReservations) {
+      this.props.getReservations();
+    }
+  };
+
   render() {
     const { classes, className, reservations, movies, cinemas } = this.props;
     const { rowsPerPage, page } = this.state;
@@ -64,17 +76,21 @@ class ReservationsTable extends Component {
               <TableRow>
                 <TableCell align="left">User</TableCell>
                 <TableCell align="left">Phone</TableCell>
+                <TableCell align="left">Placed At</TableCell>
                 <TableCell align="left">Start At</TableCell>
                 <TableCell align="left">Movie</TableCell>
                 <TableCell align="left">Cinema</TableCell>
                 <TableCell align="left">Ticket Price</TableCell>
                 <TableCell align="left">Total</TableCell>
+                <TableCell align="left">F&B Time</TableCell>
+                <TableCell align="left">F&B Items</TableCell>
+                <TableCell align="left">F&B Completed</TableCell>
                 <TableCell align="left">Checkin</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {reservations
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(reservation => (
                   <TableRow
@@ -86,6 +102,9 @@ class ReservationsTable extends Component {
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.phone}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {reservation.createdAt ? moment(reservation.createdAt).format('DD/MM/YYYY hh:mm A') : '-'}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.startAt}
@@ -102,6 +121,23 @@ class ReservationsTable extends Component {
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.total}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {reservation.foodItems && reservation.foodItems.length > 0 
+                        ? `${reservation.foodDeliveryTime || 'At Interval'} (${reservation.foodDeliveryMethod || 'Seat Delivery'})` 
+                        : '-'}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {reservation.foodItems && reservation.foodItems.length > 0 ? reservation.foodItems.map(item => `${item.name} (x${item.quantity} - ₹${item.price * item.quantity})`).join(', ') : '-'}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {reservation.foodItems && reservation.foodItems.length > 0 ? (
+                        <Switch
+                          checked={!!reservation.foodOrderCompleted}
+                          onChange={() => this.handleToggleFoodOrder(reservation._id, reservation.foodOrderCompleted)}
+                          color="primary"
+                        />
+                      ) : '-'}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.checkin ? 'yes' : 'no'}

@@ -15,7 +15,7 @@ export default theme => ({
     }
   },
   customHero: {
-    minHeight: '51vh',
+    minHeight: '65vh',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',

@@ -19,8 +19,8 @@ const useStyles = makeStyles({
     height: 140,
     border: 'none',
     borderRadius: '0 14px 14px 0',
-    background: 'linear-gradient(180deg, #991b1b 0%, #b72429 50%, #7f1d1d 100%)',
-    boxShadow: '3px 0 14px rgba(183, 36, 41, 0.45)',
+    background: 'linear-gradient(180deg, #d32f2f 0%, #e53935 50%, #c62828 100%)',
+    boxShadow: '3px 0 14px rgba(229, 57, 53, 0.45)',
     cursor: 'pointer',
     zIndex: EDGE_Z,
     padding: 0,
@@ -30,7 +30,7 @@ const useStyles = makeStyles({
     transition: 'width 0.2s ease, box-shadow 0.2s ease',
     '&:hover': {
       width: 28,
-      boxShadow: '4px 0 18px rgba(183, 36, 41, 0.55)',
+      boxShadow: '4px 0 18px rgba(229, 57, 53, 0.55)',
     },
   },
   handleLabel: {

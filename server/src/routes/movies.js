@@ -173,6 +173,31 @@ router.get('/movies/:id', async (req, res) => {
   }
 });
 
+// Toggle Interest in a Movie
+router.post('/movies/:id/interest', auth.simple, async (req, res) => {
+  try {
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) return res.status(404).send({ error: 'Movie not found' });
+
+    const isInterested = movie.interestedUsers.includes(req.user._id);
+
+    if (isInterested) {
+      // Remove interest
+      movie.interestedUsers = movie.interestedUsers.filter(
+        userId => userId.toString() !== req.user._id.toString()
+      );
+    } else {
+      // Add interest
+      movie.interestedUsers.push(req.user._id);
+    }
+
+    await movie.save();
+    res.send(movie);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // Update movie by id
 router.put('/movies/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;

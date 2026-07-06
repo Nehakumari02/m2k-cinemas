@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Typography, Grid, Button, Card, CardContent, CircularProgress, IconButton, Box, Chip } from '@material-ui/core';
+import { Typography, Grid, Button, Card, CardContent, CircularProgress, IconButton, Box, Chip, Paper } from '@material-ui/core';
 import { Add as AddIcon, Remove as RemoveIcon } from '@material-ui/icons';
 import { connect } from 'react-redux';
-import { getFood, setSelectedFood } from '../../../../../store/actions';
+import { getFood, setSelectedFood, setFoodDeliveryTime } from '../../../../../store/actions';
 import { normalizeImage } from '../../../../../utils/imageUrl';
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -154,7 +155,7 @@ const useStyles = makeStyles(theme => ({
   monthlyOfferBadge: { position: 'absolute', top: 16, left: 16, backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 800, fontSize: '0.7rem', padding: '4px 10px', borderRadius: '20px' },
 }));
 
-const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood, onSkip }) => {
+const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood, foodDeliveryTime, setFoodDeliveryTime, onSkip }) => {
   const classes = useStyles();
   const { food, loading } = foodState;
   const [activeCategory, setActiveCategory] = useState('All');
@@ -264,12 +265,14 @@ const BookingFood = ({ getFood, foodState, selectedFood, setSelectedFood, onSkip
           })}
         </Grid>
       )}
+
     </div>
   );
 };
 
 const mapStateToProps = ({ foodState, checkoutState }) => ({ 
   foodState, 
-  selectedFood: checkoutState.selectedFood 
+  selectedFood: checkoutState.selectedFood,
+  foodDeliveryTime: checkoutState.foodDeliveryTime
 });
-export default connect(mapStateToProps, { getFood, setSelectedFood })(BookingFood);
+export default connect(mapStateToProps, { getFood, setSelectedFood, setFoodDeliveryTime })(BookingFood);

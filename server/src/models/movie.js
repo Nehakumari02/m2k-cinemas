@@ -23,6 +23,12 @@ const movieSchema = new Schema({
       trim: true,
     },
   ],
+  interestedUsers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
   castCrew: [
     {
       name: {

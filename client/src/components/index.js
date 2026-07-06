@@ -17,3 +17,4 @@ export { default as Status } from './Status';
 export { default as RefundRequestModal } from './RefundRequestModal/RefundRequestModal';
 export { default as TermsAndConditionsModal } from './TermsAndConditionsModal';
 export { default as MovieBookingModals } from './MovieBookingModals';
+export { default as XIcon } from './XIcon/XIcon';

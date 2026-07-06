@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/core';
-import { Typography, Chip } from '@material-ui/core';
+import { Typography, Chip, CardContent } from '@material-ui/core';
 import { AccessTime as AccessTimeIcon } from '@material-ui/icons';
 import { Paper } from '../../../../../components';
 import { normalizeImage } from '../../../../../utils/imageUrl';
@@ -87,21 +87,27 @@ function MovieCard(props) {
       <div className={classes.imageWrapper}>
         <img alt="movie" className={classes.image} src={normalizeImage(movie.image)} />
       </div>
-      <div className={classes.details}>
-        <Typography className={classes.title} variant="h4">
-          {movie.title}
-        </Typography>
-        <Typography className={classes.description} variant="body1">
-          {movie.description}
-        </Typography>
-      </div>
-      <div className={classes.stats}>
-        <AccessTimeIcon className={classes.updateIcon} />
-        <Typography className={classes.updateText} variant="body2">
-          {movie.duration} minutes
-          {Number(movie.ticketPrice) > 0 ? ` · ₹${movie.ticketPrice} per ticket` : ''}
-        </Typography>
-      </div>
+      <CardContent>
+        <div className={classes.details}>
+          <Typography className={classes.title} variant="h4">
+            {movie.title}
+          </Typography>
+          <Typography className={classes.description} variant="body1">
+            {movie.description}
+          </Typography>
+        </div>
+        <div className={classes.stats}>
+          <Typography className={classes.update} variant="body2">
+            <AccessTimeIcon className={classes.updateIcon} />
+            {movie.duration} min
+          </Typography>
+          {movie.interestedUsers && movie.interestedUsers.length > 0 && (
+            <Typography className={classes.update} variant="body2" style={{ marginLeft: '16px', color: '#ff4d4d', fontWeight: 'bold' }}>
+              ❤️ {movie.interestedUsers.length} Interested
+            </Typography>
+          )}
+        </div>
+      </CardContent>
     </Paper>
   );
 }

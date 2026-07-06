@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { makeStyles, Typography, Container } from '@material-ui/core';
 import MovieCarousel from '../components/MovieCarousel/MovieCarousel';
 import { getMovies } from '../../../store/actions';
@@ -62,6 +63,21 @@ const useStyles = makeStyles(theme => ({
 
 function AllMoviesPage(props) {
   const { nowShowing, comingSoon, getMovies } = props;
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const searchStr = (searchParams.get('search') || '').toLowerCase();
+
+  const isMatch = (m) => {
+    if (!searchStr) return true;
+    if (m.title && m.title.toLowerCase().includes(searchStr)) return true;
+    if (m.cast && m.cast.toLowerCase().includes(searchStr)) return true;
+    if (m.director && m.director.toLowerCase().includes(searchStr)) return true;
+    return false;
+  };
+
+  const filteredNowShowing = nowShowing.filter(isMatch);
+  const filteredComingSoon = comingSoon.filter(isMatch);
 
   useEffect(() => {
     getMovies();
@@ -79,14 +95,14 @@ function AllMoviesPage(props) {
       </Typography>
 
       <div className={classes.sectionWrapper}>
-        {nowShowing.length > 0 ? (
+        {filteredNowShowing.length > 0 ? (
           <MovieCarousel
             carouselClass={classes.carousel}
             title="Now Showing"
             to="/movie/category/nowShowing"
             autoScroll
             autoScrollSpeed={3200}
-            movies={nowShowing}
+            movies={filteredNowShowing}
           />
         ) : (
           <Typography className={classes.emptyText} color="textSecondary">
@@ -96,14 +112,14 @@ function AllMoviesPage(props) {
       </div>
 
       <div className={classes.sectionWrapper}>
-        {comingSoon.length > 0 ? (
+        {filteredComingSoon.length > 0 ? (
           <MovieCarousel
             carouselClass={classes.carousel}
             title="Coming Soon"
             to="/movie/category/comingSoon"
             autoScroll
             autoScrollSpeed={3600}
-            movies={comingSoon}
+            movies={filteredComingSoon}
           />
         ) : (
           <Typography className={classes.emptyText} color="textSecondary">

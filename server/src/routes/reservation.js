@@ -176,6 +176,8 @@ router.patch('/reservations/:id', auth.enhance, async (req, res) => {
     'phone',
     'checkin',
     'foodItems',
+    'foodOrderCompleted',
+    'foodDeliveryMethod',
   ];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
@@ -219,9 +221,11 @@ router.patch('/reservations/confirm/:id', auth.simple, async (req, res) => {
     }
 
     // Update reservation data with final details from payment step
-    const { total, pointsUsed, foodItems, appliedFirstGstBenefit } = req.body;
+    const { total, pointsUsed, foodItems, foodDeliveryTime, foodDeliveryMethod, appliedFirstGstBenefit } = req.body;
     if (total !== undefined) reservation.total = total;
     if (foodItems !== undefined) reservation.foodItems = foodItems;
+    if (foodDeliveryTime !== undefined) reservation.foodDeliveryTime = foodDeliveryTime;
+    if (foodDeliveryMethod !== undefined) reservation.foodDeliveryMethod = foodDeliveryMethod;
 
     const QRCode = await generateQR(`https://elcinema.herokuapp.com/#/checkin/${reservation._id}`);
     
