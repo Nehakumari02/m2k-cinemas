@@ -53,11 +53,12 @@ const useStyles = makeStyles(theme => ({
   /* ── Category Band ── */
   categoryBandFullWidth: {
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
     maxWidth: '600px',
-    margin: '6px auto',
-    gap: '12px'
+    margin: '16px auto 12px auto',
+    gap: '8px'
   },
   categoryBandShiftRight: {
     paddingLeft: 44,
@@ -65,15 +66,16 @@ const useStyles = makeStyles(theme => ({
   },
 
   categoryLine: {
-    flex: 1,
+    width: '100%',
     height: '1px',
     background: '#e2e8f0'
   },
   categoryLabel: {
-    fontSize: '0.7rem',
-    fontWeight: 800,
+    fontSize: '0.75rem',
+    fontWeight: 700,
     color: '#334155',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    letterSpacing: '0.5px'
   },
 
   /* ── Row ── */
@@ -570,16 +572,14 @@ export default function BookingSeats({
           <Fragment key={originalRowIndex}>
             {/* Category label band */}
             {showBand && (
-              <div
-                className={classNames(
-                  classes.categoryBandFullWidth,
-                  cinema && cinema.layoutKey === 'm2k-venue' && classes.categoryBandShiftRight
-                )}>
-                <div className={classes.categoryLine} />
-                <span className={classes.categoryLabel}>
-                  {getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering) ? `₹${getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering)} ` : ''}{category.label}
-                </span>
-                <div className={classes.categoryLine} />
+              <div className={classes.row}>
+                <span className={classes.rowLabel} />
+                <div className={classes.categoryBandFullWidth}>
+                  <span className={classes.categoryLabel}>
+                    {getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering) ? `₹${getSeatTicketPrice(movie, cinema, 0, rowLetter, seatNumbering)} ` : ''}{category.label}
+                  </span>
+                  <div className={classes.categoryLine} />
+                </div>
               </div>
             )}
 
