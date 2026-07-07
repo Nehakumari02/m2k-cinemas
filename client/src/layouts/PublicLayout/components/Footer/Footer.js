@@ -94,7 +94,7 @@ export default function Footer() {
                 {M2K_REGISTERED_ADDRESS}
               </Typography>
               <Typography variant="caption" style={{ color: '#94a3b8', display: 'block', fontSize: '0.7rem' }}>
-                +91 0124 4525000 · info@m2kcinemas.com
+                customercare@m2kcinemas.com
               </Typography>
               <Typography variant="caption" style={{ color: '#94a3b8', display: 'block', fontSize: '0.7rem', marginTop: 4 }}>
                 M2K Rohini: 9818199906 · M2K Pitampura: 981818199923
