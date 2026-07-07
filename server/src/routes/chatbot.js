@@ -16,7 +16,7 @@ router.post('/chatbot', async (req, res) => {
     const query = message.toLowerCase();
     
     // 1. Movie matching
-    if (query.includes('movie') || query.includes('playing') || query.includes('film')) {
+    if (query.includes('movie') || query.includes('playing') || query.includes('film') || query.includes('showtime') || query.includes('show')) {
       const movies = await Movie.find().limit(5);
       if (movies.length > 0) {
         const titles = movies.map(m => m.title).join(', ');
