@@ -146,12 +146,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   pastEvent: {
-    filter: 'grayscale(0.6)',
-    opacity: 0.8,
-    '&:hover': {
-      filter: 'grayscale(0)',
-      opacity: 1,
-    },
+    // Styling removed so past events look the same as upcoming ones
   },
   loader: {
     display: 'flex',

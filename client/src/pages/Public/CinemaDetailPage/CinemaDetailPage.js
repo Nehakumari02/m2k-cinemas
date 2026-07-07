@@ -228,18 +228,7 @@ function CinemaDetailPage({ match, cinema, movies, showtimes, getCinema, getShow
               {cinema.name}: {formatCinemaPhone(cinema)}
             </Typography>
           )}
-          <Box mt={1}>
-            <Chip
-              className={classes.chip}
-              label={
-                minMoviePrice > 0
-                  ? `From ₹${minMoviePrice} per ticket (by movie)`
-                  : 'Ticket price set per movie'
-              }
-            />
-            {premiumLabel && <Chip className={classes.chip} label={premiumLabel} />}
-            <Chip className={classes.chip} label={`${cinema.seatsAvailable} seats in hall`} />
-          </Box>
+
           <div className={classes.ctaRow}>
             <Button
               component={Link}
