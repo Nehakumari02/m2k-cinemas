@@ -26,16 +26,18 @@ const cinemaUserModeling = async (cinemas, username) => {
 
     const newCinemas = JSON.parse(JSON.stringify(cinemas));
     let i = 0;
-    let extractedObj;
     for (let sortedCinema of sortedCinemaResult) {
+      let extractedObj = null;
       newCinemas.forEach((cinema, index) => {
         if (cinema._id == sortedCinema[0]) {
           console.log('FOUND');
           extractedObj = newCinemas.splice(index, 1);
         }
       });
-      newCinemas.splice(i, 0, extractedObj[0]);
-      i++;
+      if (extractedObj && extractedObj.length > 0) {
+        newCinemas.splice(i, 0, extractedObj[0]);
+        i++;
+      }
     }
 
     console.log(newCinemas);

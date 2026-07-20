@@ -35,27 +35,8 @@ function CarouselArrow({ direction, onClick, currentSlide, slideCount, infinite 
   );
 }
 
-function buildSettings(movieCount, isMobile) {
+function buildSettings(movieCount) {
   const count = Math.max(movieCount, 1);
-
-  if (isMobile) {
-    return {
-      dots: true,
-      arrows: true,
-      infinite: count > 1,
-      speed: 420,
-      cssEase: 'cubic-bezier(0.4, 0, 0.2, 1)',
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      centerMode: true,
-      centerPadding: '28px',
-      swipeToSlide: true,
-      touchThreshold: 6,
-      waitForAnimate: false,
-      lazyLoad: 'ondemand',
-    };
-  }
-
   const desktopShow = Math.min(5, count);
   const canInfinite = count > desktopShow;
 
@@ -101,6 +82,24 @@ function buildSettings(movieCount, isMobile) {
           centerPadding: count === 1 ? '40px' : '0px',
         },
       },
+      {
+        breakpoint: 600,
+        settings: {
+          dots: true,
+          arrows: true,
+          infinite: count > 1,
+          speed: 420,
+          cssEase: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: true,
+          centerPadding: '28px',
+          swipeToSlide: true,
+          touchThreshold: 6,
+          waitForAnimate: false,
+          lazyLoad: 'ondemand',
+        }
+      }
     ],
   };
 }
@@ -114,12 +113,9 @@ function MovieCarousel({
   autoScrollSpeed = 3500,
 }) {
   const classes = useStyles();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const baseSettings = useMemo(() => buildSettings(movies.length, isMobile), [
+  const baseSettings = useMemo(() => buildSettings(movies.length), [
     movies.length,
-    isMobile,
   ]);
 
   const settings = useMemo(

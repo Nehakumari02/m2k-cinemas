@@ -56,12 +56,15 @@ const foodOrderSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['Wallet', 'Card', 'UPI', 'NetBanking'],
+      enum: ['Wallet', 'Card', 'UPI', 'NetBanking', 'icici'],
       required: true,
+    },
+    paymentId: {
+      type: String,
     },
     status: {
       type: String,
-      enum: ['Pending', 'Preparing', 'Ready', 'Collected', 'Cancelled'],
+      enum: ['PENDING_PAYMENT', 'Pending', 'Preparing', 'Ready', 'Collected', 'Cancelled'],
       default: 'Pending',
     },
     orderNumber: {

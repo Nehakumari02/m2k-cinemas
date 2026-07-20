@@ -110,6 +110,34 @@ router.post('/users/login/google', async (req, res) => {
   }
 });
 
+router.post('/users/login/guest', async (req, res) => {
+  try {
+    const { sessionId, name } = req.body;
+    let user;
+    if (sessionId) {
+      user = await User.findOne({ guestSessionId: sessionId });
+    }
+    if (!user) {
+      const newSessionId = sessionId || require('crypto').randomBytes(16).toString('hex');
+      user = new User({
+        name: name || 'Guest User',
+        username: `guest_${newSessionId.slice(0, 10)}`,
+        email: `guest_${newSessionId.slice(0, 10)}@m2k.com`,
+        password: require('crypto').randomBytes(16).toString('hex') + 'Pwd!', // random password matching length/reqs
+        isSessionGuest: true,
+        guestSessionId: newSessionId,
+        role: 'guest'
+      });
+      await user.save();
+    }
+    const token = await user.generateAuthToken();
+    res.status(201).send({ user, token, sessionId: user.guestSessionId });
+  } catch (e) {
+    console.error('Guest login error:', e);
+    res.status(400).send({ error: { message: 'Guest login failed' } });
+  }
+});
+
 // Logout user
 router.post('/users/logout', auth.simple, async (req, res) => {
   try {

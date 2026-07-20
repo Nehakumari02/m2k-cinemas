@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
-import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 
 import Loading from './components/Loading';
 import { ProtectedRoute, WithLayoutRoute } from './routers';
@@ -84,6 +85,7 @@ const Routes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Router>
+        <ScrollToTop />
         <Switch>
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />

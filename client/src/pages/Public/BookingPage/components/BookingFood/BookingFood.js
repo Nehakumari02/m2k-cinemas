@@ -124,8 +124,10 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderTop: '1px solid #f3f4f6',
-    paddingTop: theme.spacing(2)
+    backgroundColor: '#f5eef8',
+    margin: theme.spacing(2, -3, -3, -3),
+    padding: theme.spacing(2, 3),
+    borderTop: '1px solid #e1bee7'
   },
   price: {
     fontWeight: 800,

@@ -34,7 +34,7 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refund Requested', 'Refunded'],
+      enum: ['PENDING_PAYMENT', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refund Requested', 'Refunded'],
       default: 'Pending',
     },
     shippingAddress: {
@@ -47,8 +47,11 @@ const orderSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['Wallet', 'Card', 'UPI', 'NetBanking'],
+      enum: ['Wallet', 'Card', 'UPI', 'NetBanking', 'icici'],
       required: true,
+    },
+    paymentId: {
+      type: String,
     },
     trackingId: {
       type: String,

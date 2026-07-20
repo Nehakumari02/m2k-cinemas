@@ -97,7 +97,8 @@ export default function Footer() {
                 customercare@m2kcinemas.com
               </Typography>
               <Typography variant="caption" style={{ color: '#94a3b8', display: 'block', fontSize: '0.7rem', marginTop: 4 }}>
-                M2K Rohini: 9818199906 · M2K Pitampura: 981818199923
+                M2K Rohini: 9818199906<br />
+                M2K Pitampura: 981818199923
               </Typography>
             </Box>
             <Box display="flex" gap={1} mt={1}>

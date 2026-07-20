@@ -153,7 +153,7 @@ export default theme => ({
 
   /* ── Carousel Sections ────────────────────── */
   sectionWrapper: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
     paddingTop: theme.spacing(5),
     paddingBottom: theme.spacing(2),
     scrollMarginTop: '130px',

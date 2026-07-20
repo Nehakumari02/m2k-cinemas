@@ -31,14 +31,14 @@ const useStyles = makeStyles(theme => ({
     margin: '0 auto',
     backgroundColor: '#ffffff',
     borderRadius: 12,
+    border: '1px solid #e2e8f0',
     color: '#0f172a',
-    boxShadow: '0 8px 24px rgba(15,23,42,0.14)',
+    boxShadow: 'none',
     overflow: 'hidden',
-    transition: 'transform .25s ease, box-shadow .25s ease',
+    transition: 'transform .25s ease',
     position: 'relative',
     '&:hover': {
       transform: 'translateY(-6px)',
-      boxShadow: '0 20px 40px rgba(15,23,42,0.2)',
     },
   },
   mediaWrapper: {
@@ -98,47 +98,54 @@ const useStyles = makeStyles(theme => ({
     },
     zIndex: 5,
   },
-  bookOverlay: {
-    marginTop: '16px',
-    width: '100%',
-  },
-  bookBtn: {
-    width: '100%',
-    padding: '12px 0',
-    backgroundColor: '#0f172a',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: 8,
-    fontWeight: 700,
-    fontSize: '0.9rem',
-    cursor: 'pointer',
-    transition: 'background-color .25s ease',
-    '&:hover': {
-      backgroundColor: '#1e293b',
-    },
-  },
-  playOverlay: {
+  hoverActionOverlay: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: '50%',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '50px',
-    height: '50px',
-    color: '#fff',
-    cursor: 'pointer',
-    transition: 'transform .2s ease, background-color .2s ease',
-    '&:hover': {
-      transform: 'translate(-50%, -50%) scale(1.1)',
-      backgroundColor: 'rgba(0,0,0,0.7)',
-    },
-    '& svg': {
-      fontSize: '2.5rem',
+    gap: '12px',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+    zIndex: 10,
+    padding: '20px',
+    '$card:hover &': {
+      opacity: 1,
     }
+  },
+  hoverBtnBook: {
+    width: '100%',
+    padding: '10px 0',
+    backgroundColor: '#b72429',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: 24,
+    fontWeight: 800,
+    fontSize: '0.85rem',
+    cursor: 'pointer',
+    transition: 'transform 0.2s, background-color 0.2s',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      backgroundColor: '#8a1b1e',
+    },
+  },
+  hoverBtnTrailer: {
+    width: '100%',
+    padding: '10px 0',
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
+    border: 'none',
+    borderRadius: 24,
+    fontWeight: 800,
+    fontSize: '0.85rem',
+    cursor: 'pointer',
+    transition: 'transform 0.2s',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      backgroundColor: '#f1f5f9',
+    },
   },
   h5: {
     textTransform: 'capitalize',
@@ -273,15 +280,30 @@ const MovieCardSimple = props => {
         <CardActionArea component="div" onClick={onCardClick}>
           <div className={classes.mediaWrapper}>
             <img className={classes.mediaImage} src={imageUrl} alt={movie.title} />
-            {movie.trailerUrl && (
-              <div className={classes.playOverlay} onClick={onWatchTrailer}>
-                <PlayCircleOutlineIcon />
-              </div>
-            )}
+            <div className={classes.hoverActionOverlay}>
+              {isComingSoon ? (
+                <button 
+                  className={classes.hoverBtnBook} 
+                  style={{ backgroundColor: isInterested ? '#475569' : '#b72429', color: '#ffffff' }}
+                  onClick={onShowInterest}
+                >
+                  {isInterested ? 'INTERESTED' : 'SHOW INTEREST'}
+                </button>
+              ) : (
+                <button className={classes.hoverBtnBook} onClick={onBookTickets}>
+                  BOOK TICKETS
+                </button>
+              )}
+              {movie.trailerUrl && (
+                <button className={classes.hoverBtnTrailer} onClick={onWatchTrailer}>
+                  WATCH TRAILER
+                </button>
+              )}
+            </div>
             {movie.language && (
               <span className={classes.langBadge}>{movie.language}</span>
             )}
-            {movie.format && (
+            {movie.format && movie.format.toUpperCase() !== '2D' && (
               <span className={classes.formatBadge}>{movie.format}</span>
             )}
             <IconButton className={classes.wishlistBtn} onClick={handleWishlistToggle} size="small" style={{ top: '38px' }}>
@@ -291,7 +313,7 @@ const MovieCardSimple = props => {
           <CardContent className={classes.cardContent}>
             <div className={classes.detailsRow}>
               <Typography className={classes.detailsLeft} variant="caption" color="inherit">
-                {(movie.language || 'LANG').toUpperCase()} • {movie.duration || '--'} MIN
+                {movie.duration ? `${movie.duration} MIN` : '-- MIN'}
               </Typography>
               <span className={classes.ratingPill}>
                 <StarIcon style={{ fontSize: '0.8rem' }} />
@@ -301,29 +323,7 @@ const MovieCardSimple = props => {
             <Typography className={classes.meta} variant="caption" color="inherit">
               {movie.genre ? movie.genre.split(',').slice(0, 2).join(' • ') : 'Drama • Action'}
             </Typography>
-            <Typography
-              className={classes.h5}
-              gutterBottom
-              variant="h5"
-              component="h2"
-              color="inherit">
-              {movie.title}
-            </Typography>
-            <div className={classes.bookOverlay}>
-              {isComingSoon ? (
-                <button 
-                  className={classes.bookBtn} 
-                  style={{ backgroundColor: isInterested ? '#475569' : '#0f172a' }}
-                  onClick={onShowInterest}
-                >
-                  {isInterested ? 'Interested' : 'Show Interest'}
-                </button>
-              ) : (
-                <button className={classes.bookBtn} onClick={onBookTickets}>
-                  Book Tickets
-                </button>
-              )}
-            </div>
+
           </CardContent>
         </CardActionArea>
       </Card>

@@ -102,6 +102,10 @@ const movieSchema = new Schema({
     required: false,
     default: 0,
   },
+  isAdult: {
+    type: Boolean,
+    default: false,
+  },
   releaseDate: {
     type: Date,
     required: true,

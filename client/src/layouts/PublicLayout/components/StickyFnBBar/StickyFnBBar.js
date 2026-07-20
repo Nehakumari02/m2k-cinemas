@@ -37,29 +37,21 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     textDecoration: 'none',
-    position: 'relative',
-    background: `url(${foodBg}) center 30% / cover no-repeat`,
+    background: 'linear-gradient(180deg, #e0b0ff 0%, #cfa1ed 100%)',
     padding: theme.spacing(1.75, 2),
     borderRadius: 8,
     transition: 'filter 0.2s ease, transform 0.15s ease',
     overflow: 'hidden',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.2)', // Lightened overlay for better image visibility
-      transition: 'background-color 0.2s ease',
-      zIndex: 1,
-    },
     '&:hover': {
       transform: 'scale(1.02)',
-      '&::before': {
-        backgroundColor: 'rgba(0, 0, 0, 0.1)', // Even lighter on hover
-      },
+      filter: 'brightness(1.05)',
+    },
+    [theme.breakpoints.down('xs')]: {
+      padding: theme.spacing(1.75, 1.5),
     },
   },
   fnbLabel: {
-    color: '#ffffff',
+    color: '#0f172a',
     fontWeight: 800,
     fontSize: '0.82rem',
     letterSpacing: '0.04em',
@@ -69,7 +61,9 @@ const useStyles = makeStyles(theme => ({
     gap: 6,
     position: 'relative',
     zIndex: 2,
-    textShadow: '0px 2px 4px rgba(0,0,0,0.6)', // Added text shadow for readability on lighter background
+    [theme.breakpoints.down('xs')]: {
+      fontSize: '0.72rem',
+    },
   },
   secondaryLink: {
     flex: 1,
@@ -147,7 +141,7 @@ function StickyFnBBar({ foodCartCount, selectedMovie }) {
       ) : (
         <Link to="/showtimings" className={classes.secondaryLink}>
           <MovieFilterIcon style={{ fontSize: 20 }} />
-          Curated Shows
+          Book Ticket
         </Link>
       )}
       <MovieBookingModals flow={bookingFlow} />

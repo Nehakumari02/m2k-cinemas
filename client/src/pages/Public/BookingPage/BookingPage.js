@@ -69,8 +69,7 @@ import BookingFood from './components/BookingFood/BookingFood';
 import BookingFoodLastChance from './components/BookingFoodLastChance/BookingFoodLastChance';
 import jsPDF from 'jspdf';
 
-const REGISTRATION_REQUIRED_MSG =
-  'Registration required. Please create a full account with your phone number to book tickets.';
+const REGISTRATION_REQUIRED_MSG = 'Login required.';
 
 function needsRegistration(user) {
   return Boolean(user?.isSessionGuest || !(user?.phone || '').trim());
@@ -131,6 +130,37 @@ class BookingPage extends Component {
       getSuggestedReservationSeats(user.username);
       getWalletData();
       this.props.loadUser();
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const reservationId = urlParams.get('reservationId');
+    
+    if (paymentStatus === 'success' && reservationId) {
+      this.props.setAlert('Payment successful!', 'success', 3000);
+      this.stopTimer();
+      
+      // Fetch user reservations to get the QRCode
+      fetch('/reservations/me', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const reservation = data.find(r => r._id === reservationId);
+        if (reservation && reservation.QRCode) {
+          this.props.setQRCode(reservation.QRCode);
+          this.props.showInvitationForm();
+        }
+      })
+      .catch(err => console.error('Error fetching reservation for QR', err));
+      
+      // Clean up URL
+      window.history.replaceState(null, '', window.location.pathname);
+    } else if (paymentStatus === 'failed') {
+      this.props.setAlert('Payment failed or cancelled.', 'error', 5000);
+      window.history.replaceState(null, '', window.location.pathname);
     }
   }
 
@@ -563,8 +593,52 @@ class BookingPage extends Component {
       } catch (e) {
         return this.props.setAlert('Server error during wallet payment', 'error', 5000);
       }
+    } else if (paymentMethod === 'icici' || (paymentMethod === 'netbanking' && paymentDetails.bankName.toLowerCase().includes('icici'))) {
+      const reservationData = {
+        date: selectedDate,
+        startAt: selectedTime,
+        seats: this.bookSeats(),
+        ticketPrice: getMovieBaseTicketPrice(movie, cinema),
+        total: afterDiscountTotal,
+        pointsUsed: pointsUsed,
+        foodItems,
+        foodDeliveryTime,
+        foodDeliveryMethod,
+        movieId: movie._id,
+        cinemaId: cinema._id,
+        username: user.username,
+        phone: user.phone
+      };
+
+      try {
+        const token = localStorage.getItem('jwtToken');
+        const iciciResponse = await fetch('/reservations/icici/initiate', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ amount: finalAmount, reservationData })
+        });
+        
+        const data = await iciciResponse.json();
+        if (iciciResponse.ok && data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+          return; 
+        } else {
+          return this.props.setAlert(data.error || 'Failed to initiate ICICI payment', 'error', 5000);
+        }
+      } catch (e) {
+        return this.props.setAlert('Server error during ICICI checkout', 'error', 5000);
+      }
     } else {
       paymentSuccess = await this.launchPayment(finalAmount);
+    }
+    
+    // Halt if payment failed (except when finalAmount is 0 or payment was intercepted by redirect)
+    const isIciciRedirect = paymentMethod === 'icici' || (paymentMethod === 'netbanking' && paymentDetails.bankName.toLowerCase().includes('icici'));
+    if (!paymentSuccess && !isIciciRedirect && finalAmount > 0) {
+      return; 
     }
 
     const response = pendingReservationId 
@@ -685,7 +759,7 @@ class BookingPage extends Component {
     }
   };
 
-  onContinueToPayment = async () => {
+  onContinueToPayment = async (loggedInUser = null) => {
     const {
       selectedSeats,
       isAuth,
@@ -693,9 +767,11 @@ class BookingPage extends Component {
       selectedFood
     } = this.props;
 
+    const user = loggedInUser || this.props.user;
+
     if (selectedSeats.length === 0) return;
 
-    if (!isAuth) {
+    if (!isAuth && !loggedInUser) {
       this.setState({ loginResumePayment: true });
       return toggleLoginPopup();
     }
@@ -1458,12 +1534,12 @@ class BookingPage extends Component {
           maxWidth="sm">
           <LoginForm
             redirect={false}
-            onAuthSuccess={() => {
+            onAuthSuccess={(loggedInUser) => {
               const { toggleLoginPopup: closeLogin } = this.props;
               if (this.state.loginResumePayment) {
                 this.setState({ loginResumePayment: false }, () => {
                   closeLogin();
-                  this.onContinueToPayment();
+                  this.onContinueToPayment(loggedInUser);
                 });
               } else {
                 closeLogin();

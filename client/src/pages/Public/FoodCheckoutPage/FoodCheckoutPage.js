@@ -107,6 +107,22 @@ const FoodCheckoutPage = ({
       getWalletData();
       loadUser();
     }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const orderId = urlParams.get('orderId');
+    if (paymentStatus === 'success' && orderId) {
+      fetch('/orders/food/me', { headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` } })
+        .then(res => res.json())
+        .then(data => {
+          const order = data.find(o => o._id === orderId);
+          if (order) setOrderComplete(order);
+        }).catch(err => console.error(err));
+      window.history.replaceState(null, '', window.location.pathname);
+    } else if (paymentStatus === 'error' || paymentStatus === 'failed') {
+      alert('Payment failed or was cancelled.');
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }, [getWalletData, getOffers, getMemberships, loadUser, isAuth]);
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.offerPrice > 0 ? item.offerPrice : item.price) * item.quantity, 0);
@@ -201,6 +217,33 @@ const FoodCheckoutPage = ({
       },
       paymentMethod,
     };
+
+    if (paymentMethod === 'icici' || (paymentMethod === 'NetBanking' && pickup.notes.toLowerCase().includes('icici'))) {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        const iciciResponse = await fetch('/orders/food/icici/initiate', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ amount: finalTotal, orderData })
+        });
+        const data = await iciciResponse.json();
+        if (iciciResponse.ok && data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+          return;
+        } else {
+          alert(data.error || 'Failed to initiate ICICI payment');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        alert('Server error during ICICI checkout');
+        setLoading(false);
+        return;
+      }
+    }
 
     const res = await createFoodOrder(orderData);
     setLoading(false);
@@ -374,10 +417,11 @@ const FoodCheckoutPage = ({
                   value={paymentMethod}
                   onChange={e => setPaymentMethod(e.target.value)}
                   variant="outlined">
-                  <MenuItem value="Card">Credit / Debit Card</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
                   <MenuItem value="UPI">UPI</MenuItem>
                   <MenuItem value="NetBanking">Net Banking</MenuItem>
-                  <MenuItem value="Wallet">M2K Wallet (₹{walletBalance})</MenuItem>
+                  <MenuItem value="icici">ICICI Bank</MenuItem>
+                  <MenuItem value="Wallet">M2K Wallet (Balance: ₹{walletBalance})</MenuItem>
                 </TextField>
               </Box>
             </Paper>

@@ -76,6 +76,9 @@ const reservationSchema = new Schema({
     enum: ['Paid', 'Pending', 'Refund Requested', 'Refunded', 'Cancelled'],
     default: 'Paid',
   },
+  paymentId: {
+    type: String,
+  },
   expiresAt: {
     type: Date,
     index: { expiresAfterSeconds: 0 }

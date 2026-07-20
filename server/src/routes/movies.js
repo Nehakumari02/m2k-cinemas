@@ -219,6 +219,7 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'releaseDate',
     'endDate',
     'isPublished',
+    'isAdult',
     'format',
     'certificate',
     'languages',

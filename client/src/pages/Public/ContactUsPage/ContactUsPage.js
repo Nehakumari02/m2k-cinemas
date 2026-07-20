@@ -170,9 +170,7 @@ const ContactUsPage = () => {
                   <Typography variant="h6" style={{ fontWeight: 800 }}>Email Us</Typography>
                   <Typography variant="body1" style={{ color: '#64748b', lineHeight: 1.7 }}>
                     <strong>For Feedback, School/Corporate Bookings, Kitty & Birthday Parties:</strong><br />
-                    <a href="mailto:customercare@m2kcinemas.com" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 600 }}>customercare@m2kcinemas.com</a><br /><br />
-                    <strong>General Support:</strong><br />
-                    <a href="mailto:support@m2kcinemas.com" style={{ color: '#64748b', textDecoration: 'none' }}>support@m2kcinemas.com</a>
+                    <a href="mailto:customercare@m2kcinemas.com" style={{ color: '#b72429', textDecoration: 'none', fontWeight: 600 }}>customercare@m2kcinemas.com</a>
                   </Typography>
                 </div>
               </div>

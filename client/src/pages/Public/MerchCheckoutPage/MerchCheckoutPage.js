@@ -65,6 +65,20 @@ const MerchCheckoutPage = ({
     getWalletData();
     getMemberships();
     if (isAuth) loadUser();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    if (paymentStatus === 'success') {
+      window.history.replaceState(null, '', window.location.pathname);
+      // Wait for 2 seconds so the user can see the success message
+      setTimeout(() => {
+        window.location.href = '/#/mydashboard';
+        window.location.reload();
+      }, 2000);
+    } else if (paymentStatus === 'error' || paymentStatus === 'failed') {
+      alert('Payment failed or was cancelled.');
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }, [getWalletData, getMemberships, loadUser, isAuth]);
 
   const [address, setAddress] = useState({
@@ -114,6 +128,33 @@ const MerchCheckoutPage = ({
       paymentMethod,
       pointsUsed
     };
+
+    if (paymentMethod === 'icici' || (paymentMethod === 'NetBanking' && address.address.toLowerCase().includes('icici'))) {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        const iciciResponse = await fetch('/orders/merch/icici/initiate', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ amount: finalTotal, orderData })
+        });
+        const data = await iciciResponse.json();
+        if (iciciResponse.ok && data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+          return;
+        } else {
+          alert(data.error || 'Failed to initiate ICICI payment');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        alert('Server error during ICICI checkout');
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       const res = await createOrder(orderData);
@@ -227,9 +268,10 @@ const MerchCheckoutPage = ({
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   variant="outlined"
                 >
-                  <MenuItem value="Card">Credit / Debit Card</MenuItem>
-                  <MenuItem value="UPI">UPI / Google Pay</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
+                  <MenuItem value="UPI">UPI</MenuItem>
                   <MenuItem value="NetBanking">Net Banking</MenuItem>
+                  <MenuItem value="icici">ICICI Bank</MenuItem>
                   <MenuItem value="Wallet">M2K Wallet (Balance: ₹{walletBalance})</MenuItem>
                 </TextField>
               </Box>

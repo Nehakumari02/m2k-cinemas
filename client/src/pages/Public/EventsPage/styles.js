@@ -2,11 +2,11 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: '#0a0a0f',
+    backgroundColor: '#ffffff',
     minHeight: '100vh',
     padding: '120px 0 80px',
-    color: '#fff',
-    backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(183, 36, 41, 0.1) 0%, transparent 50%)',
+    color: '#0f172a',
+    backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(183, 36, 41, 0.05) 0%, transparent 50%)',
   },
   header: {
     textAlign: 'center',
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase',
     letterSpacing: '-1px',
     marginBottom: theme.spacing(2),
-    background: 'linear-gradient(45deg, #fff 30%, #a1a1a1 90%)',
+    background: 'linear-gradient(45deg, #0f172a 30%, #475569 90%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     [theme.breakpoints.down('sm')]: {
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     WebkitTextFillColor: '#b72429',
   },
   subtitle: {
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'rgba(0, 0, 0, 0.6)',
     maxWidth: '600px',
     margin: '0 auto',
     fontSize: '1.1rem',
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   sectionTitle: {
     fontWeight: 800,
     fontSize: '1.8rem',
-    color: '#fff',
+    color: '#0f172a',
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing(2),
@@ -66,18 +66,18 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
     backdropFilter: 'blur(10px)',
     borderRadius: '24px',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    border: '1px solid rgba(0, 0, 0, 0.08)',
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     overflow: 'hidden',
     position: 'relative',
     '&:hover': {
       transform: 'translateY(-10px)',
-      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+      backgroundColor: '#ffffff',
       borderColor: 'rgba(183, 36, 41, 0.4)',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(183, 36, 41, 0.1)',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(183, 36, 41, 0.05)',
       '& $media': {
         transform: 'scale(1.1)',
       },
@@ -104,7 +104,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     fontSize: '0.85rem',
     zIndex: 2,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
   },
   cardContent: {
     padding: theme.spacing(4),
@@ -116,11 +116,11 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 800,
     fontSize: '1.4rem',
     marginBottom: theme.spacing(1.5),
-    color: '#fff',
+    color: '#0f172a',
     lineHeight: 1.3,
   },
   eventDescription: {
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(0, 0, 0, 0.6)',
     fontSize: '0.95rem',
     lineHeight: 1.6,
     marginBottom: theme.spacing(3),
@@ -137,12 +137,14 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'none',
     fontSize: '1rem',
     transition: 'all 0.3s ease',
-    backgroundColor: 'transparent',
+    backgroundColor: '#b72429',
     border: '2px solid #b72429',
-    color: '#fff',
+    color: '#ffffff',
     '&:hover': {
-      backgroundColor: '#b72429',
-      boxShadow: '0 8px 20px rgba(183, 36, 41, 0.4)',
+      backgroundColor: '#8a1b1e',
+      borderColor: '#8a1b1e',
+      color: '#ffffff',
+      boxShadow: '0 8px 20px rgba(183, 36, 41, 0.2)',
     },
   },
   pastEvent: {
@@ -157,10 +159,10 @@ const useStyles = makeStyles((theme) => ({
   emptyState: {
     textAlign: 'center',
     padding: theme.spacing(8),
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
     borderRadius: '24px',
-    border: '1px dashed rgba(255, 255, 255, 0.1)',
-    color: 'rgba(255, 255, 255, 0.4)',
+    border: '1px dashed rgba(0, 0, 0, 0.1)',
+    color: 'rgba(0, 0, 0, 0.6)',
   },
   dialogPaper: {
     backgroundColor: 'transparent',

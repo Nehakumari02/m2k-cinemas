@@ -59,6 +59,7 @@ class AddMovie extends Component {
     releaseDate: new Date(),
     endDate: new Date(),
     isPublished: true,
+    isAdult: false,
     format: '2D',
     certificate: '',
     languages: '',
@@ -83,6 +84,7 @@ class AddMovie extends Component {
         releaseDate,
         endDate,
         isPublished,
+        isAdult,
         format,
         certificate,
         languages,
@@ -110,6 +112,7 @@ class AddMovie extends Component {
         rating: rating || '',
         endDate,
         isPublished: isPublished !== undefined ? isPublished : true,
+        isAdult: isAdult || false,
         format: format || '2D',
         certificate: certificate || '',
         languages: languages || '',
@@ -162,6 +165,7 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
+      isAdult,
       format,
       certificate,
       languages,
@@ -190,6 +194,7 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
+      isAdult,
       format,
       certificate,
       languages,
@@ -219,6 +224,7 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
+      isAdult,
       format,
       certificate,
       languages,
@@ -256,6 +262,7 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
+      isAdult,
       format,
       certificate,
       languages,
@@ -347,6 +354,7 @@ class AddMovie extends Component {
       releaseDate,
       endDate,
       isPublished,
+      isAdult,
       format,
       certificate,
       languages,
@@ -710,6 +718,19 @@ class AddMovie extends Component {
                     />
                   }
                   label="Published (visible to users)"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  className={classes.switchRow}
+                  control={
+                    <Switch
+                      checked={isAdult}
+                      onChange={e => this.handleFieldChange('isAdult', e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Adult Movie (A Rated)"
                 />
               </Grid>
             </Grid>

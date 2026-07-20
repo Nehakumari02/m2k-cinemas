@@ -9,6 +9,8 @@ export default function useMovieBookingFlow() {
   const [termsOpen, setTermsOpen] = useState(false);
   const [pendingMovie, setPendingMovie] = useState(null);
 
+  const [adultWarningOpen, setAdultWarningOpen] = useState(false);
+
   const goToBooking = useCallback(
     movie => {
       if (movie?._id) {
@@ -30,7 +32,21 @@ export default function useMovieBookingFlow() {
   const startBooking = useCallback(movie => {
     if (!movie?._id) return;
     setPendingMovie(movie);
+    if (movie.isAdult) {
+      setAdultWarningOpen(true);
+    } else {
+      setTermsOpen(true);
+    }
+  }, []);
+
+  const handleAdultWarningAccept = useCallback(() => {
+    setAdultWarningOpen(false);
     setTermsOpen(true);
+  }, []);
+
+  const handleAdultWarningCancel = useCallback(() => {
+    setAdultWarningOpen(false);
+    setPendingMovie(null);
   }, []);
 
   const handleTermsAccept = useCallback(() => {
@@ -45,9 +61,12 @@ export default function useMovieBookingFlow() {
   }, []);
 
   return {
+    adultWarningOpen,
     termsOpen,
     pendingMovie,
     startBooking,
+    handleAdultWarningAccept,
+    handleAdultWarningCancel,
     handleTermsAccept,
     handleTermsCancel,
   };

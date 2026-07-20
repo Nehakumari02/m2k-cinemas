@@ -101,7 +101,13 @@ function LoginForm(props) {
   };
 
   return (
-    <form className={classes.form}>
+    <form 
+      className={classes.form} 
+      onSubmit={(e) => {
+        e.preventDefault();
+        props.login(values.username, values.password);
+      }}
+    >
       <Typography className={classes.title} variant="h2">
         Sign in
       </Typography>
@@ -163,7 +169,7 @@ function LoginForm(props) {
       <Button
         className={classes.loginButton}
         color="primary"
-        onClick={() => props.login(values.username, values.password)}
+        type="submit"
         size="large"
         variant="contained">
         Login now

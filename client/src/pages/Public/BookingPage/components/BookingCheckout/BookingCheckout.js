@@ -442,6 +442,7 @@ export default function BookingCheckout(props) {
               <MenuItem value="card">Card</MenuItem>
               <MenuItem value="upi">UPI</MenuItem>
               <MenuItem value="netbanking">Net Banking</MenuItem>
+              <MenuItem value="icici">ICICI Bank</MenuItem>
               <MenuItem value="wallet">M2K Wallet (Balance: ₹{walletBalance})</MenuItem>
             </TextField>
 

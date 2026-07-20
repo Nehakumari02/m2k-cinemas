@@ -37,6 +37,7 @@ const feedbackRouter = require('./routes/feedback');
 const chatbotRouter = require('./routes/chatbot');
 const guestLoginHandler = require('./handlers/guestLoginHandler');
 const adminAuditLog = require('./middlewares/adminAuditLog');
+const iciciReservationsRouter = require('./routes/iciciReservations');
 
 const app = express();
 app.disable('x-powered-by');
@@ -85,6 +86,7 @@ app.use(activityLogsRouter);
 app.use(notificationsRouter);
 app.use(feedbackRouter);
 app.use(chatbotRouter);
+app.use(iciciReservationsRouter);
 
 app.get('/health', (req, res) => {
   res.send({
