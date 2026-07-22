@@ -37,14 +37,13 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     textDecoration: 'none',
-    background: 'linear-gradient(180deg, #e0b0ff 0%, #cfa1ed 100%)',
+    background: '#25D366',
     padding: theme.spacing(1.75, 2),
     borderRadius: 8,
     transition: 'filter 0.2s ease, transform 0.15s ease',
     overflow: 'hidden',
     '&:hover': {
       transform: 'scale(1.02)',
-      filter: 'brightness(1.05)',
     },
     [theme.breakpoints.down('xs')]: {
       padding: theme.spacing(1.75, 1.5),
