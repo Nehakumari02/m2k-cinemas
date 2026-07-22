@@ -100,17 +100,17 @@ const useStyles = makeStyles(theme => ({
   },
   hoverActionOverlay: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    left: 0, right: 0, bottom: 0, height: '50%',
+    background: 'linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     gap: '12px',
     opacity: 0,
     transition: 'opacity 0.3s ease',
     zIndex: 10,
-    padding: '20px',
+    padding: '20px 15px',
     '$card:hover &': {
       opacity: 1,
     }
@@ -118,43 +118,43 @@ const useStyles = makeStyles(theme => ({
   hoverBtnBook: {
     width: '100%',
     padding: '10px 0',
-    backgroundColor: '#b72429',
-    color: '#ffffff',
+    backgroundColor: '#ffc107',
+    color: '#000000',
     border: 'none',
-    borderRadius: 24,
+    borderRadius: 8,
     fontWeight: 800,
-    fontSize: '0.85rem',
+    fontSize: '0.9rem',
     cursor: 'pointer',
     transition: 'transform 0.2s, background-color 0.2s',
     '&:hover': {
-      transform: 'scale(1.05)',
-      backgroundColor: '#8a1b1e',
+      transform: 'scale(1.03)',
+      backgroundColor: '#ffb300',
     },
   },
   hoverBtnTrailer: {
-    width: '100%',
-    padding: '10px 0',
-    backgroundColor: '#ffffff',
-    color: '#0f172a',
+    background: 'transparent',
+    color: '#ffffff',
     border: 'none',
-    borderRadius: 24,
-    fontWeight: 800,
-    fontSize: '0.85rem',
     cursor: 'pointer',
+    padding: 0,
     transition: 'transform 0.2s',
     '&:hover': {
-      transform: 'scale(1.05)',
-      backgroundColor: '#f1f5f9',
+      transform: 'scale(1.1)',
     },
+    '& svg': {
+      fontSize: '3rem',
+    }
   },
   h5: {
-    textTransform: 'capitalize',
+    textTransform: 'uppercase',
     fontSize: '1rem',
     fontWeight: 700,
+    color: '#000000',
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    marginTop: '5px',
   },
   meta: {
     color: '#64748b',
@@ -281,22 +281,22 @@ const MovieCardSimple = props => {
           <div className={classes.mediaWrapper}>
             <img className={classes.mediaImage} src={imageUrl} alt={movie.title} />
             <div className={classes.hoverActionOverlay}>
+              {movie.trailerUrl && (
+                <button className={classes.hoverBtnTrailer} onClick={onWatchTrailer} aria-label="Watch Trailer">
+                  <PlayCircleOutlineIcon />
+                </button>
+              )}
               {isComingSoon ? (
                 <button 
                   className={classes.hoverBtnBook} 
-                  style={{ backgroundColor: isInterested ? '#475569' : '#b72429', color: '#ffffff' }}
+                  style={{ backgroundColor: isInterested ? '#475569' : '#ffc107', color: isInterested ? '#ffffff' : '#000000' }}
                   onClick={onShowInterest}
                 >
-                  {isInterested ? 'INTERESTED' : 'SHOW INTEREST'}
+                  {isInterested ? 'Interested' : 'Show Interest'}
                 </button>
               ) : (
                 <button className={classes.hoverBtnBook} onClick={onBookTickets}>
-                  BOOK TICKETS
-                </button>
-              )}
-              {movie.trailerUrl && (
-                <button className={classes.hoverBtnTrailer} onClick={onWatchTrailer}>
-                  WATCH TRAILER
+                  Book
                 </button>
               )}
             </div>
@@ -311,7 +311,10 @@ const MovieCardSimple = props => {
             </IconButton>
           </div>
           <CardContent className={classes.cardContent}>
-            <div className={classes.detailsRow}>
+            <Typography className={classes.h5} variant="h5" component="h2">
+              {movie.title}
+            </Typography>
+            <div className={classes.detailsRow} style={{ marginTop: '8px' }}>
               <Typography className={classes.detailsLeft} variant="caption" color="inherit">
                 {movie.duration ? `${movie.duration} MIN` : '-- MIN'}
               </Typography>

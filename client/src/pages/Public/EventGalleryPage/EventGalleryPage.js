@@ -9,6 +9,7 @@ const EventGalleryPage = ({ match, history }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Force HMR
 
   const eventId = match.params.id;
 

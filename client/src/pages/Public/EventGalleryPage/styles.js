@@ -2,11 +2,11 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: '#0a0a0f',
+    backgroundColor: '#f8f9fa !important',
     minHeight: '100vh',
     padding: '120px 0 80px',
-    color: '#fff',
-    backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(183, 36, 41, 0.1) 0%, transparent 50%)',
+    color: '#0f172a !important',
+    backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(183, 36, 41, 0.05) 0%, transparent 50%)',
   },
   header: {
     textAlign: 'center',
@@ -91,10 +91,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.5rem',
     marginBottom: theme.spacing(3),
     textAlign: 'center',
-    color: '#fff',
+    color: '#0f172a',
   },
   backButton: {
-    color: '#fff',
+    color: '#0f172a',
     marginBottom: theme.spacing(4),
     textTransform: 'none',
     fontWeight: 600,
