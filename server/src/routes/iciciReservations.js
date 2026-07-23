@@ -45,7 +45,7 @@ router.post('/reservations/icici/initiate', auth.simple, async (req, res) => {
             finalUrl += `?tranCtx=${iciciRes.data.tranCtx}`;
         }
 
-        // 4. Send URL to frontend
+        // 4. Send URL to frontend for  redirectionss
         res.send({ paymentUrl: finalUrl });
     } catch (e) {
         res.status(500).send({ error: 'Server error', details: e.message });
