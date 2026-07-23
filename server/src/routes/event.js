@@ -6,7 +6,7 @@ const upload = require('../utils/multer');
 const router = new express.Router();
 
 // Upload event image
-router.post('/api/events/upload', auth.staff, upload('events').single('image'), async (req, res) => {
+router.post('/events/upload', auth.staff, upload('events').single('image'), async (req, res) => {
   try {
     const url = `/uploads/events/${req.file.filename}`;
 
@@ -17,7 +17,7 @@ router.post('/api/events/upload', auth.staff, upload('events').single('image'), 
 });
 
 // Create event
-router.post('/api/events', auth.staff, async (req, res) => {
+router.post('/events', auth.staff, async (req, res) => {
   const event = new Event(req.body);
   try {
     await event.save();
@@ -28,7 +28,11 @@ router.post('/api/events', auth.staff, async (req, res) => {
 });
 
 // Get all events
-router.get('/api/events', async (req, res) => {
+router.get('/events', async (req, res, next) => {
+  // If a browser is refreshing the page, skip this API route and let React handle it
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return next();
+  }
   try {
     const events = await Event.find({});
     res.send(events);
@@ -38,7 +42,11 @@ router.get('/api/events', async (req, res) => {
 });
 
 // Get event by id
-router.get('/api/events/:id', async (req, res) => {
+router.get('/events/:id', async (req, res, next) => {
+  // If a browser is requesting the gallery page, skip this API route
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return next();
+  }
   const _id = req.params.id;
   try {
     const event = await Event.findById(_id);
@@ -50,7 +58,7 @@ router.get('/api/events/:id', async (req, res) => {
 });
 
 // Update event
-router.patch('/api/events/:id', auth.staff, async (req, res) => {
+router.patch('/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = ['title', 'date', 'description', 'image', 'gallery'];
@@ -70,7 +78,7 @@ router.patch('/api/events/:id', auth.staff, async (req, res) => {
 });
 
 // Delete event
-router.delete('/api/events/:id', auth.staff, async (req, res) => {
+router.delete('/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   try {
     const event = await Event.findByIdAndDelete(_id);

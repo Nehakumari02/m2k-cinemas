@@ -11,7 +11,7 @@ const API_PREFIXES = [
   '/offers',
   '/experiences',
   '/food',
-  '/api/events',
+  '/events',
   '/wallet',
   '/products',
   '/orders',
@@ -27,13 +27,7 @@ const API_PREFIXES = [
 
 module.exports = function setupProxy(app) {
   app.use(
-    proxy((pathname, req) => {
-      // Do not proxy if the browser is requesting a webpage
-      if (req.headers.accept && req.headers.accept.includes('text/html')) {
-        return false;
-      }
-      return API_PREFIXES.some(prefix => pathname.startsWith(prefix));
-    }, {
+    proxy((pathname) => API_PREFIXES.some(prefix => pathname.startsWith(prefix)), {
       target: 'http://localhost:8080',
       changeOrigin: true,
     })

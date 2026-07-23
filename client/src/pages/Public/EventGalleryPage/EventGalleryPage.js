@@ -21,7 +21,7 @@ const EventGalleryPage = ({ match, history }) => {
       setLoading(true);
       setEvent(null);
       try {
-        const res = await fetch(`/api/events/${eventId}`);
+        const res = await fetch(`/events/${eventId}`);
         if (cancelled) return;
         if (res.ok) {
           setEvent(await res.json());
