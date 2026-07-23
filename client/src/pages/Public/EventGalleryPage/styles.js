@@ -139,11 +139,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     cursor: 'pointer',
     backgroundColor: '#1a1a24',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+    boxShadow: 'none',
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
       transform: 'translateY(-8px) scale(1.02)',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+      boxShadow: 'none',
       '& $imageOverlay': {
         opacity: 1,
       },
