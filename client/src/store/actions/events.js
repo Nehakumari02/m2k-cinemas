@@ -4,7 +4,7 @@ import { setAlert } from './alert';
 // GET all events
 export const getEvents = () => async dispatch => {
   try {
-    const response = await fetch('/events', {
+    const response = await fetch('/api/events', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -42,7 +42,7 @@ const errorMessageFromBody = (data, response) => {
 export const addEvent = eventData => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
-    const response = await fetch('/events', {
+    const response = await fetch('/api/events', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,7 +68,7 @@ export const addEvent = eventData => async dispatch => {
 export const removeEvent = id => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
-    const response = await fetch(`/events/${id}`, {
+    const response = await fetch(`/api/events/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -89,7 +89,7 @@ export const removeEvent = id => async dispatch => {
 export const updateEvent = (id, eventData) => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
-    const response = await fetch(`/events/${id}`, {
+    const response = await fetch(`/api/events/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ export const uploadEventImage = image => async dispatch => {
     const formData = new FormData();
     formData.append('image', image);
 
-    const response = await fetch('/events/upload', {
+    const response = await fetch('/api/events/upload', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData
