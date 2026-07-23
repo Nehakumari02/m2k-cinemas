@@ -143,7 +143,7 @@ const useStyles = makeStyles((theme) => ({
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
       transform: 'translateY(-8px) scale(1.02)',
-      boxShadow: '0 20px 40px rgba(183, 36, 41, 0.2)',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
       '& $imageOverlay': {
         opacity: 1,
       },
@@ -164,7 +164,7 @@ const useStyles = makeStyles((theme) => ({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(183, 36, 41, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

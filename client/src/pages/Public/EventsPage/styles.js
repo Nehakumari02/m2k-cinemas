@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
       transform: 'translateY(-10px)',
       backgroundColor: '#ffffff',
       borderColor: 'rgba(183, 36, 41, 0.4)',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(183, 36, 41, 0.05)',
+      boxShadow: 'none',
       '& $media': {
         transform: 'scale(1.1)',
       },
