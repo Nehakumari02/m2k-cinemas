@@ -11,7 +11,7 @@ const API_PREFIXES = [
   '/offers',
   '/experiences',
   '/food',
-  '/api/events',
+  '/events',
   '/wallet',
   '/products',
   '/orders',
