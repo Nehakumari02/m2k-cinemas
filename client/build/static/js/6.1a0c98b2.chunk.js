@@ -1,2 +1,0 @@
-(this["webpackJsonpcinema-plus-client"]=this["webpackJsonpcinema-plus-client"]||[]).push([[6],{599:function(o,t,n){"use strict";n.r(t),n.d(t,"getUserLocation",(function(){return e}));const e=()=>new Promise((o,t)=>{navigator.geolocation?navigator.geolocation.getCurrentPosition(t=>{o({latitude:t.coords.latitude,longitude:t.coords.longitude})},o=>{t(o)}):t(new Error("Geolocation is not supported by your browser"))})}}]);
-//# sourceMappingURL=6.1a0c98b2.chunk.js.map

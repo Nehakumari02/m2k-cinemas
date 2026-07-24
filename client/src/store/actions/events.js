@@ -6,7 +6,7 @@ export const getEvents = () => async dispatch => {
   try {
     const response = await fetch('/events', {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
     });
     const events = await response.json();
     if (response.ok) {

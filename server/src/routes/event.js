@@ -29,8 +29,8 @@ router.post('/events', auth.staff, async (req, res) => {
 
 // Get all events
 router.get('/events', async (req, res, next) => {
-  // If a browser is refreshing the page, skip this API route and let React handle it
-  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+  // If request is not from our React API fetch, it's likely a browser refresh, let React Router handle it
+  if (req.headers['x-requested-with'] !== 'XMLHttpRequest') {
     return next();
   }
   try {
@@ -43,8 +43,8 @@ router.get('/events', async (req, res, next) => {
 
 // Get event by id
 router.get('/events/:id', async (req, res, next) => {
-  // If a browser is requesting the gallery page, skip this API route
-  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+  // If request is not from our React API fetch, let React Router handle it
+  if (req.headers['x-requested-with'] !== 'XMLHttpRequest') {
     return next();
   }
   const _id = req.params.id;
