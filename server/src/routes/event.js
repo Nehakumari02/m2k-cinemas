@@ -6,7 +6,7 @@ const upload = require('../utils/multer');
 const router = new express.Router();
 
 // Upload event image
-router.post('/events/upload', auth.staff, upload('events').single('image'), async (req, res) => {
+router.post('/api/events/upload', auth.staff, upload('events').single('image'), async (req, res) => {
   try {
     const url = `/uploads/events/${req.file.filename}`;
 
@@ -17,7 +17,7 @@ router.post('/events/upload', auth.staff, upload('events').single('image'), asyn
 });
 
 // Create event
-router.post('/events', auth.staff, async (req, res) => {
+router.post('/api/events', auth.staff, async (req, res) => {
   const event = new Event(req.body);
   try {
     await event.save();
@@ -28,7 +28,7 @@ router.post('/events', auth.staff, async (req, res) => {
 });
 
 // Get all events
-router.get('/events', async (req, res, next) => {
+router.get('/api/events', async (req, res, next) => {
   // If request is not from our React API fetch, it's likely a browser refresh, let React Router handle it
   if (req.headers['x-requested-with'] !== 'XMLHttpRequest') {
     return next();
@@ -42,7 +42,7 @@ router.get('/events', async (req, res, next) => {
 });
 
 // Get event by id
-router.get('/events/:id', async (req, res, next) => {
+router.get('/api/events/:id', async (req, res, next) => {
   // If request is not from our React API fetch, let React Router handle it
   if (req.headers['x-requested-with'] !== 'XMLHttpRequest') {
     return next();
@@ -58,7 +58,7 @@ router.get('/events/:id', async (req, res, next) => {
 });
 
 // Update event
-router.patch('/events/:id', auth.staff, async (req, res) => {
+router.patch('/api/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = ['title', 'date', 'description', 'image', 'gallery'];
@@ -78,7 +78,7 @@ router.patch('/events/:id', auth.staff, async (req, res) => {
 });
 
 // Delete event
-router.delete('/events/:id', auth.staff, async (req, res) => {
+router.delete('/api/events/:id', auth.staff, async (req, res) => {
   const _id = req.params.id;
   try {
     const event = await Event.findByIdAndDelete(_id);

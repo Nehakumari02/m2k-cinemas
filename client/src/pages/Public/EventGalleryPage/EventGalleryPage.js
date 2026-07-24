@@ -21,7 +21,7 @@ const EventGalleryPage = ({ match, history }) => {
       setLoading(true);
       setEvent(null);
       try {
-        const res = await fetch(`/events/${eventId}`, {
+        const res = await fetch(`/api/events/${eventId}`, {
           headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
         if (cancelled) return;
